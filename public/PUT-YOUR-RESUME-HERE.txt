@@ -1,0 +1,4 @@
+Drop your resume PDF in this /public folder and name it "resume.pdf".
+The Contact section links to /resume.pdf and expects it here.
+
+You can delete this note file once you've added your actual resume.
