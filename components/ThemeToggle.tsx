@@ -11,7 +11,7 @@ export default function ThemeToggle() {
   }, []);
 
   function toggle() {
-    const next = theme === "dark" ? "light" : "dark";
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     setTheme(next);
     document.documentElement.setAttribute("data-theme", next);
     try {
@@ -25,7 +25,9 @@ export default function ThemeToggle() {
     <button
       onClick={toggle}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-muted transition-colors hover:border-accent hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      type="button"
+      aria-pressed={theme === "dark"}
+      className="glass-control flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted transition-all hover:-translate-y-0.5 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
     >
       <span className="font-mono text-sm">{theme === "dark" ? "☾" : "☀"}</span>
     </button>

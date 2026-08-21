@@ -2,29 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ---- Theme tokens ------------------------------------------------- */
-/* Light is the default (no attribute / data-theme="light").          */
-/* Dark overrides via html[data-theme="dark"].                        */
+/* ===================================================================
+   Theme tokens — Light default / dark via html[data-theme="dark"]
+   =================================================================== */
 
 :root,
 html[data-theme="light"] {
-  --bg: #eef0f2;
-  --surface: #ffffff;
-  --border: #d8dbe0;
-  --text: #14161f;
-  --text-muted: #5b5f6b;
-  --accent: #c9822e;
-  --accent-2: #2e7986;
+  --bg: #eef1f6;
+  --surface: rgba(255, 255, 255, 0.55);
+  --glass-edge: rgba(255, 255, 255, 0.68);
+  --border: rgba(22, 27, 35, 0.10);
+  --text: #16181c;
+  --text-muted: #5c6167;
+  --accent: #2f6bff;
+  --accent-2: #6a7484;
 }
 
 html[data-theme="dark"] {
-  --bg: #12141c;
-  --surface: #1b1e2a;
-  --border: #2a2e3d;
-  --text: #edeae0;
-  --text-muted: #9498aa;
-  --accent: #e3a857;
-  --accent-2: #6fa8b8;
+  --bg: #0c0e13;
+  --surface: rgba(255, 255, 255, 0.06);
+  --glass-edge: rgba(255, 255, 255, 0.15);
+  --border: rgba(255, 255, 255, 0.12);
+  --text: #f2f3f5;
+  --text-muted: #9aa0a8;
+  --accent: #5b96ff;
+  --accent-2: #8a93a0;
 }
 
 html {
@@ -32,10 +34,281 @@ html {
 }
 
 body {
+  background-color: var(--bg);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* ---- Motion --------------------------------------------------------- */
+/* Ambient aurora — two fixed colour fields that sit behind the glass so
+   panels visibly refract them as you scroll. */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+body::before {
+  width: 46rem;
+  height: 46rem;
+  top: -14rem;
+  right: -10rem;
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(96, 160, 255, 0.55),
+    rgba(120, 100, 255, 0.16) 55%,
+    transparent 72%
+  );
+  filter: blur(6px);
+  animation: aurora-drift 26s ease-in-out infinite alternate;
+}
+
+body::after {
+  width: 38rem;
+  height: 38rem;
+  bottom: -12rem;
+  left: -12rem;
+  background: radial-gradient(
+    circle at 60% 40%,
+    rgba(150, 120, 255, 0.42),
+    rgba(90, 200, 255, 0.15) 55%,
+    transparent 70%
+  );
+  filter: blur(8px);
+  animation: aurora-drift 32s ease-in-out -9s infinite alternate-reverse;
+}
+
+html[data-theme="dark"] body::before {
+  opacity: 0.6;
+}
+
+html[data-theme="dark"] body::after {
+  opacity: 0.5;
+}
+
+/* ===================================================================
+   Liquid glass surface
+   =================================================================== */
+
+.liquid-surface {
+  position: relative;
+  border: 1px solid var(--glass-edge);
+  background:
+    radial-gradient(120% 90% at 10% 0%, rgba(255, 255, 255, 0.5), transparent 44%),
+    radial-gradient(130% 120% at 92% 100%, rgba(110, 150, 255, 0.14), transparent 52%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.22));
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.22),
+    0 24px 55px -20px rgba(20, 32, 52, 0.25),
+    0 2px 8px -2px rgba(20, 32, 52, 0.06);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s ease,
+    border-color 0.4s ease;
+}
+
+.liquid-surface:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.26),
+    0 30px 60px -22px rgba(20, 32, 52, 0.32),
+    0 0 0 1px rgba(47, 107, 255, 0.14);
+}
+
+html[data-theme="dark"] .liquid-surface {
+  background:
+    radial-gradient(120% 90% at 10% 0%, rgba(255, 255, 255, 0.12), transparent 42%),
+    radial-gradient(130% 120% at 92% 100%, rgba(90, 140, 255, 0.12), transparent 52%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    0 24px 55px -20px rgba(0, 0, 0, 0.6),
+    0 2px 8px -2px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"] .liquid-surface:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 30px 60px -22px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(91, 150, 255, 0.22);
+}
+
+/* ===================================================================
+   Header
+   =================================================================== */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding: 1rem 0.9rem 0;
+  transition: padding 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 72rem;
+  min-height: 3.5rem;
+  margin: 0 auto;
+  padding: 0.5rem 0.7rem 0.5rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 1.35rem;
+  transition:
+    max-width 500ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 360ms ease,
+    border-color 360ms ease,
+    box-shadow 360ms ease,
+    backdrop-filter 360ms ease;
+}
+
+.site-header.is-compact {
+  padding: 0.75rem 1.1rem 0;
+}
+
+.site-header.is-compact .site-header-inner {
+  max-width: 62rem;
+  border-color: var(--glass-edge);
+  background:
+    radial-gradient(120% 90% at 10% 0%, rgba(255, 255, 255, 0.42), transparent 46%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.28));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 14px 38px rgba(18, 24, 32, 0.14);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+html[data-theme="dark"] .site-header.is-compact .site-header-inner {
+  background:
+    radial-gradient(120% 90% at 10% 0%, rgba(255, 255, 255, 0.1), transparent 46%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 14px 38px rgba(0, 0, 0, 0.5);
+}
+
+.brand-mark,
+.header-actions,
+.desktop-nav {
+  display: flex;
+  align-items: center;
+}
+
+.brand-mark {
+  gap: 0.6rem;
+  color: var(--text);
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.brand-monogram {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border-radius: 0.9rem;
+  background: linear-gradient(145deg, var(--text), color-mix(in srgb, var(--text) 60%, var(--accent)));
+  color: var(--bg);
+  font-size: 0.95rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition:
+    border-radius 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-header.is-compact .brand-monogram {
+  border-radius: 50%;
+  transform: scale(0.9);
+}
+
+.desktop-nav {
+  gap: 1.25rem;
+  font-size: 0.73rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.desktop-nav a {
+  transition: color 180ms ease;
+}
+
+.desktop-nav a:hover {
+  color: var(--text);
+}
+
+.header-actions {
+  gap: 0.65rem;
+}
+
+.glass-control {
+  border: 1px solid var(--glass-edge);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.28));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+}
+
+html[data-theme="dark"] .glass-control {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+/* ===================================================================
+   Liquid card sheen (hero graphic)
+   =================================================================== */
+
+.liquid-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    118deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.22) 48%,
+    transparent 62%
+  );
+  transform: translateX(-120%);
+  animation: glass-sheen 9s ease-in-out 1s infinite;
+  pointer-events: none;
+}
+
+/* ===================================================================
+   Keyframes
+   =================================================================== */
+
+@keyframes aurora-drift {
+  from {
+    transform: translate3d(-1.5rem, -1rem, 0) scale(0.96);
+  }
+  to {
+    transform: translate3d(2rem, 1.5rem, 0) scale(1.05);
+  }
+}
+
+@keyframes glass-sheen {
+  0%,
+  58% {
+    transform: translateX(-120%);
+  }
+  82%,
+  100% {
+    transform: translateX(120%);
+  }
+}
 
 @keyframes blink {
   0%,
@@ -46,10 +319,6 @@ body {
   100% {
     opacity: 0;
   }
-}
-
-.cursor-blink {
-  animation: blink 1s step-end infinite;
 }
 
 @keyframes fadeUp {
@@ -63,22 +332,47 @@ body {
   }
 }
 
-.reveal {
-  opacity: 0;
-  animation: fadeUp 0.7s ease-out forwards;
-}
-
 @keyframes softIn {
   from {
     opacity: 0;
+    transform: translateY(0.3rem) scale(0.985);
   }
   to {
     opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
+/* ===================================================================
+   Motion helpers
+   =================================================================== */
+
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+.reveal {
+  animation: fadeUp 0.7s ease-out both;
+}
+
 .status-swap {
-  animation: softIn 0.35s ease-out;
+  animation: softIn 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Scroll-triggered reveal (see components/Reveal.tsx).
+   Hidden by default, transitions in when Reveal adds .is-visible. */
+.reveal-onscroll {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-onscroll.is-visible {
+  opacity: 1;
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -90,26 +384,56 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  .reveal,
+  .reveal-onscroll {
+    opacity: 1;
+    transform: none;
+  }
+
+  body::before,
+  body::after {
+    animation: none;
+  }
+
+  .liquid-card::after {
+    animation: none;
+  }
 }
 
-/* ---- Small utility: hairline divider that respects theme ----------- */
-.hr-line {
-  border-color: var(--border);
+/* ===================================================================
+   Responsive
+   =================================================================== */
+
+@media (max-width: 767px) {
+  .site-header {
+    padding: 0.65rem 0.65rem 0;
+  }
+
+  .site-header-inner {
+    min-height: 3.25rem;
+    padding: 0.42rem 0.5rem 0.42rem 0.62rem;
+  }
+
+  .brand-name {
+    font-size: 0.78rem;
+  }
+
+  .desktop-nav {
+    display: none;
+  }
 }
 
-/* ---- Scroll-triggered reveal (see components/Reveal.tsx) ----------- */
-.reveal-onscroll {
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+@media (min-width: 768px) and (max-width: 1023px) {
+  .desktop-nav {
+    display: none;
+  }
 }
 
-.reveal-onscroll.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+/* ===================================================================
+   Cascading stagger for grids of cards sharing .stagger
+   =================================================================== */
 
-/* Cascading delay for grids of cards sharing the .stagger parent. */
 .stagger > *:nth-child(1) {
   transition-delay: 0ms;
 }
@@ -129,7 +453,10 @@ body {
   transition-delay: 350ms;
 }
 
-/* ---- Accessible focus states everywhere, not just buttons ---------- */
+/* ===================================================================
+   Accessible focus states
+   =================================================================== */
+
 a:focus-visible,
 button:focus-visible {
   outline: 2px solid var(--accent);
@@ -137,13 +464,13 @@ button:focus-visible {
   border-radius: 2px;
 }
 
-/* ---- Skip link: visually hidden until focused ----------------------- */
 .skip-link {
   position: absolute;
   left: -9999px;
   top: 0;
   z-index: 50;
 }
+
 .skip-link:focus {
   left: 1rem;
   top: 1rem;

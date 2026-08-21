@@ -46,8 +46,8 @@ export const metadata: Metadata = {
 
 export const viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#eef0f2" },
-    { media: "(prefers-color-scheme: dark)", color: "#12141c" },
+    { media: "(prefers-color-scheme: light)", color: "#eef1f6" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c0e13" },
   ],
 };
 
@@ -69,6 +69,7 @@ export default function RootLayout({
             __html: `
               (function () {
                 try {
+                  document.documentElement.classList.add('motion-ready');
                   var stored = localStorage.getItem('theme');
                   var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
                   document.documentElement.setAttribute('data-theme', theme);
@@ -77,6 +78,10 @@ export default function RootLayout({
             `,
           }}
         />
+        {/* Without JS, reveal elements must not stay hidden. */}
+        <noscript>
+          <style>{`.reveal-onscroll{opacity:1 !important;transform:none !important;}`}</style>
+        </noscript>
       </head>
       <body className="bg-bg text-ink font-sans antialiased">
         <a href="#top-content" className="skip-link rounded bg-ink px-4 py-2 font-mono text-sm text-bg">

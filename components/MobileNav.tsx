@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function MobileNav({
   links,
@@ -9,11 +9,21 @@ export default function MobileNav({
 }) {
   const [open, setOpen] = useState(false);
 
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
-    <div className="sm:hidden">
+    <div className="relative lg:hidden">
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
+        aria-controls="mobile-navigation"
         aria-label={open ? "Close menu" : "Open menu"}
         className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-ink transition-colors hover:border-accent hover:text-accent"
       >
@@ -40,6 +50,7 @@ export default function MobileNav({
         <nav
           className="absolute left-0 right-0 top-full border-b border-border bg-bg px-6 py-4 shadow-sm"
           aria-label="Mobile"
+          id="mobile-navigation"
         >
           <ul className="flex flex-col gap-4 font-mono text-sm uppercase tracking-wide text-muted">
             {links.map((link) => (

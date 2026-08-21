@@ -16,7 +16,7 @@ export default function Reveal({
     const el = ref.current;
     if (!el) return;
 
-    // If IntersectionObserver isn't available for some reason, just show it.
+    // No IntersectionObserver? Show immediately rather than stay hidden.
     if (typeof IntersectionObserver === "undefined") {
       setVisible(true);
       return;
@@ -29,7 +29,7 @@ export default function Reveal({
           observer.disconnect();
         }
       },
-      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
     );
 
     observer.observe(el);
@@ -37,7 +37,10 @@ export default function Reveal({
   }, []);
 
   return (
-    <div ref={ref} className={`reveal-onscroll ${visible ? "is-visible" : ""} ${className}`}>
+    <div
+      ref={ref}
+      className={`reveal-onscroll ${visible ? "is-visible" : ""} ${className}`}
+    >
       {children}
     </div>
   );
