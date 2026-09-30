@@ -80,17 +80,27 @@ export const work = {
 
 export const notes = {
   title: "Field notes",
+  scenes: {
+    branchesLabel: "branches",
+    branchesTotal: "83+",
+    triageAlarm: "ransomware?",
+    triageCalm: "a script renaming files",
+    lanes: ["requester", "approver", "audit"],
+  },
   intro: "A few things from the job, told without the parts that should stay inside the bank.",
   items: [
     {
+      scene: "branches",
       title: "A cloud edge for 83+ branches",
       body: "Part of the team that moved web security for more than 83 branches onto a cloud security edge, keeping policy behavior consistent while the network underneath kept changing.",
     },
     {
+      scene: "triage",
       title: "The ransomware that wasn't",
       body: "An alert that looked like a DDoS with ransomware on top. Careful triage showed a crude script renaming files. Contained, then written up so the next analyst starts from evidence instead of panic.",
     },
     {
+      scene: "lanes",
       title: "Making process legible",
       body: "Wrote the SOPs, RACI matrices and swimlane flows for how proxy exceptions are requested and approved, so decisions stop living in one person's head.",
     },

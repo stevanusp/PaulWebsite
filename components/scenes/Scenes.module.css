@@ -1,0 +1,114 @@
+.scene {
+  display: block;
+  width: 100%;
+  max-width: var(--measure);
+  height: auto;
+  overflow: visible;
+  aspect-ratio: 480 / 150;
+}
+
+.base {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.alert {
+  fill: none;
+  stroke-width: 2.25;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.stop {
+  stop-color: var(--alert);
+  stop-opacity: 1;
+}
+
+.stopClear {
+  stop-color: var(--alert);
+  stop-opacity: 0;
+}
+
+.corners,
+.cornersCalm {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: square;
+  vector-effect: non-scaling-stroke;
+}
+
+.corners {
+  stroke: var(--alert);
+}
+
+.cornersCalm {
+  stroke: var(--line-strong);
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.labelAlert {
+  fill: var(--alert-text);
+}
+
+.labelCalm {
+  fill: var(--muted);
+}
+
+.dot {
+  fill: var(--ink);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  fill: var(--muted);
+}
+
+.lane {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.laneLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  fill: var(--muted);
+}
+
+.step {
+  fill: var(--surface);
+  stroke: var(--ink);
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+
+.arrow {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+@media print {
+  .scene {
+    display: none;
+  }
+}

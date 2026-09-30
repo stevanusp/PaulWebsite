@@ -147,8 +147,8 @@ Cost: each scene runs a rAF for about 2.4 s, once. Idle cost afterwards is zero.
 
 Acceptance
 - Scrolling fast past all three does not start them off screen or at the same time.
-- Reduced motion, no JS and print show the final frames correctly, on one A4 page count no
-  worse than today (4 pages).
+- Reduced motion and no JS show the final frames. Print hides the scenes (decoration, the note
+  text already tells the story), so the print length stays at 4 A4 pages.
 - No layout shift (fixed aspect ratio box reserved in CSS).
 
 ---
