@@ -1,0 +1,206 @@
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100svh - var(--nav-h));
+  padding-top: clamp(2.5rem, 9vh, 8rem);
+  padding-bottom: clamp(0.75rem, 2.5vh, 2rem);
+}
+
+.inner {
+  display: grid;
+  /* On tall screens the text block sits centered between the bar and the line. */
+  margin-block: 0 auto;
+}
+
+@media (min-aspect-ratio: 1/1.15) {
+  .inner {
+    margin-block: 0 auto;
+  }
+}
+
+@media (max-aspect-ratio: 1/1.15) and (min-width: 640px) {
+  .inner {
+    margin-block: auto;
+  }
+}
+
+.title {
+  font-size: clamp(3rem, min(1.2rem + 7.2vw, 14.5vh), 7.75rem);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  font-weight: 600;
+  max-width: 11.2em;
+}
+
+.words {
+  display: block;
+}
+
+/* Each word rises out of its own mask. Delays use nth-child, not inline styles,
+   so the page needs no inline style attributes under the CSP. */
+.word {
+  display: inline-block;
+  overflow: clip;
+  vertical-align: top;
+  padding-block: 0.04em 0.16em;
+  margin-block: -0.04em -0.16em;
+}
+
+.wordInner {
+  display: inline-block;
+  animation: rise 1s var(--ease-out) both;
+}
+
+.words > span:nth-child(1) .wordInner {
+  animation-delay: 80ms;
+}
+.words > span:nth-child(2) .wordInner {
+  animation-delay: 135ms;
+}
+.words > span:nth-child(3) .wordInner {
+  animation-delay: 190ms;
+}
+.words > span:nth-child(4) .wordInner {
+  animation-delay: 245ms;
+}
+.words > span:nth-child(5) .wordInner {
+  animation-delay: 300ms;
+}
+.words > span:nth-child(6) .wordInner {
+  animation-delay: 355ms;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(108%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.meta {
+  margin-top: clamp(1.5rem, 4.5vh, 2.75rem);
+  max-width: 44em;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lead {
+  max-width: 33em;
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  letter-spacing: var(--ls-lead);
+  color: var(--muted);
+}
+
+.status {
+  margin-top: var(--s-4);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-top: var(--s-5);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 24px;
+  border-radius: var(--radius-pill);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  transition:
+    background-color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease,
+    transform var(--dur-press) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button:active {
+  transform: scale(0.97);
+}
+
+.primary {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.secondary {
+  background: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+
+.buttonMeta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .primary:hover {
+    background: color-mix(in srgb, var(--ink) 84%, var(--bg));
+  }
+  .secondary:hover {
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+}
+
+.signal {
+  padding-top: clamp(1.25rem, 4.5vh, 3.5rem);
+}
+
+@media (max-width: 639px) {
+  .actions .button {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordInner {
+    animation: fade 0.3s ease both;
+  }
+}
+
+@media print {
+  .hero {
+    min-height: 0;
+    padding-top: 0;
+    padding-bottom: 8pt;
+  }
+  .title {
+    font-size: 30pt;
+  }
+  .meta {
+    margin-top: 10pt;
+  }
+  .wordInner {
+    animation: none;
+  }
+  .actions,
+  .signal {
+    display: none;
+  }
+}

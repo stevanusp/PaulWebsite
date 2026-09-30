@@ -1,0 +1,116 @@
+.section {
+  padding-block: var(--section-y);
+}
+
+.section + .section {
+  padding-top: 0;
+}
+
+.grid {
+  display: grid;
+  gap: var(--s-6);
+}
+
+.title {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  letter-spacing: var(--ls-h2);
+  font-weight: 600;
+}
+
+.body {
+  min-width: 0;
+}
+
+.intro {
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  letter-spacing: var(--ls-lead);
+  color: var(--muted);
+  max-width: 30em;
+  margin-bottom: var(--s-7);
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 24px;
+  }
+  .title {
+    grid-column: 1 / span 4;
+    padding-right: var(--s-5);
+  }
+  .body {
+    grid-column: 5 / -1;
+    padding-top: 0.45em;
+  }
+}
+
+/* Shared row pattern: a hairline, a heading and its text. */
+.rows {
+  list-style: none;
+  padding: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.row {
+  display: grid;
+  gap: var(--s-2) var(--s-5);
+  padding-block: var(--s-6);
+  border-top: 1px solid var(--line);
+}
+
+.rowTitle {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+  letter-spacing: var(--ls-h3);
+  font-weight: 600;
+}
+
+.rowText {
+  color: var(--muted);
+  max-width: var(--measure);
+}
+
+.rowMeta {
+  color: var(--muted);
+  margin-top: var(--s-2);
+}
+
+@media (min-width: 768px) {
+  .row.split {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 5fr);
+  }
+}
+
+.note {
+  margin-top: var(--s-5);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--muted);
+}
+
+@media print {
+  .section {
+    padding-block: 14pt;
+    break-inside: auto;
+  }
+  .grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 12pt;
+  }
+  .title {
+    grid-column: 1 / span 3;
+  }
+  .body {
+    grid-column: 4 / -1;
+    padding-top: 0.2em;
+  }
+  .row {
+    break-inside: avoid;
+    padding-block: 10pt;
+  }
+  .intro {
+    margin-bottom: 12pt;
+  }
+}

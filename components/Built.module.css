@@ -1,0 +1,8 @@
+.text {
+  display: grid;
+  gap: var(--s-3);
+}
+
+.stack {
+  color: var(--muted);
+}

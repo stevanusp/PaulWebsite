@@ -1,0 +1,168 @@
+.instrument {
+  margin-top: var(--s-8);
+}
+
+/* A small piece of hardware: a light body around a dark screen. */
+.panel {
+  padding: clamp(12px, 2vw, 20px);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    0 1px 2px rgba(21, 23, 26, 0.04),
+    0 12px 32px -12px rgba(21, 23, 26, 0.12);
+}
+
+.screen {
+  position: relative;
+  height: 160px;
+  border-radius: calc(var(--radius-panel) - 10px);
+  background: var(--stage-bg);
+  overflow: hidden;
+}
+
+.screenLabel,
+.screenValue {
+  position: absolute;
+  top: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  z-index: 1;
+}
+
+.screenLabel {
+  left: 16px;
+  color: var(--stage-muted);
+}
+
+.screenValue {
+  right: 16px;
+  color: var(--stage-ink);
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.center {
+  stroke: var(--stage-line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.trace {
+  fill: none;
+  stroke: var(--stage-ink);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  transition: stroke 600ms ease;
+}
+
+.screen[data-live="false"] .trace {
+  stroke: var(--stage-faint);
+}
+
+.pads {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(8px, 1.2vw, 12px);
+  margin-top: clamp(8px, 1.2vw, 12px);
+}
+
+.pad {
+  position: relative;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 2px;
+  height: clamp(68px, 9vw, 92px);
+  border: 0;
+  border-radius: var(--radius-pad);
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line);
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 520ms var(--ease-out),
+    color 520ms var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+
+.pad:active {
+  transform: scale(0.97);
+}
+
+/* The hit: instant on, slow decay, like a pad light. */
+.pad[data-hit="true"] {
+  background: var(--ink);
+  color: var(--bg);
+  transition: none;
+}
+
+.padName {
+  font-size: clamp(1.25rem, 1rem + 0.8vw, 1.625rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.padDegree {
+  font-size: 11px;
+  color: inherit;
+  opacity: 0.6;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pad:hover {
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+}
+
+.caption {
+  margin-top: var(--s-4);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--muted);
+}
+
+.keys {
+  display: inline;
+}
+
+/* Touch devices have no number keys to press. */
+@media (hover: none) {
+  .keys {
+    display: none;
+  }
+}
+
+.found {
+  min-height: 1.5em;
+  margin-top: var(--s-1);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  .panel {
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+}
+
+@media print {
+  .instrument {
+    display: none;
+  }
+}

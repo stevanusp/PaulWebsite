@@ -1,0 +1,45 @@
+.list {
+  counter-reset: none;
+}
+
+.item {
+  padding-block: var(--s-5);
+}
+
+.when {
+  color: var(--muted);
+  padding-top: 0.3em;
+}
+
+.what {
+  display: grid;
+  gap: var(--s-1);
+}
+
+.role {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--s-3);
+  font-size: var(--fs-body);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+}
+
+.org {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.noteText {
+  color: var(--muted);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  max-width: var(--measure);
+}
+
+@media (min-width: 768px) {
+  .item {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 6fr);
+  }
+}

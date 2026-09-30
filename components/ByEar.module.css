@@ -1,0 +1,13 @@
+.lead {
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  letter-spacing: var(--ls-lead);
+  color: var(--ink);
+  max-width: 28em;
+}
+
+.body {
+  margin-top: var(--s-5);
+  color: var(--muted);
+  max-width: var(--measure);
+}

@@ -1,0 +1,336 @@
+/* The instrument stage. Dark in both themes.
+   Static by default (no JS, reduced motion, print); pinned and live when scripting is on. */
+.stage {
+  --stage-mode: static;
+  position: relative;
+  background: var(--stage-bg);
+  color: var(--stage-ink);
+}
+
+.sticky {
+  padding-block: var(--section-y);
+}
+
+.top {
+  display: grid;
+  gap: var(--s-7);
+}
+
+.title {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  letter-spacing: var(--ls-h2);
+  font-weight: 600;
+}
+
+.bars {
+  display: none;
+}
+
+.steps {
+  display: grid;
+  gap: var(--s-8);
+  list-style: none;
+  padding: 0;
+}
+
+.step {
+  display: grid;
+  align-content: start;
+  gap: var(--s-4);
+}
+
+.stepTitle {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+  letter-spacing: var(--ls-h3);
+  font-weight: 600;
+}
+
+.stepBody {
+  color: var(--stage-muted);
+  max-width: var(--measure);
+}
+
+.still {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 480 / 150;
+  margin-bottom: var(--s-3);
+  overflow: visible;
+}
+
+.visual {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-6);
+  }
+}
+
+/* SVG parts, shared by the live stage and the still frames */
+.center {
+  stroke: var(--stage-line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.bandFill {
+  fill: var(--stage-ink);
+  fill-opacity: 0.05;
+}
+
+.bandEdge {
+  stroke: var(--stage-faint);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+  vector-effect: non-scaling-stroke;
+}
+
+.base {
+  fill: none;
+  stroke: var(--stage-ink);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.alert {
+  fill: none;
+  stroke-width: 2.25;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.stop {
+  stop-color: var(--stage-alert);
+  stop-opacity: 1;
+}
+
+.stopClear {
+  stop-color: var(--stage-alert);
+  stop-opacity: 0;
+}
+
+.corners {
+  fill: none;
+  stroke: var(--stage-alert);
+  stroke-width: 1.5;
+  stroke-linecap: square;
+  vector-effect: non-scaling-stroke;
+}
+
+.cell {
+  fill: var(--stage-alert);
+  fill-opacity: 0.08;
+  stroke: var(--stage-alert);
+  stroke-opacity: 0.7;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.labelNormal {
+  fill: var(--stage-muted);
+}
+
+.labelAlert {
+  fill: var(--stage-alert);
+}
+
+.labelContained {
+  fill: var(--stage-ink);
+}
+
+/* Live, pinned mode */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .stage {
+    --stage-mode: live;
+    height: 300svh;
+  }
+
+  .sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    padding-top: calc(var(--nav-h) + clamp(1.5rem, 7vh, 5.5rem));
+    padding-bottom: clamp(1rem, 4vh, 2.5rem);
+    overflow: hidden;
+  }
+
+  .top {
+    gap: var(--s-6);
+    align-items: start;
+  }
+
+  .head {
+    display: grid;
+    gap: var(--s-4);
+    align-content: start;
+  }
+
+  .title {
+    font-size: var(--fs-h3);
+    line-height: var(--lh-h3);
+    letter-spacing: var(--ls-h3);
+    font-weight: 500;
+    color: var(--stage-muted);
+  }
+
+  .bars {
+    display: flex;
+    gap: 6px;
+  }
+
+  .bars > span {
+    position: relative;
+    width: 40px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--stage-line);
+    overflow: hidden;
+  }
+
+  .bars i {
+    position: absolute;
+    inset: 0;
+    background: var(--stage-ink);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .step {
+    grid-area: 1 / 1;
+    gap: var(--s-5);
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 420ms var(--ease-out),
+      transform 520ms var(--ease-out);
+  }
+
+  .stage[data-active="0"] .step:nth-child(1),
+  .stage[data-active="1"] .step:nth-child(2),
+  .stage[data-active="2"] .step:nth-child(3) {
+    opacity: 1;
+    transform: none;
+  }
+
+  .stepTitle {
+    font-size: var(--fs-step);
+    line-height: var(--lh-step);
+    letter-spacing: var(--ls-step);
+    max-width: 12em;
+  }
+
+  .stepBody {
+    font-size: var(--fs-lead);
+    line-height: var(--lh-lead);
+    letter-spacing: var(--ls-lead);
+    max-width: 30em;
+  }
+
+  .still {
+    display: none;
+  }
+
+  .visual {
+    display: block;
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 150px;
+    margin-top: clamp(1rem, 4vh, 3rem);
+  }
+
+  .svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  @media (min-width: 1024px) {
+    .top {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 24px;
+    }
+    .head {
+      grid-column: 1 / span 4;
+      padding-top: 0.6em;
+    }
+    .steps {
+      grid-column: 5 / -1;
+    }
+  }
+}
+
+/* Print: a light, static three-panel diagram. */
+@media print {
+  .stage {
+    --stage-bg: #ffffff;
+    --stage-ink: #000000;
+    --stage-muted: #333333;
+    --stage-faint: #999999;
+    --stage-line: #dddddd;
+    --stage-alert: #b45309;
+    height: auto !important;
+    background: #ffffff;
+    color: #000000;
+  }
+  .sticky {
+    position: static !important;
+    height: auto !important;
+    display: block !important;
+    padding-block: 18pt !important;
+    overflow: visible !important;
+  }
+  .visual,
+  .bars {
+    display: none !important;
+  }
+  .still {
+    display: block !important;
+  }
+  .steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 14pt !important;
+  }
+  .step {
+    grid-area: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    gap: 6pt !important;
+    break-inside: avoid;
+  }
+  .title {
+    font-size: var(--fs-h2) !important;
+    color: #000000 !important;
+    font-weight: 600 !important;
+  }
+  .stepTitle {
+    font-size: var(--fs-h3) !important;
+  }
+  .stepBody {
+    font-size: var(--fs-small) !important;
+    line-height: 1.45 !important;
+  }
+}

@@ -1,0 +1,21 @@
+.footer {
+  border-top: 1px solid var(--line);
+}
+
+.inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s-2) var(--s-5);
+  padding-block: var(--s-6) var(--s-7);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--muted);
+}
+
+@media print {
+  .inner {
+    padding-block: 12pt;
+  }
+}
