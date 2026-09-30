@@ -68,9 +68,45 @@
   stroke: var(--stage-faint);
 }
 
+/* Flagged: the detector boxes the scope and the trace turns amber. */
+.corners {
+  fill: none;
+  stroke: var(--stage-alert);
+  stroke-width: 1.5;
+  stroke-linecap: square;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  transform: scale(1.05);
+  transform-origin: center;
+  transform-box: fill-box;
+  transition:
+    opacity 200ms ease,
+    transform 420ms var(--ease-out);
+}
+
+.screen[data-flag="true"] .corners {
+  opacity: 1;
+  transform: none;
+}
+
+.screen[data-flag="true"] .trace {
+  stroke: var(--stage-alert);
+}
+
+.screen[data-flag="true"] .screenValue {
+  color: var(--stage-alert);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .corners,
+  .trace {
+    transition: none;
+  }
+}
+
 .pads {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 0.55fr);
   gap: clamp(8px, 1.2vw, 12px);
   margin-top: clamp(8px, 1.2vw, 12px);
 }
@@ -100,6 +136,33 @@
 
 .pad:active {
   transform: scale(0.97);
+}
+
+/* The odd one out: quiet by default, amber only when it is flagged. */
+.padWrong {
+  background: transparent;
+  box-shadow: none;
+  border: 1px dashed var(--line-strong);
+  color: var(--muted);
+}
+
+.pad.padWrong[data-hit="true"] {
+  background: var(--alert);
+  border-color: var(--alert);
+  color: var(--bg);
+}
+
+@media (max-width: 639px) {
+  .pads {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .padWrong {
+    grid-column: 1 / -1;
+    height: 56px;
+    grid-auto-flow: column;
+    gap: 10px;
+    align-content: center;
+  }
 }
 
 /* The hit: instant on, slow decay, like a pad light. */

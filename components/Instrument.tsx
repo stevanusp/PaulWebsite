@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ear } from "@/content/site";
-import { getEngine, type Engine } from "@/lib/epiano";
+import { cornersPath } from "@/lib/signal";
+import { getEngine, inKey, type Engine } from "@/lib/epiano";
 import styles from "./Instrument.module.css";
 
 // Voicings with smooth voice leading: C, G, Am, F.
@@ -12,6 +13,9 @@ const VOICINGS: readonly (readonly number[])[] = [
   [45, 64, 69, 72],
   [41, 65, 69, 72],
 ];
+// A note outside the key of C: F sharp, a tritone above the tonic.
+const WRONG_NOTE = 66;
+const FLAG_MS = 1700;
 const SPAN = 1024; // samples shown, about 21 ms at 48 kHz
 const H = 160;
 
@@ -20,6 +24,7 @@ export default function Instrument() {
   const screenRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const traceRef = useRef<SVGPathElement>(null);
+  const cornersRef = useRef<SVGPathElement>(null);
   const engineRef = useRef<Engine | null>(null);
   const rafRef = useRef(0);
   const quietRef = useRef(0);
@@ -31,6 +36,8 @@ export default function Instrument() {
 
   const [current, setCurrent] = useState<number | null>(null);
   const [found, setFound] = useState(false);
+  const [wrong, setWrong] = useState(false);
+  const [flagged, setFlagged] = useState(false);
 
   const flat = useCallback(() => {
     const W = widthRef.current;
@@ -117,12 +124,43 @@ export default function Instrument() {
         }, 140);
       }
 
+      setWrong(false);
       const hist = [...historyRef.current, index].slice(-4);
       historyRef.current = hist;
       if (hist.join() === "0,1,2,3") setFound(true);
     },
     [loop],
   );
+
+  const playWrong = useCallback(() => {
+    if (!engineRef.current) engineRef.current = getEngine();
+    // Sounds on top of whatever is ringing, so the clash is audible.
+    engineRef.current.play([WRONG_NOTE], { keep: true });
+    quietRef.current = 0;
+    if (screenRef.current) screenRef.current.dataset.live = "true";
+    if (!rafRef.current) loop();
+
+    const pad = padRefs.current[4];
+    if (pad) {
+      window.clearTimeout(hitTimers.current[4]);
+      pad.dataset.hit = "true";
+      hitTimers.current[4] = window.setTimeout(() => {
+        pad.dataset.hit = "false";
+      }, 140);
+    }
+
+    // The detector is real: it checks the pitch against the key the pads are in.
+    if (!inKey(WRONG_NOTE)) {
+      setWrong(true);
+      setFlagged(true);
+      if (screenRef.current) screenRef.current.dataset.flag = "true";
+      window.clearTimeout(hitTimers.current[5]);
+      hitTimers.current[5] = window.setTimeout(() => {
+        setFlagged(false);
+        if (screenRef.current) screenRef.current.dataset.flag = "false";
+      }, FLAG_MS);
+    }
+  }, [loop]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -133,6 +171,7 @@ export default function Instrument() {
     const measure = () => {
       widthRef.current = Math.max(1, Math.round(screen.clientWidth));
       svg.setAttribute("viewBox", `0 0 ${widthRef.current} ${H}`);
+      cornersRef.current?.setAttribute("d", cornersPath(14, 34, widthRef.current - 14, H - 14, 12));
       if (!rafRef.current) flat();
     };
     measure();
@@ -155,6 +194,9 @@ export default function Instrument() {
       if (n >= 1 && n <= 4) {
         e.preventDefault();
         play(n - 1);
+      } else if (n === 5) {
+        e.preventDefault();
+        playWrong();
       }
     };
     window.addEventListener("keydown", onKey);
@@ -167,21 +209,22 @@ export default function Instrument() {
       cancelAnimationFrame(rafRef.current);
       timers.forEach((t) => window.clearTimeout(t));
     };
-  }, [flat, play]);
+  }, [flat, play, playWrong]);
 
   return (
     <div ref={rootRef} className={styles.instrument}>
       <div className={styles.panel}>
-        <div ref={screenRef} className={styles.screen} data-live="false">
+        <div ref={screenRef} className={styles.screen} data-live="false" data-flag="false">
           <span className={`mono ${styles.screenLabel}`} aria-hidden="true">
             {ear.scopeLabel}
           </span>
           <span className={`mono ${styles.screenValue}`} aria-hidden="true">
-            {current === null ? ear.idleLabel : ear.chords[current].label}
+            {flagged ? ear.wrongLabel : current === null ? ear.idleLabel : ear.chords[current].label}
           </span>
           <svg ref={svgRef} className={styles.svg} viewBox={`0 0 600 ${H}`} preserveAspectRatio="none" aria-hidden="true">
             <line className={styles.center} x1="0" x2="100%" y1={H / 2} y2={H / 2} />
             <path ref={traceRef} className={styles.trace} d={`M0 ${H / 2}L600 ${H / 2}`} />
+            <path ref={cornersRef} className={styles.corners} d="M0 0" />
           </svg>
         </div>
 
@@ -210,6 +253,26 @@ export default function Instrument() {
               <span className="visually-hidden">, play {chord.label}</span>
             </button>
           ))}
+          <button
+            ref={(el) => {
+              padRefs.current[4] = el;
+            }}
+            type="button"
+            className={`${styles.pad} ${styles.padWrong}`}
+            data-hit="false"
+            aria-keyshortcuts="5"
+            onPointerDown={(e) => {
+              if (e.button !== 0) return;
+              playWrong();
+            }}
+            onClick={(e) => {
+              if (e.detail === 0) playWrong();
+            }}
+          >
+            <span className={styles.padName}>{ear.wrongName}</span>{" "}
+            <span className={`mono ${styles.padDegree}`}>{ear.wrongDegree}</span>
+            <span className="visually-hidden">, {ear.wrongPlay}</span>
+          </button>
         </div>
       </div>
 
@@ -218,7 +281,7 @@ export default function Instrument() {
         <span className={styles.keys}>{ear.captionKeys}</span>.
       </p>
       <p className={styles.found} aria-live="polite">
-        {found ? ear.found : ""}
+        {wrong ? ear.wrongLine : found ? ear.found : ""}
       </p>
     </div>
   );

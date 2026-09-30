@@ -6,8 +6,13 @@ type Voice = { out: GainNode; oscs: OscillatorNode[] };
 export type Engine = {
   ctx: AudioContext;
   analyser: AnalyserNode;
-  play: (notes: readonly number[]) => void;
+  /** With `keep`, the chord already ringing is not damped, so the new notes sound on top of it. */
+  play: (notes: readonly number[], opts?: { keep?: boolean }) => void;
 };
+
+// The key the pads live in. A note outside it "doesn't belong".
+const C_MAJOR = new Set([0, 2, 4, 5, 7, 9, 11]);
+export const inKey = (midi: number) => C_MAJOR.has(((midi % 12) + 12) % 12);
 
 let engine: Engine | null = null;
 
@@ -129,12 +134,12 @@ export function getEngine(): Engine {
 
   let held: Voice[] = [];
 
-  const play = (notes: readonly number[]) => {
+  const play = (notes: readonly number[], opts?: { keep?: boolean }) => {
     if (ctx.state !== "running") void ctx.resume();
     const now = ctx.currentTime + 0.005;
 
     // Changing chords lifts the dampers on the previous one.
-    for (const v of held) {
+    for (const v of opts?.keep ? [] : held) {
       v.out.gain.cancelScheduledValues(now);
       v.out.gain.setValueAtTime(v.out.gain.value, now);
       v.out.gain.setTargetAtTime(0.0001, now, 0.09);
@@ -146,7 +151,7 @@ export function getEngine(): Engine {
         }
       }
     }
-    held = [];
+    if (!opts?.keep) held = [];
 
     // Roll the chord slightly, bass first, like a hand does.
     const perNote = 0.17;
