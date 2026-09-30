@@ -112,6 +112,8 @@ export default function Method() {
     let last = 0;
     let t = 0;
     let lastActive = -1;
+    let top = 0; // section top in page coordinates, refreshed in measure()
+    let span = 0;
 
     const setLabel = (el: SVGTextElement, l: StageFrame["normalLabel"]) => {
       el.setAttribute("x", l.x.toFixed(1));
@@ -119,11 +121,7 @@ export default function Method() {
       el.style.opacity = l.opacity.toFixed(3);
     };
 
-    const progress = () => {
-      const r = section.getBoundingClientRect();
-      const span = r.height - window.innerHeight;
-      return span > 0 ? clamp(-r.top / span) : 0;
-    };
+    const progress = () => (span > 0 ? clamp((window.scrollY - top) / span) : 0);
 
     const draw = () => {
       const p = progress();
@@ -203,12 +201,16 @@ export default function Method() {
         inset = Math.max(16, Math.round(left));
       }
       svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+      top = section.getBoundingClientRect().top + window.scrollY;
+      span = section.offsetHeight - window.innerHeight;
       if (isLive()) draw();
       sync();
     };
 
     const ro = new ResizeObserver(measure);
     ro.observe(visual);
+    // Content above can change height (font swap, wrapping), which moves the section.
+    ro.observe(document.body);
     const io = new IntersectionObserver(
       (entries) => {
         inView = entries[0]?.isIntersecting ?? false;

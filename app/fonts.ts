@@ -18,6 +18,7 @@ export const plexMono = localFont({
     { path: "./fonts/IBMPlexMono-Medium.woff2", weight: "500", style: "normal" },
   ],
   display: "swap",
+  preload: false,
   variable: "--font-plex-mono",
   adjustFontFallback: false,
   fallback: ["ui-monospace", "Menlo", "monospace"],

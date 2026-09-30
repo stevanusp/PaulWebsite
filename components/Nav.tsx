@@ -15,9 +15,10 @@ export default function Nav() {
 
     const update = () => {
       ticking = false;
-      header.dataset.scrolled = window.scrollY > 8 ? "true" : "false";
 
+      // Read everything first, then write, so the browser lays out once per frame.
       // Switch to a dark material while the dark instrument stage sits under the bar.
+      const scrolled = window.scrollY > 8;
       const probe = header.offsetHeight / 2;
       const stage = document.getElementById("method");
       let dark = false;
@@ -25,7 +26,6 @@ export default function Nav() {
         const r = stage.getBoundingClientRect();
         dark = r.top <= probe && r.bottom >= probe;
       }
-      header.dataset.tone = dark ? "dark" : "light";
 
       const line = window.innerHeight * 0.4;
       let current = "";
@@ -35,6 +35,9 @@ export default function Nav() {
         const r = el.getBoundingClientRect();
         if (r.top <= line && r.bottom > line) current = item.id;
       }
+
+      header.dataset.scrolled = scrolled ? "true" : "false";
+      header.dataset.tone = dark ? "dark" : "light";
       setActive(current);
     };
 

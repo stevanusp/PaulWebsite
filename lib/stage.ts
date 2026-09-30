@@ -4,7 +4,6 @@
 import {
   NORMAL_BOUND,
   burst,
-  clamp,
   cornersPath,
   easeInOutCubic,
   limit,
@@ -144,4 +143,3 @@ export function stageFrame(
 export const STILL_P = [0.3, 0.6, 0.97] as const;
 export const STILL_T = 0.9;
 
-export const clampP = (v: number) => clamp(v, 0, 1);

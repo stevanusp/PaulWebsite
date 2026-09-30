@@ -227,7 +227,6 @@ export default function HeroSignal({ label, description }: Props) {
         type="button"
         className={styles.pause}
         onClick={toggle}
-        aria-pressed={paused}
         aria-label={paused ? "Play the signal animation" : "Pause the signal animation"}
       >
         <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true" focusable="false">
