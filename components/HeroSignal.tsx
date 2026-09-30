@@ -7,6 +7,7 @@ import {
   HERO_SPOTS,
   burst,
   burstEnvelope,
+  clamp,
   cornersPath,
   easeOutCubic,
   heroStaticPath,
@@ -24,9 +25,12 @@ const SSR_W = 2560;
 const SSR_H = 160;
 const SSR_PATH = heroStaticPath(SSR_W, SSR_H);
 
-type Props = { label: string; description: string };
+type Props = { label: string; description: string; hint: string };
 
-export default function HeroSignal({ label, description }: Props) {
+// A poke is ignored for this long after the previous one started.
+const POKE_COOLDOWN = 1.2;
+
+export default function HeroSignal({ label, description, hint }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const baseRef = useRef<SVGPathElement>(null);
@@ -38,6 +42,7 @@ export default function HeroSignal({ label, description }: Props) {
   const pausedRef = useRef(false);
   const syncRef = useRef<() => void>(() => {});
   const [paused, setPaused] = useState(false);
+  const [hinted, setHinted] = useState(true);
 
   const toggle = () => {
     pausedRef.current = !pausedRef.current;
@@ -64,11 +69,16 @@ export default function HeroSignal({ label, description }: Props) {
     let visible = true;
     let last = 0;
     let clock = 0;
+    // A poke replaces the scheduled burst. After it, the schedule restarts from `epoch`.
+    let manual: { cx: number; t0: number } | null = null;
+    let epoch = 0;
+    let lastPoke = -Infinity;
+    const sigmaFor = () => (W < 640 ? 13 : 19);
 
     const render = (t: number, cx: number, E: number, flag: number, lock: number) => {
       const mid = H / 2;
       const h = H / 2;
-      const sigma = W < 640 ? 13 : 19;
+      const sigma = sigmaFor();
       const amp = HERO_AMP * h;
       const reach = reachFor(amp, h, 3);
       // A soft limiter keeps every excursion inside the detection box.
@@ -114,21 +124,58 @@ export default function HeroSignal({ label, description }: Props) {
       }
     };
 
-    const frame = (t: number) => {
-      const since = t - BURST.firstAt;
-      if (since < 0) {
-        render(t, W * HERO_SPOTS[0], 0, 0, 0);
-        return;
-      }
-      const n = Math.floor(since / BURST.period);
-      const tau = since - n * BURST.period;
-      const cx = W * HERO_SPOTS[n % HERO_SPOTS.length];
+    const paint = (t: number, cx: number, tau: number) => {
       const E = burstEnvelope(tau);
       const flagIn = smoothstep(BURST.flagStart, BURST.flagStart + 0.12, tau);
       const flagOut = 1 - smoothstep(BURST.flagEnd - 0.45, BURST.flagEnd, tau);
       const lock = easeOutCubic((tau - BURST.flagStart) / 0.34);
       render(t, cx, E, flagIn * flagOut, lock);
     };
+
+    const frame = (t: number) => {
+      if (manual) {
+        const tau = t - manual.t0;
+        if (tau <= BURST.flagEnd) {
+          paint(t, manual.cx, tau);
+          return;
+        }
+        manual = null;
+        epoch = t;
+      }
+      const since = t - epoch - BURST.firstAt;
+      if (since < 0) {
+        render(t, W * HERO_SPOTS[0], 0, 0, 0);
+        return;
+      }
+      const n = Math.floor(since / BURST.period);
+      paint(t, W * HERO_SPOTS[n % HERO_SPOTS.length], since - n * BURST.period);
+    };
+
+    // Tap or click the line to make an anomaly right there. A drag is a scroll, not a poke.
+    let down: { x: number; y: number; at: number } | null = null;
+    const onDown = (e: PointerEvent) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      down = { x: e.clientX, y: e.clientY, at: performance.now() };
+    };
+    const onUp = (e: PointerEvent) => {
+      const d = down;
+      down = null;
+      if (!d || !running || reduce.matches || pausedRef.current) return;
+      if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 8 || performance.now() - d.at > 350) return;
+      if (clock - lastPoke < POKE_COOLDOWN) return;
+      // Keep the whole detection box inside the viewport.
+      const margin = 2.4 * sigmaFor() + 9;
+      const x = e.clientX - svg.getBoundingClientRect().left;
+      manual = { cx: clamp(x, margin, Math.max(margin, W - margin)), t0: clock };
+      lastPoke = clock;
+      setHinted(false);
+    };
+    const onCancel = () => {
+      down = null;
+    };
+    svg.addEventListener("pointerdown", onDown);
+    svg.addEventListener("pointerup", onUp);
+    svg.addEventListener("pointercancel", onCancel);
 
     // Reduced motion: one still frame that still tells the story.
     const renderStill = () => render(0.62, W * HERO_SPOTS[0], 1, 1, 1);
@@ -193,6 +240,9 @@ export default function HeroSignal({ label, description }: Props) {
       io.disconnect();
       document.removeEventListener("visibilitychange", sync);
       reduce.removeEventListener("change", sync);
+      svg.removeEventListener("pointerdown", onDown);
+      svg.removeEventListener("pointerup", onUp);
+      svg.removeEventListener("pointercancel", onCancel);
     };
   }, []);
 
@@ -223,6 +273,11 @@ export default function HeroSignal({ label, description }: Props) {
           {label}
         </text>
       </svg>
+      {hinted ? (
+        <span className={styles.hint} aria-hidden="true">
+          {hint}
+        </span>
+      ) : null}
       <button
         type="button"
         className={styles.pause}

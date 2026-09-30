@@ -36,7 +36,7 @@ export default function Hero() {
       </div>
 
       <div className={styles.signal}>
-        <HeroSignal label={hero.signalLabel} description={hero.signalDescription} />
+        <HeroSignal label={hero.signalLabel} description={hero.signalDescription} hint={hero.signalHint} />
       </div>
     </section>
   );
