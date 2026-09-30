@@ -83,12 +83,6 @@
   }
 }
 
-.note {
-  margin-top: var(--s-5);
-  font-size: var(--fs-small);
-  line-height: var(--lh-small);
-  color: var(--muted);
-}
 
 @media print {
   .section {

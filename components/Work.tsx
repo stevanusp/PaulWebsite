@@ -12,7 +12,6 @@ export default function Work() {
           </li>
         ))}
       </ul>
-      <p className={s.note}>{work.note}</p>
     </Section>
   );
 }

@@ -14,7 +14,7 @@ export const site = {
 
 export const nav = [
   { id: "work", label: "Work" },
-  { id: "notes", label: "Notes" },
+  { id: "notes", label: "Field notes" },
   { id: "built", label: "Built" },
   { id: "path", label: "Path" },
   { id: "contact", label: "Contact" },
@@ -75,7 +75,6 @@ export const work = {
       body: "Tuning intrusion prevention against real traffic instead of vendor defaults, and inspecting what leaves, including traffic headed to AI tools.",
     },
   ],
-  note: "CompTIA Security+. Working toward CySA+.",
 } as const;
 
 export const notes = {
@@ -85,24 +84,20 @@ export const notes = {
     {
       title: "A cloud edge for 83+ branches",
       body: "Part of the team that moved web security for more than 83 branches onto a cloud security edge, keeping policy behavior consistent while the network underneath kept changing.",
-      outcome: "Same rules, new edge, no surprise outages.",
     },
     {
       title: "The ransomware that wasn't",
       body: "An alert that looked like a DDoS with ransomware on top. Careful triage showed a crude script renaming files. Contained, then written up so the next analyst starts from evidence instead of panic.",
-      outcome: "Calm first, then conclusions.",
     },
     {
       title: "Making process legible",
       body: "Wrote the SOPs, RACI matrices and swimlane flows for how proxy exceptions are requested and approved, so decisions stop living in one person's head.",
-      outcome: "Faster approvals, easier audits.",
     },
   ],
 } as const;
 
 export const built = {
   title: "Built after hours",
-  intro: "Side projects, mostly to understand something by making it.",
   items: [
     {
       title: "Hermes",
@@ -121,8 +116,8 @@ export const built = {
     },
     {
       title: "Respawn",
-      body: "A small resale business for secondhand electronics. My first startup, a furniture company, closed. This one runs on unit economics I can explain on one page.",
-      stack: "side business, jakarta",
+      body: "A small resale business for secondhand electronics, run on unit economics I can explain on one page.",
+      stack: "",
     },
   ],
 } as const;
@@ -176,7 +171,7 @@ export const ear = {
   caption: "The four chords a lot of pop songs are built on. Tap a pad",
   captionKeys: ", or press 1 to 4",
   scopeLabel: "scope",
-  idleLabel: "no input",
+  idleLabel: "tap a pad",
   found: "You found it: I, V, vi, IV.",
   chords: [
     { name: "C", degree: "I", label: "C major" },
