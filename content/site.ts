@@ -140,6 +140,8 @@ export const work = {
       body: "Tuning intrusion prevention against real traffic instead of vendor defaults, and inspecting what leaves, including traffic headed to AI tools.",
     },
   ],
+  description:
+    "An illustration: a piano keyboard whose keys go down in a wave, then stand up into the outline of a cloud and close into one shape, while the black keys gather into a padlock at its center and it locks.",
 } as const;
 
 export const notes = {
@@ -241,6 +243,7 @@ export const ear = {
   },
   tryLabel: "Or play it yourself",
   caption: "My favorite loop, in the song's key. Play the chords, then the lone G after them. Tap a pad",
+  fact: "Fun fact: it's the Just the Two of Us progression with one passing chord. In Japan it's called marusa, and YOASOBI's Yoru ni Kakeru uses it in the chorus.",
   captionKeys: ", or press 1 to 7",
   idleLabel: "Tap a pad",
   found: "That's the whole loop. B7 leads it back to Emaj7.",

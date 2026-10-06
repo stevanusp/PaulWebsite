@@ -1,0 +1,159 @@
+/* "What I work on": three tiles beside a picture of a piano that becomes a cloud with a lock.
+   Static by default (no JS, reduced motion, print): a piano and a cloud side by side over the
+   tiles. With script and motion welcome, the picture holds still while the tiles scroll past
+   it, and the scroll position drives the change. JS reads --work-mode and follows. */
+.scrolly {
+  --work-mode: static;
+  display: grid;
+  gap: var(--s-6);
+}
+
+.stage {
+  min-width: 0;
+}
+
+.live {
+  display: none;
+}
+
+.stills {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.items {
+  display: grid;
+  gap: 16px;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 760px) {
+  .items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1040px) {
+  .items {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .scrolly {
+    --work-mode: live;
+    gap: 0;
+  }
+
+  .live {
+    display: block;
+  }
+
+  .stills {
+    display: none;
+  }
+
+  /* Phones: the picture sticks to the top, under the nav, and the tiles pass beneath it. Its
+     background runs up behind the nav so nothing shows between the two. */
+  .stage {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: calc(var(--nav-h) + var(--s-3)) 0 var(--s-5);
+    background: var(--bg);
+  }
+
+  .stage::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: var(--s-6);
+    background: linear-gradient(var(--bg), transparent);
+    pointer-events: none;
+  }
+
+  .items {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36svh;
+    padding-block: 12svh 34svh;
+  }
+
+  /* The tile being read is at full strength; the others wait a step back. */
+  .item {
+    opacity: 0.4;
+    transition: opacity 320ms ease;
+  }
+
+  .item[data-active="true"] {
+    opacity: 1;
+  }
+
+  @media (min-width: 900px) {
+    .scrolly {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      column-gap: clamp(2rem, 4vw, 4rem);
+      align-items: start;
+    }
+
+    .stage {
+      top: 0;
+      display: flex;
+      align-items: center;
+      height: 100svh;
+      padding: var(--nav-h) 0 var(--s-5);
+      background: none;
+    }
+
+    .stage::after {
+      content: none;
+    }
+
+    .live {
+      width: 100%;
+    }
+
+    .items {
+      gap: 30svh;
+      padding-block: 30svh;
+    }
+  }
+}
+
+/* The piano keeps its real colors in both themes; the cloud and lock follow the theme. */
+.tray {
+  fill: #1c1c1f;
+}
+
+.white {
+  fill: #f7f7f5;
+  stroke: #c9cacd;
+  stroke-width: 1;
+}
+
+.black {
+  fill: #141416;
+}
+
+.ink {
+  fill: var(--ink);
+}
+
+.cut {
+  fill: var(--bg);
+}
+
+.shackle {
+  fill: none;
+  stroke: var(--bg);
+  stroke-linecap: round;
+}

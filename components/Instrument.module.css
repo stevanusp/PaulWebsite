@@ -234,6 +234,13 @@
   display: inline;
 }
 
+.fact {
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--muted);
+  max-width: 44em;
+}
+
 /* Touch devices have no number keys to press. */
 @media (hover: none) {
   .shortcuts {

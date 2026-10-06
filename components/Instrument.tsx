@@ -211,6 +211,7 @@ export default function Instrument() {
           {ear.caption}
           <span className={styles.shortcuts}>{ear.captionKeys}</span>.
         </p>
+        <p className={styles.fact}>{ear.fact}</p>
         <p className={styles.found} aria-live="polite">
           {heard === "outside" ? ear.note.outsideLine : heard === "belongs" ? ear.note.belongsLine : found ? ear.found : ""}
         </p>
