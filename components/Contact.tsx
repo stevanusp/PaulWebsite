@@ -14,36 +14,38 @@ export default function Contact() {
   return (
     <section id="contact" className={styles.contact} aria-labelledby="contact-title">
       <div className="container">
-        <h2 id="contact-title" className={styles.title} data-rail="">
-          {contact.title}
-        </h2>
-        <p className={styles.line}>{contact.line}</p>
-        <div className={styles.emailRow}>
-          <a className={styles.email} href={`mailto:${site.email}`}>
-            {site.email}
-          </a>
-          <CopyEmail email={site.email} copy={contact.copy} copied={contact.copied} />
+        <div className={`tile ${styles.panel}`}>
+          <h2 id="contact-title" className={`sheen ${styles.title}`}>
+            {contact.title}
+          </h2>
+          <p className={styles.line}>{contact.line}</p>
+          <div className={styles.emailRow}>
+            <a className={styles.email} href={`mailto:${site.email}`}>
+              {site.email}
+            </a>
+            <CopyEmail email={site.email} copy={contact.copy} copied={contact.copied} />
+          </div>
+          <ul className={styles.links}>
+            <li>
+              <a
+                className="pill pill-quiet"
+                href={site.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-print-url={site.linkedin}
+              >
+                {contact.linkedin}
+                <External />
+                <span className="visually-hidden"> (opens in a new tab)</span>
+              </a>
+            </li>
+            <li>
+              <a className="pill pill-quiet" href={site.resume} download>
+                {contact.resume}
+              </a>
+            </li>
+          </ul>
         </div>
-        <ul className={styles.links}>
-          <li>
-            <a
-              className="link"
-              href={site.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-print-url={site.linkedin}
-            >
-              {contact.linkedin}
-              <External />
-              <span className="visually-hidden"> (opens in a new tab)</span>
-            </a>
-          </li>
-          <li>
-            <a className="link" href={site.resume} download>
-              {contact.resume}
-            </a>
-          </li>
-        </ul>
       </div>
     </section>
   );

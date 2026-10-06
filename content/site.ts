@@ -21,6 +21,11 @@ export const nav = [
   { id: "contact", label: "Contact" },
 ] as const;
 
+export const ui = {
+  toLight: "Switch to light mode",
+  toDark: "Switch to dark mode",
+} as const;
+
 export const hero = {
   title: "I listen for what doesn't belong.",
   words: ["I", "listen", "for", "what", "doesn't", "belong."],
@@ -30,11 +35,12 @@ export const hero = {
   primary: "Email me",
   secondary: "Résumé",
   secondaryMeta: "PDF",
-  signalLabel: "anomaly",
-  signalHint: "poke the line",
-  hud: { live: "listening", flagged: "flagged" },
-  signalDescription:
-    "A live signal line. Every few seconds a burst breaks the pattern and is flagged as an anomaly.",
+  photo: {
+    src: "/media/paulus-at-the-keys.jpg",
+    width: 360,
+    height: 540,
+    alt: "Stevanus playing a keyboard at a live event, beside a singer at the microphone.",
+  },
 } as const;
 
 export type Step = { title: string; body: string };
@@ -55,9 +61,6 @@ export const method = {
       body: "Contain what's wrong and keep everyone else working. Then explain the decision in plain words, so it can be audited and maintained.",
     },
   ] satisfies Step[],
-  labels: { normal: "normal", anomaly: "doesn't belong", contained: "contained" },
-  description:
-    "A signal line in three states: a band marking the normal range, a burst breaking out of it, and the burst boxed in and contained while the rest of the line keeps moving.",
 } as const;
 
 export const work = {
@@ -82,20 +85,13 @@ export const work = {
 
 export const notes = {
   title: "Field notes",
-  scenes: {
-    branchesLabel: "branches",
-    branchesTotal: "83+",
-    lanes: ["requester", "approver", "audit"],
-  },
   intro: "A few things from the job, told without the parts that should stay inside the bank.",
   items: [
     {
-      scene: "branches",
       title: "A cloud edge for 83+ branches",
       body: "Part of the team that moved web security for more than 83 branches onto a cloud security edge, keeping policy behavior consistent while the network underneath kept changing.",
     },
     {
-      scene: "lanes",
       title: "Making process legible",
       body: "Wrote the SOPs, RACI matrices and swimlane flows for how proxy exceptions are requested and approved, so decisions stop living in one person's head.",
     },
@@ -130,6 +126,7 @@ export const built = {
 
 export const path = {
   title: "Path",
+  now: "Now",
   items: [
     {
       when: "2023 to now",
@@ -174,12 +171,6 @@ export const ear = {
   title: "By ear",
   lead: "I play piano without sheet music. I hear a chord, find it, then look for the next one.",
   body: "It's the same habit I bring to traffic: learn what normal sounds like, and the wrong note announces itself. Away from the keys I'm an audiophile, which mostly means strong opinions about DACs, amplifiers, and the difference between a clean signal and a loud one.",
-  photo: {
-    src: "/media/paulus-at-the-keys.jpg",
-    width: 360,
-    height: 540,
-    alt: "Stevanus playing a keyboard at a live event, beside a singer at the microphone.",
-  },
   song: {
     title: "It's been a while",
     note: "A song I wrote.",
@@ -192,8 +183,7 @@ export const ear = {
   tryLabel: "Or play it yourself",
   caption: "The four chords a lot of pop songs are built on. Tap a pad",
   captionKeys: ", or press 1 to 5",
-  scopeLabel: "scope",
-  idleLabel: "tap a pad",
+  idleLabel: "Tap a pad",
   found: "You found it: I, V, vi, IV.",
   wrongName: "F#",
   wrongDegree: "?",

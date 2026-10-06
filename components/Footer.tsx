@@ -6,7 +6,7 @@ export default function Footer() {
     <footer className={styles.footer}>
       <div className={`container ${styles.inner}`}>
         <p>{footer.left}</p>
-        <p className="mono">{footer.right}</p>
+        <p>{footer.right}</p>
       </div>
     </footer>
   );

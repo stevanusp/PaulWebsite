@@ -14,7 +14,7 @@ export default function Section({ id, title, intro, children, className }: Props
     <section id={id} className={`${styles.section} ${className ?? ""}`} aria-labelledby={`${id}-title`}>
       <div className="container">
         <div className={styles.head}>
-          <h2 id={`${id}-title`} className={styles.title} data-rail="">
+          <h2 id={`${id}-title`} className={styles.title}>
             {title}
           </h2>
           {intro ? <Lit className={styles.intro} text={intro} /> : null}

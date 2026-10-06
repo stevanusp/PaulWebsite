@@ -1,125 +1,33 @@
 .instrument {
-  margin-top: var(--s-5);
+  display: grid;
+  gap: var(--s-4);
 }
 
-/* A small piece of hardware: a raised body around a deep screen with a graticule. */
-.panel {
-  padding: clamp(10px, 1.6vw, 16px);
-  border-radius: var(--radius-panel);
-  background: var(--surface);
-  box-shadow: inset 0 0 0 1px var(--line);
+/* What is playing, said plainly. Amber only when the note does not belong. */
+.status {
+  min-height: 1.5em;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--muted);
+  transition: color var(--dur-base) ease;
 }
 
-.screen {
-  position: relative;
-  height: clamp(150px, 20vw, 200px);
-  border-radius: calc(var(--radius-panel) - 12px);
-  background-color: var(--stage-bg);
-  background-image:
-    linear-gradient(color-mix(in srgb, var(--stage-line) 60%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--stage-line) 60%, transparent) 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-position: center;
-  overflow: hidden;
-}
-
-.screenLabel,
-.screenValue {
-  position: absolute;
-  top: 12px;
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 0;
-  z-index: 1;
-}
-
-.screenLabel {
-  left: 16px;
-  color: var(--stage-muted);
-}
-
-.screenValue {
-  right: 16px;
-  color: var(--stage-ink);
-}
-
-.svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.center {
-  stroke: var(--stage-line);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-}
-
-.trace {
-  fill: none;
-  stroke: var(--stage-signal);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-  transition: stroke 600ms ease;
-}
-
-.screen[data-live="false"] .trace {
-  stroke: var(--stage-faint);
-}
-
-/* Flagged: the detector boxes the scope and the trace turns amber. */
-.corners {
-  fill: none;
-  stroke: var(--stage-alert);
-  stroke-width: 1.5;
-  stroke-linecap: square;
-  vector-effect: non-scaling-stroke;
-  opacity: 0;
-  transform: scale(1.05);
-  transform-origin: center;
-  transform-box: fill-box;
-  transition:
-    opacity 200ms ease,
-    transform 420ms var(--ease-out);
-}
-
-.screen[data-flag="true"] .corners {
-  opacity: 1;
-  transform: none;
-}
-
-.screen[data-flag="true"] .trace {
-  stroke: var(--stage-alert);
-}
-
-.screen[data-flag="true"] .screenValue {
-  color: var(--stage-alert);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .corners,
-  .trace {
-    transition: none;
-  }
+.status[data-flag="true"] {
+  color: var(--alert);
 }
 
 .pads {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 0.55fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 0.6fr);
   gap: clamp(8px, 1.2vw, 12px);
-  margin-top: clamp(8px, 1.2vw, 12px);
 }
 
 .pad {
-  position: relative;
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 2px;
-  height: clamp(68px, 9vw, 92px);
+  gap: 4px;
+  height: clamp(76px, 10vw, 104px);
   border: 0;
   border-radius: var(--radius-pad);
   background: var(--bg);
@@ -140,18 +48,42 @@
   transform: scale(0.97);
 }
 
-/* The odd one out: quiet by default, amber only when it is flagged. */
+/* The hit: instant on, slow decay, like a pad light. */
+.pad[data-hit="true"] {
+  background: var(--ink);
+  color: var(--bg);
+  transition: none;
+}
+
+/* The odd one out: quiet by default, amber only when it is played. */
 .padWrong {
   background: transparent;
-  box-shadow: none;
-  border: 1px dashed var(--line-strong);
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
   color: var(--muted);
 }
 
 .pad.padWrong[data-hit="true"] {
   background: var(--alert);
-  border-color: var(--alert);
   color: var(--bg);
+}
+
+.padName {
+  font-size: clamp(1.25rem, 1rem + 0.8vw, 1.625rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.padDegree {
+  font-size: var(--fs-tiny);
+  font-weight: 500;
+  opacity: 0.6;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pad:hover {
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
 }
 
 @media (max-width: 639px) {
@@ -167,34 +99,7 @@
   }
 }
 
-/* The hit: instant on, slow decay, like a pad light. */
-.pad[data-hit="true"] {
-  background: var(--ink);
-  color: var(--bg);
-  transition: none;
-}
-
-.padName {
-  font-size: clamp(1.25rem, 1rem + 0.8vw, 1.625rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-
-.padDegree {
-  font-size: 11px;
-  color: inherit;
-  opacity: 0.6;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .pad:hover {
-    box-shadow: inset 0 0 0 1px var(--line-strong);
-  }
-}
-
 .caption {
-  margin-top: var(--s-4);
   font-size: var(--fs-small);
   line-height: var(--lh-small);
   color: var(--muted);
@@ -213,11 +118,9 @@
 
 .found {
   min-height: 1.5em;
-  margin-top: var(--s-1);
   font-size: var(--fs-small);
   line-height: var(--lh-small);
   font-weight: 500;
-  color: var(--ink);
 }
 
 @media print {

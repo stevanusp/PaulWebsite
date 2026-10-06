@@ -1,79 +1,74 @@
+.list {
+  list-style: none;
+  padding-block: var(--s-3);
+}
+
 .item {
-  padding-block: clamp(1.25rem, 1rem + 0.8vw, 1.75rem);
+  display: grid;
+  gap: var(--s-2) 24px;
+  padding-block: var(--s-5);
+}
+
+.item + .item {
+  border-top: 1px solid var(--line);
 }
 
 .when {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: var(--muted);
-  padding-top: 0.25em;
-  font-variant-numeric: tabular-nums;
+  gap: var(--s-3);
+  padding-top: 0.2em;
 }
 
-/* Only the present is live. */
-.item:first-child .when {
-  color: var(--signal);
-}
-
-.item:first-child .when::before {
-  content: "";
-  flex: none;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--signal);
-  box-shadow: 0 0 0 3px var(--signal-glow);
+.now {
+  display: inline-grid;
+  place-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .what {
   display: grid;
-  gap: var(--s-2);
+  gap: var(--s-1);
 }
 
 .role {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  column-gap: var(--s-4);
-  font-size: var(--fs-h3);
-  line-height: var(--lh-h3);
-  letter-spacing: var(--ls-h3);
-  font-weight: 600;
+  column-gap: var(--s-3);
+  font-size: 1.125rem;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
 }
 
 .org {
-  font-family: var(--font-sans);
-  font-size: var(--fs-body);
   font-weight: 400;
-  letter-spacing: -0.005em;
   color: var(--muted);
 }
 
-.noteText {
+.note {
   color: var(--muted);
   font-size: var(--fs-small);
   line-height: var(--lh-small);
   max-width: var(--measure);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 760px) {
   .item {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-  }
-  .when {
-    grid-column: 1 / span 4;
-  }
-  .what {
-    grid-column: 5 / -1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
   }
 }
 
 @media print {
-  .item:first-child .when {
+  .now {
+    background: none;
     color: inherit;
-  }
-  .item:first-child .when::before {
-    display: none;
+    padding: 0;
   }
 }

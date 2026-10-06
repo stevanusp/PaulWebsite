@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { SONG_PEAKS } from "@/content/song";
 import styles from "./SongPlayer.module.css";
 
 type Props = {
@@ -14,42 +13,31 @@ type Props = {
   seek: string;
 };
 
-const BAR_W = 3;
-const GAP = 2;
-const VIEW_W = SONG_PEAKS.length * (BAR_W + GAP) - GAP;
-const VIEW_H = 56;
-
 const clock = (s: number) => {
   const t = Math.max(0, Math.floor(s));
   return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
 };
 
-// The waveform is drawn once on the server. Playback only moves one clip rectangle,
-// so the bars that have played turn green without re-rendering anything.
-const BARS = SONG_PEAKS.map((p, i) => {
-  const h = Math.max(3, (p / 100) * VIEW_H);
-  return <rect key={i} x={i * (BAR_W + GAP)} y={(VIEW_H - h) / 2} width={BAR_W} height={h} rx={1.5} />;
-});
-
+// A classic player: one round button, a title, and a rounded progress bar you can drag.
 export default function SongPlayer({ title, note, src, seconds, play, pause, seek }: Props) {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const clipRef = useRef<SVGRectElement>(null);
-  const waveRef = useRef<HTMLDivElement>(null);
+  const rangeRef = useRef<HTMLInputElement>(null);
   const [playing, setPlaying] = useState(false);
   const [now, setNow] = useState(0);
   const [total, setTotal] = useState(seconds);
 
   useEffect(() => {
     const audio = audioRef.current;
-    const clip = clipRef.current;
-    if (!audio || !clip) return;
+    const range = rangeRef.current;
+    if (!audio || !range) return;
     let raf = 0;
     let shown = -1;
 
+    // The fill is a custom property set through the CSSOM, which the CSP allows.
     const paint = () => {
       const d = audio.duration || seconds;
-      const p = Math.min(1, audio.currentTime / d);
-      clip.setAttribute("width", (p * VIEW_W).toFixed(1));
+      range.style.setProperty("--p", `${Math.min(100, (audio.currentTime / d) * 100).toFixed(2)}%`);
+      range.value = String(audio.currentTime);
       const whole = Math.floor(audio.currentTime);
       if (whole !== shown) {
         shown = whole;
@@ -102,55 +90,17 @@ export default function SongPlayer({ title, note, src, seconds, play, pause, see
     else audio.pause();
   };
 
-  const seekTo = (t: number) => {
+  const onSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const audio = audioRef.current;
     if (!audio) return;
-    const d = audio.duration || total;
-    audio.currentTime = Math.min(Math.max(0, t), d - 0.05);
-    setNow(audio.currentTime);
-    clipRef.current?.setAttribute("width", ((audio.currentTime / d) * VIEW_W).toFixed(1));
-  };
-
-  // Click or drag along the waveform to move through the song.
-  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.pointerType === "mouse" && e.button !== 0) return;
-    const el = waveRef.current;
-    if (!el) return;
-    const at = (clientX: number) => {
-      const r = el.getBoundingClientRect();
-      seekTo(((clientX - r.left) / r.width) * total);
-    };
-    el.setPointerCapture(e.pointerId);
-    at(e.clientX);
-    const move = (ev: PointerEvent) => at(ev.clientX);
-    const up = () => {
-      el.removeEventListener("pointermove", move);
-      el.removeEventListener("pointerup", up);
-      el.removeEventListener("pointercancel", up);
-    };
-    el.addEventListener("pointermove", move);
-    el.addEventListener("pointerup", up);
-    el.addEventListener("pointercancel", up);
-  };
-
-  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const step = { ArrowRight: 5, ArrowUp: 5, ArrowLeft: -5, ArrowDown: -5 }[e.key];
-    if (step !== undefined) {
-      e.preventDefault();
-      seekTo(audio.currentTime + step);
-    } else if (e.key === "Home") {
-      e.preventDefault();
-      seekTo(0);
-    } else if (e.key === "End") {
-      e.preventDefault();
-      seekTo(total);
-    }
+    const t = Number(e.target.value);
+    audio.currentTime = t;
+    e.target.style.setProperty("--p", `${((t / (audio.duration || total)) * 100).toFixed(2)}%`);
+    setNow(t);
   };
 
   return (
-    <div className={styles.player} data-playing={playing ? "true" : "false"}>
+    <div className={`tile ${styles.player}`} data-playing={playing ? "true" : "false"}>
       <audio ref={audioRef} src={src} preload="none" />
 
       <div className={styles.top}>
@@ -162,9 +112,9 @@ export default function SongPlayer({ title, note, src, seconds, play, pause, see
         >
           <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
             {playing ? (
-              <path d="M5.5 3.5h3v13h-3zM11.5 3.5h3v13h-3z" fill="currentColor" />
+              <path d="M5.5 4.2c0-.7.5-1.2 1.2-1.2h.9c.7 0 1.2.5 1.2 1.2v11.6c0 .7-.5 1.2-1.2 1.2h-.9c-.7 0-1.2-.5-1.2-1.2zM11.2 4.2c0-.7.5-1.2 1.2-1.2h.9c.7 0 1.2.5 1.2 1.2v11.6c0 .7-.5 1.2-1.2 1.2h-.9c-.7 0-1.2-.5-1.2-1.2z" fill="currentColor" />
             ) : (
-              <path d="M6 3.2v13.6c0 .6.7 1 1.2.7l10.3-6.8c.5-.3.5-1.1 0-1.4L7.2 2.5C6.7 2.2 6 2.6 6 3.2z" fill="currentColor" />
+              <path d="M6 3.9v12.2c0 .9 1 1.4 1.7 1l9.4-6.1c.7-.4.7-1.4 0-1.8L7.7 2.9C7 2.5 6 3 6 3.9z" fill="currentColor" />
             )}
           </svg>
         </button>
@@ -172,41 +122,25 @@ export default function SongPlayer({ title, note, src, seconds, play, pause, see
           <p className={styles.title}>{title}</p>
           <p className={styles.note}>{note}</p>
         </div>
-        <p className={`mono ${styles.time}`} aria-hidden="true">
-          {clock(now)} / {clock(total)}
-        </p>
       </div>
 
-      <div
-        ref={waveRef}
-        className={styles.wave}
-        role="slider"
-        tabIndex={0}
-        aria-label={seek}
-        aria-valuemin={0}
-        aria-valuemax={Math.round(total)}
-        aria-valuenow={Math.round(now)}
-        aria-valuetext={`${clock(now)} of ${clock(total)}`}
-        onPointerDown={onPointerDown}
-        onKeyDown={onKeyDown}
-      >
-        <svg
-          className={styles.svg}
-          viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-          preserveAspectRatio="none"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <defs>
-            <clipPath id="song-played">
-              <rect ref={clipRef} x="0" y="0" width="0" height={VIEW_H} />
-            </clipPath>
-          </defs>
-          <g className={styles.rest}>{BARS}</g>
-          <g className={styles.played} clipPath="url(#song-played)">
-            {BARS}
-          </g>
-        </svg>
+      <div className={styles.progress}>
+        <input
+          ref={rangeRef}
+          className={styles.range}
+          type="range"
+          min={0}
+          max={total}
+          step={0.1}
+          defaultValue={0}
+          onChange={onSeek}
+          aria-label={seek}
+          aria-valuetext={`${clock(now)} of ${clock(total)}`}
+        />
+        <div className={`fine ${styles.times}`} aria-hidden="true">
+          <span>{clock(now)}</span>
+          <span>{clock(total)}</span>
+        </div>
       </div>
     </div>
   );

@@ -1,35 +1,46 @@
 import { hero, site } from "@/content/site";
-import HeroHead from "./HeroHead";
-import HeroSignal from "./HeroSignal";
 import styles from "./Hero.module.css";
 
-// Source order is head, line, then the rest. On phones that keeps the headline and the line
-// it reacts to on the first screen; on wider screens CSS moves the line to the bottom edge.
 export default function Hero() {
+  const { photo } = hero;
   return (
     <section id="top" className={styles.hero} aria-labelledby="hero-title">
-      <div className={`container ${styles.top}`}>
-        <HeroHead title={hero.title} words={hero.words} live={hero.hud.live} flagged={hero.hud.flagged} />
-      </div>
-
-      <div className={styles.signal} data-signal="">
-        <HeroSignal label={hero.signalLabel} description={hero.signalDescription} hint={hero.signalHint} />
-      </div>
-
-      <div className={`container ${styles.meta}`}>
-        <div className={styles.copy}>
-          <p className={styles.lead}>{hero.lead}</p>
-          <p className={styles.status}>{hero.status}</p>
+      <div className={`container ${styles.grid}`}>
+        <div className={styles.text}>
+          <p className={styles.name}>{site.name}</p>
+          <h1 id="hero-title" className={styles.title}>
+            <span className="visually-hidden">{hero.title}</span>
+            <span className={styles.words} aria-hidden="true">
+              {hero.words.map((word, i) => (
+                <span key={word}>
+                  <span className={styles.word}>
+                    <span className={`sheen ${styles.wordInner}`}>{word}</span>
+                  </span>
+                  {i < hero.words.length - 1 ? " " : null}
+                </span>
+              ))}
+            </span>
+          </h1>
+          <div className={styles.after}>
+            <p className={styles.lead}>{hero.lead}</p>
+            <p className={styles.status}>{hero.status}</p>
+            <div className={styles.actions}>
+              <a className="pill pill-solid" href={`mailto:${site.email}`}>
+                {hero.primary}
+              </a>
+              <a className="pill pill-quiet" href={site.resume} download>
+                {hero.secondary}
+                <span className={styles.meta}>{hero.secondaryMeta}</span>
+              </a>
+            </div>
+          </div>
         </div>
-        <div className={styles.actions}>
-          <a className={`${styles.button} ${styles.primary}`} href={`mailto:${site.email}`}>
-            {hero.primary}
-          </a>
-          <a className={`${styles.button} ${styles.secondary}`} href={site.resume} download>
-            {hero.secondary}
-            <span className={styles.buttonMeta}>{hero.secondaryMeta}</span>
-          </a>
-        </div>
+
+        <figure className={styles.photo}>
+          {/* A plain img: next/image adds an inline style attribute, which the CSP build rejects. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={photo.src} width={photo.width} height={photo.height} alt={photo.alt} fetchPriority="high" />
+        </figure>
       </div>
     </section>
   );

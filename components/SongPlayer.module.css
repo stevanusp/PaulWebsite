@@ -1,24 +1,20 @@
 .player {
   display: grid;
-  gap: var(--s-5);
-  padding: clamp(18px, 2.4vw, 28px);
-  border-radius: var(--radius-panel);
-  background: var(--surface);
-  box-shadow: inset 0 0 0 1px var(--line);
+  gap: var(--s-6);
 }
 
 .top {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
   gap: var(--s-4);
 }
 
 .button {
+  flex: none;
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border: 0;
   border-radius: 50%;
   background: var(--ink);
@@ -31,7 +27,7 @@
 }
 
 .button:active {
-  transform: scale(0.95);
+  transform: scale(0.94);
 }
 
 /* The play glyph sits optically centred, a touch right of the box centre. */
@@ -63,45 +59,80 @@
   color: var(--muted);
 }
 
-.time {
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+.progress {
+  display: grid;
+  gap: var(--s-2);
 }
 
-.wave {
-  position: relative;
-  height: 56px;
-  border-radius: 8px;
-  cursor: pointer;
-  touch-action: none;
-}
-
-.wave:focus-visible {
-  outline-offset: 6px;
-}
-
-.svg {
+/* A rounded track that fills from the left; the thumb only grows when you reach for it. */
+.range {
+  --p: 0%;
   width: 100%;
-  height: 100%;
-  display: block;
+  height: 22px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-.rest {
-  fill: var(--line-strong);
+.range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--ink) var(--p), var(--line-strong) var(--p));
 }
 
-.played {
-  fill: var(--signal);
+.range::-moz-range-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--line-strong);
 }
 
-@media (max-width: 479px) {
-  .top {
-    grid-template-columns: auto minmax(0, 1fr);
+.range::-moz-range-progress {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+}
+
+.range::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  margin-top: -4px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ink);
+  transform: scale(0.75);
+  transition: transform var(--dur-fast) var(--ease-out);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.range:active::-webkit-slider-thumb,
+.range:focus-visible::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .range:hover::-webkit-slider-thumb {
+    transform: scale(1);
   }
-  .time {
-    grid-column: 2;
-  }
+}
+
+.range:focus-visible {
+  outline-offset: 4px;
+}
+
+.times {
+  display: flex;
+  justify-content: space-between;
 }
 
 @media print {

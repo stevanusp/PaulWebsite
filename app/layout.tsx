@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { instrument, martian } from "./fonts";
+import { instrument } from "./fonts";
 import { site } from "@/content/site";
 import ConsoleNote from "@/components/ConsoleNote";
 import "./globals.css";
@@ -42,8 +42,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#070908",
-  colorScheme: "dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fbfbfa" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c0c0d" },
+  ],
+  colorScheme: "light dark",
 };
 
 const personJsonLd = {
@@ -67,9 +70,16 @@ const personJsonLd = {
   ],
 };
 
+// Runs while the HTML is parsed, before the first paint, so a saved theme never flashes.
+// Static text: scripts/csp.mjs hashes it like every other inline script.
+const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${instrument.variable} ${martian.variable}`}>
+    <html lang="en" className={instrument.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body>
         {children}
         <script

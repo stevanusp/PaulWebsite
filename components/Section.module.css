@@ -6,89 +6,68 @@
   padding-top: 0;
 }
 
-/* Head: a wide mono title, then the intro set large and offset to the right,
-   so the eye steps down and in, the way the rail steps into each section. */
 .head {
   display: grid;
-  gap: clamp(1.5rem, 1rem + 2vw, 3rem);
-  margin-bottom: clamp(3rem, 2rem + 4vw, 6rem);
+  gap: var(--s-5);
+  margin-bottom: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
 }
 
 .title {
   font-size: var(--fs-h2);
   line-height: var(--lh-h2);
   letter-spacing: var(--ls-h2);
-  font-weight: 600;
-  max-width: 14em;
+  max-width: 16em;
 }
 
 .intro {
-  font-size: clamp(1.375rem, 1rem + 1.5vw, 2.25rem);
-  line-height: 1.28;
-  letter-spacing: -0.022em;
-  font-weight: 450;
-  max-width: 23em;
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.875rem);
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  max-width: 26em;
 }
 
 .body {
   min-width: 0;
 }
 
-@media (min-width: 1024px) {
-  .head {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: 24px;
-  }
-  .title {
-    grid-column: 1 / -1;
-  }
-  .intro {
-    grid-column: 5 / -1;
-  }
-}
-
-/* Shared row pattern: a hairline, a mono heading and its text. */
-.rows {
-  list-style: none;
-  padding: 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.row {
+/* Tiles: soft rounded panels in a grid. Columns are set per section. */
+.tiles {
   display: grid;
-  gap: var(--s-3) 24px;
-  padding-block: clamp(1.75rem, 1.25rem + 1.5vw, 2.75rem);
-  border-top: 1px solid var(--line);
+  gap: 16px;
+  padding: 0;
+  list-style: none;
 }
 
-.rowTitle {
+@media (min-width: 760px) {
+  .two,
+  .three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1040px) {
+  .three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.tileInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  height: 100%;
+}
+
+.tileTitle {
   font-size: var(--fs-h3);
   line-height: var(--lh-h3);
   letter-spacing: var(--ls-h3);
-  font-weight: 600;
 }
 
-.rowText {
+.tileText {
   color: var(--muted);
   max-width: var(--measure);
-}
-
-.rowMeta {
-  color: var(--muted);
-  margin-top: var(--s-2);
-}
-
-@media (min-width: 768px) {
-  .row.split {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-  }
-  .row.split > :first-child {
-    grid-column: 1 / span 4;
-    padding-right: var(--s-5);
-  }
-  .row.split > :last-child {
-    grid-column: 5 / -1;
-  }
 }
 
 @media print {
@@ -103,8 +82,7 @@
   .intro {
     font-size: var(--fs-lead);
   }
-  .row {
-    break-inside: avoid;
-    padding-block: 10pt;
+  .tiles {
+    gap: 8pt;
   }
 }

@@ -1,65 +1,47 @@
 /* Tokens. Every color, size and curve on the site comes from here.
-   The site is one dark instrument. Green means the signal is normal and alive,
-   amber means something does not belong. Nothing else on the page gets a hue. */
+   One set of values for both themes, through light-dark(). The site follows the device,
+   and the toggle in the nav pins a choice with data-theme on <html>.
+   Nothing on this site has a sharp corner. */
 :root {
-  color-scheme: dark;
+  color-scheme: light dark;
 
-  /* ground and ink */
-  --bg: #070908;
-  --surface: #0d1210;
-  --surface-2: #141b18;
-  --ink: #e8ece7; /* 16.3:1 on bg */
-  --muted: #94a199; /* 7.4:1 on bg */
-  --faint: #56635b; /* decoration only, never text */
-  --line: #1a231f;
-  --line-strong: #2b3832;
-  --nav-bg: rgba(10, 14, 12, 0.7);
+  --bg: light-dark(#fbfbfa, #0c0c0d);
+  --surface: light-dark(#f1f1ef, #18181a);
+  --surface-2: light-dark(#e7e7e4, #232326);
+  --ink: light-dark(#1b1b1d, #f3f3f1);
+  --muted: light-dark(#66666c, #a2a2a8); /* 5.6:1 and 8.1:1 on bg */
+  --faint: light-dark(#a8a8ad, #55555b); /* decoration only, never text */
+  --line: light-dark(#e3e3e0, #29292c);
+  --line-strong: light-dark(#cdcdc9, #3b3b3f);
+  --nav-bg: light-dark(rgba(251, 251, 250, 0.72), rgba(24, 24, 26, 0.66));
 
-  /* signal: normal traffic, live status. Dim phosphor, not neon. */
-  --signal: #4fc48b; /* 9.1:1 on bg */
-  --signal-dim: #2a7050;
-  --signal-glow: rgba(79, 196, 139, 0.16);
+  /* the one accent: only for what does not belong */
+  --alert: light-dark(#b45309, #f2a23a); /* 4.9:1 and 9.4:1 on bg */
 
-  /* alert: only for what does not belong */
-  --alert: #f2a23a; /* 9.3:1 on bg */
-  --alert-text: #f2a23a;
+  /* the soft sheen on display titles */
+  --sheen-top: light-dark(#1b1b1d, #f7f7f5);
+  --sheen-bottom: light-dark(#5a5a61, #9c9ca3);
 
-  /* the pinned method stage and the instruments sit one step deeper than the page */
-  --stage-bg: #020403;
-  --stage-ink: #e8ece7;
-  --stage-muted: #94a199;
-  --stage-faint: #56635b;
-  --stage-line: #17201c;
-  --stage-alert: #f2a23a;
-  --stage-signal: #4fc48b;
-  --stage-nav-bg: rgba(2, 4, 3, 0.72);
-
-  /* type: Instrument Sans carries headlines and reading text, set tight like a product page.
-     Martian Mono is kept for small readouts only: counters, years, stacks, signal labels. */
+  /* type */
   --font-sans: var(--font-instrument), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: var(--font-martian), ui-monospace, "SF Mono", Menlo, monospace;
 
-  --fs-display: clamp(3rem, 0.9rem + 7.6vw, 8.75rem);
+  --fs-display: clamp(3rem, 1rem + 6.4vw, 7.5rem);
   --lh-display: 0.98;
   --ls-display: -0.045em;
-  --fs-h2: clamp(2.375rem, 1rem + 4.4vw, 5.5rem);
-  --lh-h2: 1.02;
+  --fs-h2: clamp(2.25rem, 1.1rem + 3.6vw, 4.5rem);
+  --lh-h2: 1.03;
   --ls-h2: -0.04em;
-  --fs-step: clamp(2rem, 1.1rem + 3.4vw, 4rem);
-  --lh-step: 1.04;
-  --ls-step: -0.035em;
-  --fs-h3: clamp(1.25rem, 1rem + 0.7vw, 1.75rem);
-  --lh-h3: 1.18;
+  --fs-h3: clamp(1.25rem, 1.05rem + 0.6vw, 1.625rem);
+  --lh-h3: 1.2;
   --ls-h3: -0.022em;
   --fs-lead: clamp(1.1875rem, 1rem + 0.55vw, 1.5rem);
   --lh-lead: 1.42;
-  --ls-lead: -0.012em;
+  --ls-lead: -0.014em;
   --fs-body: clamp(1.0625rem, 1rem + 0.15vw, 1.125rem);
   --lh-body: 1.6;
   --fs-small: 0.9375rem;
   --lh-small: 1.5;
-  --fs-mono: 0.75rem;
-  --lh-mono: 1.45;
+  --fs-tiny: 0.8125rem;
 
   /* space */
   --s-1: 4px;
@@ -71,19 +53,18 @@
   --s-7: 48px;
   --s-8: 64px;
   --s-9: 96px;
-  --s-10: 128px;
   --gutter: clamp(1.25rem, 0.5rem + 3vw, 3rem);
-  --max: 1400px;
-  --section-y: clamp(6rem, 4rem + 9vw, 12rem);
-  --measure: 38em;
-  --nav-h: 64px;
+  --max: 1240px;
+  --section-y: clamp(5rem, 3rem + 7vw, 10rem);
+  --measure: 36em;
+  --nav-h: 76px;
 
-  /* shape */
+  /* shape: soft everywhere */
   --radius-pill: 999px;
-  --radius-panel: 28px;
-  --radius-media: 28px;
-  --radius-pad: 16px;
-  --radius-focus: 10px;
+  --radius-tile: 30px;
+  --radius-media: 34px;
+  --radius-pad: 22px;
+  --radius-focus: 12px;
 
   /* motion */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -91,6 +72,14 @@
   --dur-press: 120ms;
   --dur-fast: 180ms;
   --dur-base: 260ms;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 /* Base */
@@ -117,6 +106,9 @@ body {
   min-height: 100svh;
   background: var(--bg);
   color: var(--ink);
+  transition:
+    background-color 300ms ease,
+    color 300ms ease;
   font-family: var(--font-sans);
   font-size: var(--fs-body);
   line-height: var(--lh-body);
@@ -132,6 +124,15 @@ h2,
 h3 {
   font-weight: 600;
   text-wrap: balance;
+}
+
+/* A soft top-to-bottom sheen for the two display titles. */
+.sheen {
+  background: linear-gradient(180deg, var(--sheen-top) 35%, var(--sheen-bottom) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-bottom: 0.08em;
 }
 
 p {
@@ -152,12 +153,12 @@ button {
 }
 
 ::selection {
-  background: var(--signal);
+  background: var(--ink);
   color: var(--bg);
 }
 
 :focus-visible {
-  outline: 2px solid var(--signal);
+  outline: 2px solid var(--ink);
   outline-offset: 3px;
   border-radius: var(--radius-focus);
 }
@@ -186,13 +187,67 @@ main:focus {
   border: 0;
 }
 
-.mono {
-  font-family: var(--font-mono);
-  font-size: var(--fs-mono);
-  line-height: var(--lh-mono);
-  letter-spacing: 0;
-  font-weight: 400;
-  font-stretch: 100%;
+/* Small supporting text: years, stacks, timestamps. */
+.fine {
+  font-size: var(--fs-tiny);
+  line-height: 1.45;
+  letter-spacing: 0.005em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* The shared pill button. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease,
+    transform var(--dur-press) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pill:active {
+  transform: scale(0.97);
+}
+
+.pill-solid {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.pill-quiet {
+  background: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pill-solid:hover {
+    background: color-mix(in srgb, var(--ink) 84%, var(--bg));
+  }
+  .pill-quiet:hover {
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+}
+
+/* A soft rounded tile, the site's one container. */
+.tile {
+  border-radius: var(--radius-tile);
+  background: var(--surface);
+  padding: clamp(1.5rem, 1rem + 1.6vw, 2.5rem);
 }
 
 .link {
@@ -213,6 +268,9 @@ main:focus {
   html {
     scroll-behavior: auto;
   }
+  body {
+    transition: none;
+  }
 }
 
 @media print {
@@ -222,16 +280,15 @@ main:focus {
     --ink: #000000;
     --muted: #333333;
     --line: #cccccc;
-    --signal: #1f6b47;
     --alert: #b45309;
-    --alert-text: #b45309;
+    --sheen-top: #000000;
+    --sheen-bottom: #000000;
     --section-y: 16pt;
     --fs-h2: 17pt;
     --fs-h3: 11.5pt;
     --fs-lead: 11.5pt;
     --fs-body: 10pt;
     --fs-small: 9pt;
-    --fs-mono: 8.5pt;
     --measure: 60em;
   }
 
@@ -248,113 +305,41 @@ main:focus {
 
 /* 404 page (kept global so the root layout never preloads a stray stylesheet) */
 .nf-page {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  place-items: center;
   min-height: 100svh;
-}
-
-.nf-header {
-  display: flex;
-  align-items: center;
-  height: var(--nav-h);
-}
-
-.nf-brand {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  text-decoration: none;
-  padding-block: 12px;
+  padding: var(--gutter);
+  text-align: center;
 }
 
 .nf-main {
-  padding-top: clamp(4rem, 14vh, 10rem);
-  padding-bottom: var(--s-8);
+  display: grid;
+  justify-items: center;
+  gap: var(--s-5);
+  max-width: 34em;
 }
 
 .nf-code {
-  color: var(--muted);
+  display: inline-grid;
+  place-items: center;
+  min-height: 32px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--alert);
+  font-size: var(--fs-tiny);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .nf-title {
-  margin-top: var(--s-4);
-  font-size: clamp(2.5rem, 1rem + 5vw, 5.5rem);
+  font-size: clamp(2.5rem, 1rem + 5vw, 5rem);
   line-height: var(--lh-display);
   letter-spacing: var(--ls-display);
-  font-weight: 600;
-  max-width: 12em;
 }
 
 .nf-body {
-  margin-top: var(--s-5);
   font-size: var(--fs-lead);
   line-height: var(--lh-lead);
   color: var(--muted);
-}
-
-.nf-button {
-  display: inline-flex;
-  align-items: center;
-  min-height: 48px;
-  margin-top: var(--s-6);
-  padding: 0 24px;
-  border-radius: var(--radius-pill);
-  background: var(--ink);
-  color: var(--bg);
-  font-size: 1rem;
-  letter-spacing: -0.01em;
-  font-weight: 500;
-  text-decoration: none;
-  transition: transform var(--dur-press) var(--ease-out);
-}
-
-.nf-button:active {
-  transform: scale(0.97);
-}
-
-.nf-signal {
-  width: 100%;
-  height: 160px;
-  margin-top: auto;
-  margin-bottom: clamp(1.5rem, 5vh, 3rem);
-  overflow: visible;
-}
-
-.nf-base {
-  fill: none;
-  stroke: var(--signal);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.nf-alert {
-  fill: none;
-  stroke-width: 2.25;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.nf-stop {
-  stop-color: var(--alert);
-  stop-opacity: 1;
-}
-
-.nf-stopClear {
-  stop-color: var(--alert);
-  stop-opacity: 0;
-}
-
-.nf-corners {
-  fill: none;
-  stroke: var(--alert);
-  stroke-width: 1.5;
-  vector-effect: non-scaling-stroke;
-}
-
-.nf-label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 400;
-  fill: var(--alert-text);
 }

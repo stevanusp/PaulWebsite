@@ -43,4 +43,4 @@ Nothing here is published automatically. To replace aboutspm.vercel.app:
 
 ## Fonts
 
-Martian Mono (headlines and readouts) and Instrument Sans (reading text), both under the SIL Open Font License, stored in `app/fonts/` with the Martian Mono license as `MartianMono-OFL.txt`.
+Instrument Sans, under the SIL Open Font License, stored in `app/fonts/`.
