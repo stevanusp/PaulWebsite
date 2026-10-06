@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { instrument, plexMono } from "./fonts";
+import { instrument, martian } from "./fonts";
 import { site } from "@/content/site";
 import ConsoleNote from "@/components/ConsoleNote";
 import "./globals.css";
@@ -42,11 +42,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f3f4f1" },
-    { media: "(prefers-color-scheme: dark)", color: "#0e1012" },
-  ],
-  colorScheme: "light dark",
+  themeColor: "#070908",
+  colorScheme: "dark",
 };
 
 const personJsonLd = {
@@ -72,7 +69,7 @@ const personJsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${instrument.variable} ${plexMono.variable}`}>
+    <html lang="en" className={`${instrument.variable} ${martian.variable}`}>
       <body>
         {children}
         <script

@@ -31,6 +31,7 @@ export const hero = {
   secondaryMeta: "PDF",
   signalLabel: "anomaly",
   signalHint: "poke the line",
+  hud: { live: "listening", flagged: "flagged" },
   signalDescription:
     "A live signal line. Every few seconds a burst breaks the pattern and is flagged as an anomaly.",
 } as const;

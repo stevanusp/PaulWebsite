@@ -4,10 +4,11 @@
   left: var(--s-3);
   z-index: 100;
   padding: 10px 16px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-pad);
   background: var(--ink);
   color: var(--bg);
-  font-size: var(--fs-small);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   font-weight: 500;
   text-decoration: none;
   transform: translateY(-160%);
@@ -24,24 +25,15 @@
   z-index: 50;
   height: var(--nav-h);
   background: var(--nav-bg);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(160%) blur(18px);
+  backdrop-filter: saturate(160%) blur(18px);
   color: var(--ink);
   box-shadow: 0 1px 0 transparent;
-  transition:
-    background-color var(--dur-base) ease,
-    color var(--dur-base) ease,
-    box-shadow var(--dur-base) ease;
+  transition: box-shadow var(--dur-base) ease;
 }
 
 .header[data-scrolled="true"] {
   box-shadow: 0 1px 0 var(--line);
-}
-
-.header[data-tone="dark"] {
-  background: var(--stage-nav-bg);
-  color: var(--stage-ink);
-  box-shadow: 0 1px 0 var(--stage-line);
 }
 
 .inner {
@@ -54,79 +46,96 @@
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: -0.03em;
   text-decoration: none;
   padding-block: 12px;
 }
 
+/* The mark is the site's own signal in miniature: a calm line with one beat. */
 .mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   flex: none;
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  background: var(--ink);
-  color: var(--bg);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: -0.06em;
-  line-height: 1;
-  transition:
-    background-color var(--dur-base) ease,
-    color var(--dur-base) ease;
+  overflow: visible;
 }
 
-.markDot {
-  color: #e08a1e;
-}
-
-.header[data-tone="dark"] .mark {
-  background: var(--stage-ink);
-  color: var(--stage-bg);
+.markLine {
+  fill: none;
+  stroke: var(--signal);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
 .links {
   display: flex;
   align-items: center;
-  gap: clamp(1.25rem, 2.2vw, 2rem);
+  gap: clamp(1rem, 2vw, 1.75rem);
   list-style: none;
   padding: 0;
 }
 
 .link {
+  position: relative;
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  letter-spacing: -0.005em;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
   text-decoration: none;
   color: var(--muted);
   transition: color var(--dur-fast) ease;
 }
 
-.header[data-tone="dark"] .link {
-  color: var(--stage-muted);
+/* The section you are in gets a short stretch of live line under its name. */
+.link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 9px;
+  height: 1px;
+  background: var(--signal);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-base) var(--ease-out);
 }
 
-.header[data-tone="dark"] :focus-visible {
-  outline-color: var(--stage-ink);
+.link[aria-current="true"] {
+  color: var(--ink);
 }
 
-.link[aria-current="true"],
-.header[data-tone="dark"] .link[aria-current="true"] {
-  color: inherit;
+.link[aria-current="true"]::after {
+  transform: scaleX(1);
+}
+
+/* Contact stays in view on every screen, as a small button. */
+.keep .link {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-pad);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  transition:
+    color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease;
+}
+
+.keep .link::after {
+  display: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .link:hover,
-  .header[data-tone="dark"] .link:hover {
-    color: inherit;
+  .link:hover {
+    color: var(--ink);
+  }
+  .keep .link:hover {
+    box-shadow: inset 0 0 0 1px var(--signal);
   }
 }
 
@@ -141,9 +150,6 @@
     background: var(--bg);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-  }
-  .header[data-tone="dark"] {
-    background: var(--stage-bg);
   }
 }
 

@@ -3,48 +3,73 @@
   display: flex;
   flex-direction: column;
   min-height: calc(100svh - var(--nav-h));
-  padding-top: clamp(2.5rem, 9vh, 8rem);
+  padding-top: clamp(1.5rem, 6vh, 5rem);
   padding-bottom: clamp(0.75rem, 2.5vh, 2rem);
 }
 
 .inner {
   display: grid;
-  /* On tall screens the text block sits centered between the bar and the line. */
+  gap: clamp(1.5rem, 4.5vh, 3.25rem);
   margin-block: 0 auto;
 }
 
-@media (min-aspect-ratio: 1/1.15) {
-  .inner {
-    margin-block: 0 auto;
-  }
+/* The live readout above the headline: one dot, one word, one counter. */
+.hud {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-bottom: clamp(1rem, 3vh, 2rem);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  line-height: var(--lh-mono);
+  font-weight: 400;
+  color: var(--muted);
+  animation: fade 0.6s ease 0.1s both;
 }
 
-@media (max-aspect-ratio: 1/1.15) and (min-width: 640px) {
-  .inner {
-    margin-block: auto;
-  }
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--signal);
+  box-shadow: 0 0 0 3px var(--signal-glow);
+}
+
+.hudCount {
+  margin-left: var(--s-3);
+  padding-left: var(--s-3);
+  border-left: 1px solid var(--line-strong);
+  font-variant-numeric: tabular-nums;
 }
 
 .title {
-  font-size: clamp(3rem, min(1.2rem + 7.2vw, 14.5vh), 7.75rem);
+  font-size: var(--fs-display);
   line-height: var(--lh-display);
   letter-spacing: var(--ls-display);
-  font-weight: 600;
-  max-width: 11.2em;
+  font-weight: 500;
+  max-width: 12.5em;
 }
 
 .words {
   display: block;
 }
 
-/* Each word rises out of its own mask. Delays use nth-child, not inline styles,
-   so the page needs no inline style attributes under the CSP. */
+/* Each word rises out of its own mask. The mask is a clip-path, not overflow, so it can be
+   released once the rise is done and a flagged glyph is free to jitter and draw its brackets.
+   Delays use nth-child, not inline styles, so the page needs no style attributes under the CSP. */
 .word {
   display: inline-block;
-  overflow: clip;
   vertical-align: top;
   padding-block: 0.04em 0.16em;
   margin-block: -0.04em -0.16em;
+  clip-path: inset(-1em -1em 0 -1em);
+  animation: unmask 1ms linear 1.5s forwards;
+}
+
+@keyframes unmask {
+  to {
+    clip-path: inset(-1em -1em -1em -1em);
+  }
 }
 
 .wordInner {
@@ -80,17 +105,139 @@
   }
 }
 
-.meta {
-  margin-top: clamp(1.5rem, 4.5vh, 2.75rem);
-  max-width: 44em;
-}
-
 @keyframes fade {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
+  }
+}
+
+/* A glyph that does not belong: it jitters, turns amber and is boxed by four corners. */
+.ch {
+  position: relative;
+  display: inline-block;
+  transition: color 0.5s ease;
+}
+
+.ch::after {
+  content: "";
+  position: absolute;
+  inset: -0.06em -0.1em -0.12em;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--alert) 0 0) left top / 0.2em 2px no-repeat,
+    linear-gradient(var(--alert) 0 0) left top / 2px 0.2em no-repeat,
+    linear-gradient(var(--alert) 0 0) right top / 0.2em 2px no-repeat,
+    linear-gradient(var(--alert) 0 0) right top / 2px 0.2em no-repeat,
+    linear-gradient(var(--alert) 0 0) left bottom / 0.2em 2px no-repeat,
+    linear-gradient(var(--alert) 0 0) left bottom / 2px 0.2em no-repeat,
+    linear-gradient(var(--alert) 0 0) right bottom / 0.2em 2px no-repeat,
+    linear-gradient(var(--alert) 0 0) right bottom / 2px 0.2em no-repeat;
+}
+
+.hit {
+  color: var(--alert);
+  animation: glitch 0.9s steps(1, end) both;
+}
+
+.hit::after {
+  animation: lock 0.55s var(--ease-out) 0.2s both;
+  opacity: 1;
+}
+
+.still {
+  animation: none;
+}
+
+.still::after {
+  animation: none;
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0.05em, -0.04em) skewX(-8deg);
+  }
+  12% {
+    transform: translate(-0.06em, 0.03em) skewX(6deg);
+  }
+  24% {
+    transform: translate(0.03em, 0.05em);
+  }
+  38% {
+    transform: translate(-0.04em, -0.03em) skewX(-4deg);
+  }
+  52% {
+    transform: translate(0.02em, 0.02em);
+  }
+  70% {
+    transform: translate(-0.015em, 0);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes lock {
+  from {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* A line drawn from the flagged glyph down to the burst it caused. */
+.tether {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-left: 1px dashed var(--alert);
+  opacity: 0;
+  transform-origin: top;
+  pointer-events: none;
+}
+
+.tetherOn {
+  animation: tether 3.3s linear both;
+}
+
+@keyframes tether {
+  0% {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  7% {
+    opacity: 0.9;
+    transform: scaleY(1);
+    animation-timing-function: ease-out;
+  }
+  70% {
+    opacity: 0.9;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(1);
+  }
+}
+
+.meta {
+  display: grid;
+  gap: var(--s-5);
+  align-items: end;
+}
+
+@media (min-width: 900px) {
+  .meta {
+    grid-template-columns: minmax(0, 36em) auto;
+    justify-content: space-between;
   }
 }
 
@@ -114,7 +261,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--s-3);
-  margin-top: var(--s-5);
 }
 
 .button {
@@ -122,12 +268,13 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 48px;
+  min-height: 52px;
   padding: 0 24px;
-  border-radius: var(--radius-pill);
-  font-size: 1rem;
+  border-radius: var(--radius-pad);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
   font-weight: 500;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.02em;
   text-decoration: none;
   transition:
     background-color var(--dur-fast) ease,
@@ -152,19 +299,17 @@
 }
 
 .buttonMeta {
-  font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-weight: 400;
   color: var(--muted);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .primary:hover {
-    background: color-mix(in srgb, var(--ink) 84%, var(--bg));
+    background: color-mix(in srgb, var(--ink) 82%, var(--bg));
   }
   .secondary:hover {
-    box-shadow: inset 0 0 0 1px var(--ink);
+    box-shadow: inset 0 0 0 1px var(--signal);
   }
 }
 
@@ -182,6 +327,18 @@
   .wordInner {
     animation: fade 0.3s ease both;
   }
+  .word {
+    animation: none;
+    clip-path: none;
+  }
+  .hud {
+    animation: none;
+  }
+  .hit,
+  .hit::after,
+  .tetherOn {
+    animation: none;
+  }
 }
 
 @media print {
@@ -193,11 +350,19 @@
   .title {
     font-size: 30pt;
   }
+  .hud,
+  .tether {
+    display: none;
+  }
   .meta {
     margin-top: 10pt;
   }
   .wordInner {
     animation: none;
+  }
+  .word {
+    animation: none;
+    clip-path: none;
   }
   .actions,
   .signal {

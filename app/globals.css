@@ -1,45 +1,55 @@
-/* Tokens. Every color, size and curve on the site comes from here. */
+/* Tokens. Every color, size and curve on the site comes from here.
+   The site is one dark instrument. Green means the signal is normal and alive,
+   amber means something does not belong. Nothing else on the page gets a hue. */
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
 
-  /* color, light */
-  --bg: #f3f4f1;
-  --surface: #ffffff;
-  --surface-2: #e9ebe6;
-  --ink: #15171a;
-  --muted: #565c63; /* 6.12:1 on bg */
-  --faint: #8a9097; /* decoration only, never text */
-  --line: #dcdfda;
-  --line-strong: #c7cbc5;
-  --alert: #c25e00; /* anomaly strokes, 3.89:1 on bg */
-  --alert-text: #b45309; /* anomaly labels, 4.55:1 on bg */
-  --nav-bg: rgba(243, 244, 241, 0.78);
+  /* ground and ink */
+  --bg: #070908;
+  --surface: #0d1210;
+  --surface-2: #141b18;
+  --ink: #e8ece7; /* 16.3:1 on bg */
+  --muted: #94a199; /* 7.4:1 on bg */
+  --faint: #56635b; /* decoration only, never text */
+  --line: #1a231f;
+  --line-strong: #2b3832;
+  --nav-bg: rgba(10, 14, 12, 0.7);
 
-  /* the instrument stage is dark in both themes */
-  --stage-bg: #0b0c0d;
-  --stage-ink: #ecede9;
-  --stage-muted: #a0a6ac; /* 7.97:1 */
-  --stage-faint: #5b6168;
-  --stage-line: #24282c;
-  --stage-alert: #f2a23a; /* 9.33:1 */
-  --stage-nav-bg: rgba(11, 12, 13, 0.72);
+  /* signal: normal traffic, live status. Dim phosphor, not neon. */
+  --signal: #4fc48b; /* 9.1:1 on bg */
+  --signal-dim: #2a7050;
+  --signal-glow: rgba(79, 196, 139, 0.16);
 
-  /* type */
+  /* alert: only for what does not belong */
+  --alert: #f2a23a; /* 9.3:1 on bg */
+  --alert-text: #f2a23a;
+
+  /* the pinned method stage and the instruments sit one step deeper than the page */
+  --stage-bg: #020403;
+  --stage-ink: #e8ece7;
+  --stage-muted: #94a199;
+  --stage-faint: #56635b;
+  --stage-line: #17201c;
+  --stage-alert: #f2a23a;
+  --stage-signal: #4fc48b;
+  --stage-nav-bg: rgba(2, 4, 3, 0.72);
+
+  /* type: Martian Mono is the voice, Instrument Sans is the reading text */
   --font-sans: var(--font-instrument), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  --font-mono: var(--font-martian), ui-monospace, "SF Mono", Menlo, monospace;
 
-  --fs-display: clamp(3rem, 1.2rem + 7.2vw, 7.75rem);
-  --lh-display: 0.95;
-  --ls-display: -0.045em;
-  --fs-h2: clamp(2rem, 1.3rem + 2.6vw, 3.25rem);
-  --lh-h2: 1.04;
-  --ls-h2: -0.032em;
-  --fs-step: clamp(2rem, 1.2rem + 3.2vw, 3.75rem);
-  --lh-step: 1.02;
-  --ls-step: -0.035em;
-  --fs-h3: clamp(1.1875rem, 1rem + 0.5vw, 1.5rem);
-  --lh-h3: 1.25;
-  --ls-h3: -0.014em;
+  --fs-display: clamp(2.5rem, 0.9rem + 6.6vw, 7.5rem);
+  --lh-display: 1;
+  --ls-display: -0.055em;
+  --fs-h2: clamp(1.75rem, 1.1rem + 2.4vw, 3.25rem);
+  --lh-h2: 1.08;
+  --ls-h2: -0.05em;
+  --fs-step: clamp(1.75rem, 1rem + 3vw, 3.5rem);
+  --lh-step: 1.08;
+  --ls-step: -0.05em;
+  --fs-h3: clamp(1.125rem, 0.95rem + 0.55vw, 1.5rem);
+  --lh-h3: 1.2;
+  --ls-h3: -0.04em;
   --fs-lead: clamp(1.1875rem, 1rem + 0.55vw, 1.5rem);
   --lh-lead: 1.42;
   --ls-lead: -0.012em;
@@ -47,8 +57,8 @@
   --lh-body: 1.6;
   --fs-small: 0.9375rem;
   --lh-small: 1.5;
-  --fs-mono: 0.8125rem;
-  --lh-mono: 1.4;
+  --fs-mono: 0.75rem;
+  --lh-mono: 1.45;
 
   /* space */
   --s-1: 4px;
@@ -62,16 +72,16 @@
   --s-9: 96px;
   --s-10: 128px;
   --gutter: clamp(1.25rem, 0.5rem + 3vw, 3rem);
-  --max: 1320px;
-  --section-y: clamp(6rem, 4rem + 8vw, 11rem);
+  --max: 1400px;
+  --section-y: clamp(6rem, 4rem + 9vw, 12rem);
   --measure: 38em;
-  --nav-h: 56px;
+  --nav-h: 64px;
 
   /* shape */
   --radius-pill: 999px;
-  --radius-panel: 28px;
-  --radius-pad: 18px;
-  --radius-focus: 8px;
+  --radius-panel: 6px;
+  --radius-pad: 4px;
+  --radius-focus: 4px;
 
   /* motion */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -79,24 +89,6 @@
   --dur-press: 120ms;
   --dur-fast: 180ms;
   --dur-base: 260ms;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e1012;
-    --surface: #16191c;
-    --surface-2: #1e2226;
-    --ink: #ecede9; /* 16.21:1 */
-    --muted: #a0a6ac; /* 7.76:1 */
-    --faint: #6b7178;
-    --line: #24282c;
-    --line-strong: #353a40;
-    --alert: #f2a23a; /* 9.08:1 */
-    --alert-text: #f2a23a;
-    --nav-bg: rgba(14, 16, 18, 0.72);
-    --stage-bg: #000000;
-    --stage-line: #1f2326;
-  }
 }
 
 /* Base */
@@ -136,7 +128,9 @@ body {
 h1,
 h2,
 h3 {
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-stretch: 100%;
   text-wrap: balance;
 }
 
@@ -158,12 +152,12 @@ button {
 }
 
 ::selection {
-  background: var(--ink);
+  background: var(--signal);
   color: var(--bg);
 }
 
 :focus-visible {
-  outline: 2px solid var(--ink);
+  outline: 2px solid var(--signal);
   outline-offset: 3px;
   border-radius: var(--radius-focus);
 }
@@ -197,6 +191,8 @@ main:focus {
   font-size: var(--fs-mono);
   line-height: var(--lh-mono);
   letter-spacing: 0;
+  font-weight: 400;
+  font-stretch: 100%;
 }
 
 .link {
@@ -226,6 +222,9 @@ main:focus {
     --ink: #000000;
     --muted: #333333;
     --line: #cccccc;
+    --signal: #1f6b47;
+    --alert: #b45309;
+    --alert-text: #b45309;
     --section-y: 16pt;
     --fs-h2: 17pt;
     --fs-h3: 11.5pt;
@@ -261,9 +260,10 @@ main:focus {
 }
 
 .nf-brand {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
   text-decoration: none;
   padding-block: 12px;
 }
@@ -282,7 +282,7 @@ main:focus {
   font-size: clamp(2.5rem, 1rem + 5vw, 5.5rem);
   line-height: var(--lh-display);
   letter-spacing: var(--ls-display);
-  font-weight: 600;
+  font-weight: 500;
   max-width: 12em;
 }
 
@@ -321,7 +321,7 @@ main:focus {
 
 .nf-base {
   fill: none;
-  stroke: var(--ink);
+  stroke: var(--signal);
   stroke-width: 1.5;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;

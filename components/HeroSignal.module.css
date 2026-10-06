@@ -1,8 +1,31 @@
 .wrap {
   position: relative;
   width: 100%;
-  height: clamp(112px, 17vh, 160px);
+  height: clamp(132px, 25vh, 250px);
   animation: scan 1.25s var(--ease-in-out) 0.25s both;
+}
+
+/* The line fades in from the left edge and out at the right, like a trace on a scope.
+   Gradients, not a mask, so the detection box and its label may still leave the frame. */
+.wrap::before,
+.wrap::after {
+  content: "";
+  position: absolute;
+  top: -60px;
+  bottom: -20px;
+  width: 9%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.wrap::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--bg), transparent);
+}
+
+.wrap::after {
+  right: 0;
+  background: linear-gradient(270deg, var(--bg), transparent);
 }
 
 .svg {
@@ -21,7 +44,7 @@
 
 .base {
   fill: none;
-  stroke: var(--ink);
+  stroke: var(--signal);
   stroke-width: 1.5;
   stroke-linejoin: round;
   stroke-linecap: round;
@@ -56,13 +79,14 @@
 
 .label {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
   fill: var(--alert-text);
 }
 
 .pause {
+  z-index: 2;
   position: absolute;
   right: var(--gutter);
   bottom: -6px;
@@ -77,18 +101,19 @@
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
   transition: color var(--dur-fast) ease;
 }
 
 .hint {
+  z-index: 2;
   position: absolute;
   left: var(--gutter);
   bottom: 2px;
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--muted);
   pointer-events: none;
 }

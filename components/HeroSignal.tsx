@@ -17,6 +17,7 @@ import {
   reachFor,
   smoothstep,
 } from "@/lib/signal";
+import { emitAnomaly } from "@/lib/anomaly";
 import styles from "./HeroSignal.module.css";
 
 // The server renders a wide, calm frame. With xMinYMid slice at the usual 160px height,
@@ -73,6 +74,11 @@ export default function HeroSignal({ label, description, hint }: Props) {
     let manual: { cx: number; t0: number } | null = null;
     let epoch = 0;
     let lastPoke = -Infinity;
+    let lastKey = "";
+    // Tell the rest of the page where a burst begins, in viewport pixels.
+    const announce = (cx: number, still = false) => {
+      emitAnomaly(svg.getBoundingClientRect().left + cx, still);
+    };
     const sigmaFor = () => (W < 640 ? 13 : 19);
 
     const render = (t: number, cx: number, E: number, flag: number, lock: number) => {
@@ -148,7 +154,13 @@ export default function HeroSignal({ label, description, hint }: Props) {
         return;
       }
       const n = Math.floor(since / BURST.period);
-      paint(t, W * HERO_SPOTS[n % HERO_SPOTS.length], since - n * BURST.period);
+      const spot = W * HERO_SPOTS[n % HERO_SPOTS.length];
+      const key = `${epoch}:${n}`;
+      if (running && key !== lastKey) {
+        lastKey = key;
+        announce(spot);
+      }
+      paint(t, spot, since - n * BURST.period);
     };
 
     // Tap or click the line to make an anomaly right there. A drag is a scroll, not a poke.
@@ -168,6 +180,7 @@ export default function HeroSignal({ label, description, hint }: Props) {
       const x = e.clientX - svg.getBoundingClientRect().left;
       manual = { cx: clamp(x, margin, Math.max(margin, W - margin)), t0: clock };
       lastPoke = clock;
+      announce(manual.cx);
       setHinted(false);
     };
     const onCancel = () => {
@@ -178,7 +191,10 @@ export default function HeroSignal({ label, description, hint }: Props) {
     svg.addEventListener("pointercancel", onCancel);
 
     // Reduced motion: one still frame that still tells the story.
-    const renderStill = () => render(0.62, W * HERO_SPOTS[0], 1, 1, 1);
+    const renderStill = () => {
+      render(0.62, W * HERO_SPOTS[0], 1, 1, 1);
+      announce(W * HERO_SPOTS[0], true);
+    };
 
     const tick = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000);

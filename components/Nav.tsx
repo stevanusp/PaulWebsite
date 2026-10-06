@@ -17,15 +17,7 @@ export default function Nav() {
       ticking = false;
 
       // Read everything first, then write, so the browser lays out once per frame.
-      // Switch to a dark material while the dark instrument stage sits under the bar.
       const scrolled = window.scrollY > 8;
-      const probe = header.offsetHeight / 2;
-      const stage = document.getElementById("method");
-      let dark = false;
-      if (stage) {
-        const r = stage.getBoundingClientRect();
-        dark = r.top <= probe && r.bottom >= probe;
-      }
 
       const line = window.innerHeight * 0.4;
       let current = "";
@@ -37,7 +29,6 @@ export default function Nav() {
       }
 
       header.dataset.scrolled = scrolled ? "true" : "false";
-      header.dataset.tone = dark ? "dark" : "light";
       setActive(current);
     };
 
@@ -61,12 +52,12 @@ export default function Nav() {
       <a className={styles.skip} href="#main">
         Skip to content
       </a>
-      <header ref={headerRef} className={styles.header} data-scrolled="false" data-tone="light">
+      <header ref={headerRef} className={styles.header} data-scrolled="false">
         <nav className={`container ${styles.inner}`} aria-label="Primary">
           <a className={styles.brand} href="#top">
-            <span className={styles.mark} aria-hidden="true">
-              SP<span className={styles.markDot}>.</span>
-            </span>
+            <svg className={styles.mark} viewBox="0 0 28 16" width="28" height="16" aria-hidden="true" focusable="false">
+              <path className={styles.markLine} d="M0 8H7l2.5-4 3 8 3-11 2.5 7H28" />
+            </svg>
             {site.name}
           </a>
           <ul className={styles.links}>
