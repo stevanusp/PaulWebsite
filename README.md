@@ -26,7 +26,7 @@ Node 20 or newer.
 | Script and style CSP | `scripts/csp.mjs` (runs after `next build`) |
 | security.txt | `public/.well-known/security.txt` (renew `Expires` before 29 Sep 2027) |
 | Résumé | `public/resume.pdf` (replace the file, keep the name) |
-| Share image and icons | `public/og.png`, `public/apple-touch-icon.png`, `app/icon.svg` |
+| Share image and icons | `public/og.jpg`, `public/apple-touch-icon.png`, `app/icon.svg` |
 
 ## Security, in one paragraph
 

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/og.png",
+        url: "/og.jpg",
         width: 1200,
         height: 630,
         alt: "Stevanus Paulus. I listen for what doesn't belong.",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: site.title,
     description: site.description,
-    images: ["/og.png"],
+    images: ["/og.jpg"],
   },
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
