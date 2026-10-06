@@ -22,6 +22,9 @@ const TYPES = {
   ".txt": "text/plain; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".webp": "image/webp",
+  ".m4a": "audio/mp4",
   ".ico": "image/x-icon",
   ".woff2": "font/woff2",
   ".pdf": "application/pdf",
@@ -46,7 +49,31 @@ createServer((req, res) => {
   const status = file ? 200 : 404;
   const path = file || join(ROOT, "404.html");
   let body = readFileSync(path);
-  const extra = {};
+  const extra = { "Accept-Ranges": "bytes" };
+
+  // Media needs byte ranges: Safari will not play audio without them, and seeking relies on them.
+  const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || "");
+  if (file && range && !COMPRESSIBLE.has(extname(path))) {
+    const size = body.length;
+    const start = range[1] ? Number(range[1]) : Math.max(0, size - Number(range[2]));
+    const end = range[1] && range[2] ? Math.min(Number(range[2]), size - 1) : size - 1;
+    if (start >= size || start > end) {
+      res.writeHead(416, { ...headers, "Content-Range": `bytes */${size}` });
+      res.end();
+      return;
+    }
+    res.writeHead(206, {
+      ...headers,
+      ...extra,
+      "Content-Type": TYPES[extname(path)] || "application/octet-stream",
+      "Content-Range": `bytes ${start}-${end}/${size}`,
+      "Content-Length": end - start + 1,
+      "Cache-Control": "no-cache",
+    });
+    res.end(body.subarray(start, end + 1));
+    return;
+  }
+
   // Compress like the production CDN does, so local Lighthouse runs are representative.
   if (COMPRESSIBLE.has(extname(path)) && /\bgzip\b/.test(req.headers["accept-encoding"] || "")) {
     body = gzipSync(body, { level: 9 });

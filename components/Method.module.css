@@ -20,7 +20,7 @@
   font-size: var(--fs-h2);
   line-height: var(--lh-h2);
   letter-spacing: var(--ls-h2);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .bars {
@@ -44,7 +44,7 @@
   font-size: var(--fs-h3);
   line-height: var(--lh-h3);
   letter-spacing: var(--ls-h3);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .stepBody {

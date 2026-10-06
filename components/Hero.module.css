@@ -44,8 +44,8 @@
   font-size: var(--fs-display);
   line-height: var(--lh-display);
   letter-spacing: var(--ls-display);
-  font-weight: 500;
-  max-width: 12.5em;
+  font-weight: 600;
+  max-width: 10.5em;
 }
 
 .words {
@@ -73,6 +73,15 @@
 .wordInner {
   display: inline-block;
   animation: rise 1s var(--ease-out) both;
+}
+
+/* A soft top-to-bottom sheen. It is set on every glyph, not on the word: a parent clipped to
+   its text paints a moving child's shape in the wrong place, so each glyph carries its own. */
+.wordInner > span {
+  background: linear-gradient(180deg, #f6f8f5 30%, #a7b5ad 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .words > span:nth-child(1) .wordInner {
@@ -136,8 +145,10 @@
     linear-gradient(var(--alert) 0 0) right bottom / 2px 0.2em no-repeat;
 }
 
-.hit {
+.hit,
+.wordInner > .hit {
   color: var(--alert);
+  -webkit-text-fill-color: var(--alert);
   animation: glitch 0.9s steps(1, end) both;
 }
 
@@ -274,13 +285,12 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 52px;
-  padding: 0 24px;
-  border-radius: var(--radius-pad);
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  min-height: 50px;
+  padding: 0 26px;
+  border-radius: var(--radius-pill);
+  font-size: 1rem;
   font-weight: 500;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   text-decoration: none;
   transition:
     background-color var(--dur-fast) ease,
@@ -305,6 +315,7 @@
 }
 
 .buttonMeta {
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 400;
   color: var(--muted);

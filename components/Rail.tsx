@@ -127,7 +127,7 @@ export default function Rail() {
         }
         ctx.strokeStyle = stroke;
         ctx.globalAlpha = alpha;
-        ctx.lineWidth = 1.25;
+        ctx.lineWidth = 1;
         ctx.lineJoin = "round";
         ctx.stroke();
         ctx.globalAlpha = 1;
@@ -135,11 +135,11 @@ export default function Rail() {
 
       // Quieter where it passes behind the pinned stage, which has a line of its own.
       if (s && s.bottom > y0 && s.top < y1) {
-        segment(y0, Math.max(y0, s.top), C.signal, 0.75);
-        segment(Math.max(y0, s.top), Math.min(y1, s.bottom), C.dim, 0.5);
-        segment(Math.min(y1, s.bottom), y1, C.signal, 0.75);
+        segment(y0, Math.max(y0, s.top), C.signal, 0.5);
+        segment(Math.max(y0, s.top), Math.min(y1, s.bottom), C.dim, 0.4);
+        segment(Math.min(y1, s.bottom), y1, C.signal, 0.5);
       } else {
-        segment(y0, y1, C.signal, 0.75);
+        segment(y0, y1, C.signal, 0.5);
       }
 
       // Amber where a burst is still ringing.
@@ -174,20 +174,6 @@ export default function Rail() {
         ctx.fill();
       });
 
-      // Where you are: a small marker riding the spine at the reading line.
-      if (read > y0 && read < y1) {
-        const x = xAt(read);
-        ctx.beginPath();
-        ctx.arc(x, read, 6, 0, Math.PI * 2);
-        ctx.fillStyle = C.signal;
-        ctx.globalAlpha = 0.16;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-        ctx.beginPath();
-        ctx.arc(x, read, 2.25, 0, Math.PI * 2);
-        ctx.fillStyle = C.signal;
-        ctx.fill();
-      }
     };
 
     const tick = (now: number) => {

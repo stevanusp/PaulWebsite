@@ -1,5 +1,5 @@
 .instrument {
-  margin-top: var(--s-8);
+  margin-top: var(--s-5);
 }
 
 /* A small piece of hardware: a raised body around a deep screen with a graticule. */
@@ -13,7 +13,7 @@
 .screen {
   position: relative;
   height: clamp(150px, 20vw, 200px);
-  border-radius: var(--radius-pad);
+  border-radius: calc(var(--radius-panel) - 12px);
   background-color: var(--stage-bg);
   background-image:
     linear-gradient(color-mix(in srgb, var(--stage-line) 60%, transparent) 1px, transparent 1px),
@@ -175,10 +175,9 @@
 }
 
 .padName {
-  font-family: var(--font-mono);
-  font-size: clamp(1.125rem, 0.9rem + 0.8vw, 1.5rem);
-  font-weight: 500;
-  letter-spacing: -0.04em;
+  font-size: clamp(1.25rem, 1rem + 0.8vw, 1.625rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
   line-height: 1;
 }
 

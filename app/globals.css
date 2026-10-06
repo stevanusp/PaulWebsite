@@ -34,22 +34,23 @@
   --stage-signal: #4fc48b;
   --stage-nav-bg: rgba(2, 4, 3, 0.72);
 
-  /* type: Martian Mono is the voice, Instrument Sans is the reading text */
+  /* type: Instrument Sans carries headlines and reading text, set tight like a product page.
+     Martian Mono is kept for small readouts only: counters, years, stacks, signal labels. */
   --font-sans: var(--font-instrument), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: var(--font-martian), ui-monospace, "SF Mono", Menlo, monospace;
 
-  --fs-display: clamp(2.5rem, 0.9rem + 6.6vw, 7.5rem);
-  --lh-display: 1;
-  --ls-display: -0.055em;
-  --fs-h2: clamp(2.125rem, 0.9rem + 4.4vw, 5.25rem);
-  --lh-h2: 1.08;
-  --ls-h2: -0.05em;
-  --fs-step: clamp(1.75rem, 1rem + 3vw, 3.5rem);
-  --lh-step: 1.08;
-  --ls-step: -0.05em;
-  --fs-h3: clamp(1.125rem, 0.95rem + 0.55vw, 1.5rem);
-  --lh-h3: 1.2;
-  --ls-h3: -0.04em;
+  --fs-display: clamp(3rem, 0.9rem + 7.6vw, 8.75rem);
+  --lh-display: 0.98;
+  --ls-display: -0.045em;
+  --fs-h2: clamp(2.375rem, 1rem + 4.4vw, 5.5rem);
+  --lh-h2: 1.02;
+  --ls-h2: -0.04em;
+  --fs-step: clamp(2rem, 1.1rem + 3.4vw, 4rem);
+  --lh-step: 1.04;
+  --ls-step: -0.035em;
+  --fs-h3: clamp(1.25rem, 1rem + 0.7vw, 1.75rem);
+  --lh-h3: 1.18;
+  --ls-h3: -0.022em;
   --fs-lead: clamp(1.1875rem, 1rem + 0.55vw, 1.5rem);
   --lh-lead: 1.42;
   --ls-lead: -0.012em;
@@ -79,9 +80,10 @@
 
   /* shape */
   --radius-pill: 999px;
-  --radius-panel: 6px;
-  --radius-pad: 4px;
-  --radius-focus: 4px;
+  --radius-panel: 28px;
+  --radius-media: 28px;
+  --radius-pad: 16px;
+  --radius-focus: 10px;
 
   /* motion */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -128,9 +130,7 @@ body {
 h1,
 h2,
 h3 {
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-stretch: 100%;
+  font-weight: 600;
   text-wrap: balance;
 }
 
@@ -260,10 +260,9 @@ main:focus {
 }
 
 .nf-brand {
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
   text-decoration: none;
   padding-block: 12px;
 }
@@ -282,7 +281,7 @@ main:focus {
   font-size: clamp(2.5rem, 1rem + 5vw, 5.5rem);
   line-height: var(--lh-display);
   letter-spacing: var(--ls-display);
-  font-weight: 500;
+  font-weight: 600;
   max-width: 12em;
 }
 
@@ -296,15 +295,14 @@ main:focus {
 .nf-button {
   display: inline-flex;
   align-items: center;
-  min-height: 52px;
+  min-height: 48px;
   margin-top: var(--s-6);
   padding: 0 24px;
-  border-radius: var(--radius-pad);
+  border-radius: var(--radius-pill);
   background: var(--ink);
   color: var(--bg);
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  letter-spacing: -0.02em;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
   font-weight: 500;
   text-decoration: none;
   transition: transform var(--dur-press) var(--ease-out);

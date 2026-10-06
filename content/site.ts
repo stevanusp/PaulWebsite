@@ -17,6 +17,7 @@ export const nav = [
   { id: "notes", label: "Field notes" },
   { id: "built", label: "Built" },
   { id: "path", label: "Path" },
+  { id: "ear", label: "By ear" },
   { id: "contact", label: "Contact" },
 ] as const;
 
@@ -84,8 +85,6 @@ export const notes = {
   scenes: {
     branchesLabel: "branches",
     branchesTotal: "83+",
-    triageAlarm: "ransomware?",
-    triageCalm: "a script renaming files",
     lanes: ["requester", "approver", "audit"],
   },
   intro: "A few things from the job, told without the parts that should stay inside the bank.",
@@ -94,11 +93,6 @@ export const notes = {
       scene: "branches",
       title: "A cloud edge for 83+ branches",
       body: "Part of the team that moved web security for more than 83 branches onto a cloud security edge, keeping policy behavior consistent while the network underneath kept changing.",
-    },
-    {
-      scene: "triage",
-      title: "The ransomware that wasn't",
-      body: "An alert that looked like a DDoS with ransomware on top. Careful triage showed a crude script renaming files. Contained, then written up so the next analyst starts from evidence instead of panic.",
     },
     {
       scene: "lanes",
@@ -180,6 +174,22 @@ export const ear = {
   title: "By ear",
   lead: "I play piano without sheet music. I hear a chord, find it, then look for the next one.",
   body: "It's the same habit I bring to traffic: learn what normal sounds like, and the wrong note announces itself. Away from the keys I'm an audiophile, which mostly means strong opinions about DACs, amplifiers, and the difference between a clean signal and a loud one.",
+  photo: {
+    src: "/media/paulus-at-the-keys.jpg",
+    width: 360,
+    height: 540,
+    alt: "Stevanus playing a keyboard at a live event, beside a singer at the microphone.",
+  },
+  song: {
+    title: "It's been a while",
+    note: "A song I wrote.",
+    src: "/media/its-been-a-while.m4a",
+    seconds: 52,
+    play: "Play",
+    pause: "Pause",
+    seek: "Song position",
+  },
+  tryLabel: "Or play it yourself",
   caption: "The four chords a lot of pop songs are built on. Tap a pad",
   captionKeys: ", or press 1 to 5",
   scopeLabel: "scope",
