@@ -19,16 +19,11 @@
   max-width: 30em;
 }
 
+/* The heading row above the pads keeps room for the keyboard, so the margin above it is smaller. */
 .try {
   display: grid;
   gap: var(--s-4);
-  margin-top: clamp(3.5rem, 2rem + 4vw, 6rem);
-}
-
-.tryLabel {
-  font-size: var(--fs-h3);
-  line-height: var(--lh-h3);
-  letter-spacing: var(--ls-h3);
+  margin-top: clamp(1rem, 0.5rem + 2vw, 2.5rem);
 }
 
 @media print {

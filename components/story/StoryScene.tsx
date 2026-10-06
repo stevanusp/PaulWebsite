@@ -1,10 +1,8 @@
 import { memo } from "react";
+import { Keystation } from "@/components/Keystation";
 import { method } from "@/content/site";
 import {
   BAR_W,
-  KB,
-  KEY_HIGH,
-  KEY_LOW,
   LAYOUT,
   LOG,
   LOOP_BARS,
@@ -37,132 +35,7 @@ const STILL_STEP = 11;
 const STILL_BAR = 1;
 const lit = (i: number) => NOTES[i].start <= STILL_STEP && STILL_STEP < NOTES[i].start + NOTES[i].len;
 
-// ---- Keyboard: drawn from the controller's top view, dark in both themes like the real one.
-// No logos or printed names: the function marks above the keys are just marks.
-
 const WHITE_PCS = new Set([0, 2, 4, 5, 7, 9, 11]);
-const KEYS_X0 = 138;
-const KEYS_X1 = 963;
-const KEYS_Y = 60;
-const WHITE_LEN = 164;
-const BLACK_LEN = 104;
-const WHITES: number[] = [];
-for (let m = KEY_LOW; m <= KEY_HIGH; m++) if (WHITE_PCS.has(m % 12)) WHITES.push(m);
-const WW = (KEYS_X1 - KEYS_X0) / WHITES.length;
-const whiteX = new Map(WHITES.map((m, i) => [m, KEYS_X0 + i * WW]));
-
-const Keyboard = memo(function Keyboard({ pressed }: { pressed: string }) {
-  const down = new Set(pressed ? pressed.split(",").map(Number) : []);
-  const blacks = [];
-  for (let m = KEY_LOW; m <= KEY_HIGH; m++) {
-    if (WHITE_PCS.has(m % 12)) continue;
-    const left = whiteX.get(m - 1);
-    if (left === undefined) continue;
-    const bw = WW * 0.58;
-    blacks.push(
-      <rect
-        key={m}
-        className={styles.black}
-        data-key={m}
-        data-down={on(down.has(m))}
-        x={f1(left + WW - bw / 2)}
-        y={KEYS_Y - 4}
-        width={f1(bw)}
-        height={BLACK_LEN}
-        rx={3}
-      />,
-    );
-  }
-  const dpad: [number, number][] = [
-    [29, 23],
-    [16, 36],
-    [29, 36],
-    [42, 36],
-    [29, 49],
-  ];
-  const ticks = Array.from({ length: 9 }, (_, i) => 70 + i * 6);
-  return (
-    <g>
-      <rect className={styles.kbBody} x={0} y={0} width={KB.w} height={KB.h} rx={16} />
-      <rect className={styles.kbEdge} x={10} y={1} width={KB.w - 20} height={2.5} rx={1.25} />
-      <rect className={styles.kbEdge} x={10} y={KB.h - 3.5} width={KB.w - 20} height={2.5} rx={1.25} />
-
-      {/* navigation pad, then stop, play and record */}
-      {dpad.map(([x, y], i) => (
-        <rect key={i} className={styles.kbButton} x={x - 5.5} y={y - 5.5} width={11} height={11} rx={3} />
-      ))}
-      <path className={styles.kbGlyph} d="M29 20.5l2.2 3.2h-4.4zM13 36l3.2-2.2v4.4zM45 36l-3.2-2.2v4.4zM29 51.5l2.2-3.2h-4.4z" />
-      <circle className={styles.kbGlyph} cx={29} cy={36} r={1.8} />
-      <rect className={styles.kbButton} x={61} y={27} width={18} height={18} rx={4.5} />
-      <rect className={styles.kbGlyph} x={67} y={33} width={6} height={6} rx={1} />
-      <rect className={styles.kbButton} x={86} y={27} width={18} height={18} rx={4.5} />
-      <path className={styles.kbGlyph} d="M92.5 32.2v7.6l6-3.8z" />
-      <circle className={styles.kbButton} cx={120} cy={36} r={9.5} />
-      <circle className={styles.kbGlyph} cx={120} cy={36} r={3.4} />
-
-      {/* volume fader */}
-      {ticks.map((y) => (
-        <g key={y}>
-          <rect className={styles.kbPrint} x={21} y={y} width={6} height={1.2} rx={0.6} />
-          <rect className={styles.kbPrint} x={36} y={y} width={6} height={1.2} rx={0.6} />
-        </g>
-      ))}
-      <rect className={styles.kbWell} x={29} y={66} width={5} height={56} rx={2.5} />
-      <rect className={styles.kbCap} x={23.5} y={104} width={16} height={13} rx={3} />
-      <rect className={styles.kbEdge} x={24.5} y={110} width={14} height={1.2} rx={0.6} />
-
-      {/* advanced, then octave down and up, with their lights */}
-      <circle className={styles.kbLedBlue} cx={71} cy={64} r={2.2} />
-      <rect className={styles.kbButton} x={62} y={74} width={18} height={11} rx={3} />
-      <rect className={styles.kbPrint} x={85} y={79} width={22} height={1.4} rx={0.7} />
-      <circle className={styles.kbLedGreen} cx={71} cy={94} r={2} />
-      <circle className={styles.kbLedGreen} cx={105} cy={94} r={2} />
-      <rect className={styles.kbButton} x={62} y={104} width={18} height={11} rx={3} />
-      <rect className={styles.kbButton} x={96} y={104} width={18} height={11} rx={3} />
-      <rect className={styles.kbPrint} x={80} y={120} width={16} height={4} rx={2} />
-
-      {/* pitch and modulation wheels in their well */}
-      <rect className={styles.kbWell} x={16} y={136} width={104} height={70} rx={26} />
-      <rect className={styles.kbSlot} x={34} y={139} width={22} height={64} rx={11} />
-      <rect className={styles.kbWheel} x={36} y={142} width={18} height={58} rx={9} />
-      <rect className={styles.kbGrip} x={39} y={163} width={12} height={16} rx={6} />
-      <rect className={styles.kbSlot} x={79} y={139} width={22} height={64} rx={11} />
-      <rect className={styles.kbWheel} x={81} y={142} width={18} height={58} rx={9} />
-      <rect className={styles.kbGrip} x={84} y={146} width={12} height={16} rx={6} />
-      <rect className={styles.kbPrint} x={36} y={213} width={18} height={1.6} rx={0.8} />
-      <rect className={styles.kbPrint} x={78} y={213} width={24} height={1.6} rx={0.8} />
-
-      {/* the strip above the keys, where the real one prints each key's second job */}
-      {WHITES.map((m, i) => (
-        <rect
-          key={m}
-          className={styles.kbPrint}
-          x={f1((whiteX.get(m) ?? 0) + WW / 2 - 4 - (i % 3) * 1.5)}
-          y={44}
-          width={8 + (i % 3) * 3}
-          height={1.6}
-          rx={0.8}
-        />
-      ))}
-
-      <rect className={styles.kbWell} x={KEYS_X0 - 3} y={KEYS_Y - 6} width={KEYS_X1 - KEYS_X0 + 6} height={KB.h - KEYS_Y + 3} rx={4} />
-      {WHITES.map((m) => (
-        <rect
-          key={m}
-          className={styles.white}
-          data-key={m}
-          data-down={on(down.has(m))}
-          x={f1((whiteX.get(m) ?? 0) + 0.75)}
-          y={KEYS_Y - 4}
-          width={f1(WW - 1.5)}
-          height={WHITE_LEN}
-          rx={4}
-        />
-      ))}
-      {blacks}
-    </g>
-  );
-});
 
 // ---- Piano roll: the parts that never move, local to the panel's top.
 
@@ -756,7 +629,7 @@ export default function StoryScene({ p, id, still = false }: Props) {
         opacity={f3(f.keysO)}
         visibility={f.keysO > 0.002 ? undefined : "hidden"}
       >
-        <Keyboard pressed={still ? VOICINGS[STILL_BAR].join(",") : ""} />
+        <Keystation pressed={still ? VOICINGS[STILL_BAR].join(",") : ""} />
       </g>
     </svg>
   );

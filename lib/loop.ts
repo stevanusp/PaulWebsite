@@ -1,5 +1,5 @@
-// The loop the story draws and the pads play: Emaj7, D#7, G#m9, C#/E#, B, in the song's key.
-// It is the progression Fmaj7, E7, Am9, D/F#, C moved down a half step into B major.
+// The loop the story draws and the pads play, in the song's key (B major):
+// Emaj7, D#7, G#m9, C#/E#, F#m7, B7. The last two are a ii-V that leads back to Emaj7.
 
 /** One chord per bar: the bass, then the right hand, as MIDI note numbers. */
 export const VOICINGS: readonly (readonly number[])[] = [
@@ -7,7 +7,8 @@ export const VOICINGS: readonly (readonly number[])[] = [
   [39, 55, 58, 61],
   [44, 56, 58, 59, 63, 66],
   [41, 56, 61, 65],
-  [47, 54, 59, 63],
+  [42, 57, 61, 64],
+  [47, 57, 63, 66],
 ];
 
 const pc = (midi: number) => ((midi % 12) + 12) % 12;
@@ -21,4 +22,3 @@ export const inChord = (midi: number, chord: readonly number[]) => chord.some((m
 
 /** The note this site keeps coming back to: G, written F double sharp, the third of D#7. */
 export const ODD_NOTE = 67;
-export const ODD_HOME = 1;

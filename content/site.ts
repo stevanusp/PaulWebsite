@@ -71,12 +71,12 @@ export const method = {
     },
     {
       title: "Then I play it.",
-      body: "On an M-Audio Keystation 49, by ear. My favorite loop, in the song's key: Emaj7, D#7, G#m9, C#/E#, B.",
+      body: "On an M-Audio Keystation 49, by ear. My favorite loop, in the song's key: Emaj7, D#7, G#m9, C#/E#, F#m7, B7, then around again.",
     },
   ] satisfies Step[],
   listen: "Listen to It's been a while",
   description:
-    "An illustration in six steps: a console of network events where one unusual upload is flagged in amber and contained; the same window turning into the song in Logic Pro, with xylophone, bass and violin tracks at 116 bpm in 3/4, B major; a piano roll where one note looks out of key until its D#7 chord appears around it; and a 49-key MIDI keyboard playing the loop Emaj7, D#7, G#m9, C#/E#, B.",
+    "An illustration in six steps: a console of network events where one unusual upload is flagged in amber and contained; the same window turning into the song in Logic Pro, with xylophone, bass and violin tracks at 116 bpm in 3/4, B major; a piano roll where one note looks out of key until its D#7 chord appears around it; and a 49-key MIDI keyboard playing the loop Emaj7, D#7, G#m9, C#/E#, F#m7, B7.",
   scene: {
     securityTitle: "Network events",
     musicTitle: "It's been a while",
@@ -108,7 +108,7 @@ export const method = {
     cardContainedSub: "Everyone else keeps working",
     tracks: ["Xylophone", "Bass", "Violin"],
     chordsLabel: "Chords",
-    chords: ["Emaj7", "D#7", "G#m9", "C#/E#", "B"],
+    chords: ["Emaj7", "D#7", "G#m9", "C#/E#", "F#m7", "B7"],
     bar: "bar",
     beat: "beat",
     tempo: "116",
@@ -241,9 +241,9 @@ export const ear = {
   },
   tryLabel: "Or play it yourself",
   caption: "My favorite loop, in the song's key. Play the chords, then the lone G after them. Tap a pad",
-  captionKeys: ", or press 1 to 6",
+  captionKeys: ", or press 1 to 7",
   idleLabel: "Tap a pad",
-  found: "That's the whole loop. It comes back around to Emaj7.",
+  found: "That's the whole loop. B7 leads it back to Emaj7.",
   note: {
     name: "G",
     sub: "one note",
@@ -258,7 +258,8 @@ export const ear = {
     { name: "D#7", degree: "III", label: "D sharp seven" },
     { name: "G#m9", degree: "vi", label: "G sharp minor nine" },
     { name: "C#/E#", degree: "II", label: "C sharp over E sharp" },
-    { name: "B", degree: "I", label: "B major" },
+    { name: "F#m7", degree: "v", label: "F sharp minor seven" },
+    { name: "B7", degree: "I7", label: "B seven" },
   ],
 } as const;
 

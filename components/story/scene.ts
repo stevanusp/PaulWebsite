@@ -4,6 +4,8 @@
 // Everything here is deterministic, so the server and the client draw the same frame. The motion
 // that runs on its own (the event feed, playback, the keys) lives in Story.tsx and adds to this.
 
+import { KEYSTATION } from "@/components/Keystation";
+
 export const VIEW_W = 1000;
 export const VIEW_H = 660;
 
@@ -29,13 +31,13 @@ const rand = (n: number) => {
   return s - Math.floor(s);
 };
 
-// ---- The song, as it sits in the project: 116 bpm, 3/4, B major. The loop is five bars.
+// ---- The song, as it sits in the project: 116 bpm, 3/4, B major. The loop is six bars.
 
 export const BPM = 116;
 export const METER = 3;
 export const BEAT_S = 60 / BPM;
 export const BAR_S = BEAT_S * METER;
-export const LOOP_BARS = 5;
+export const LOOP_BARS = 6;
 export const LOOP_S = BAR_S * LOOP_BARS;
 /** Eighth notes per bar. Notes and steps below count in eighths from the top of the loop. */
 export const STEPS = 6;
@@ -45,21 +47,28 @@ export { VOICINGS, inKey } from "@/lib/loop";
 
 export type Note = { track: number; pitch: number; start: number; len: number };
 
-// Xylophone: the chords broken into eighths. Bass: one note a bar. Violin: a falling line from bar 2.
+// Xylophone: the chords broken into eighths. Bass: one note a bar. Violin: a falling line from
+// bar 2, holding the A from F#m7 across into B7, where it becomes the seventh.
 const XYLO = [
   [64, 68, 71, 75, 71, 68],
   [63, 67, 70, 73, 70, 67],
   [68, 70, 71, 75, 78, 75],
   [65, 68, 73, 77, 73, 68],
-  [66, 71, 75, 78, 75, 71],
+  [66, 69, 73, 76, 73, 69],
+  [63, 66, 69, 71, 69, 66],
 ];
-const BASS = [40, 39, 44, 41, 35];
-const VIOLIN = [null, 73, 71, 68, 66];
+const BASS = [40, 39, 44, 41, 42, 35];
+const VIOLIN = [
+  { bar: 1, pitch: 73, bars: 1 },
+  { bar: 2, pitch: 71, bars: 1 },
+  { bar: 3, pitch: 68, bars: 1 },
+  { bar: 4, pitch: 69, bars: 2 },
+];
 
 export const NOTES: Note[] = [
   ...XYLO.flatMap((bar, b) => bar.map((pitch, s) => ({ track: 0, pitch, start: b * STEPS + s, len: 1 }))),
   ...BASS.map((pitch, b) => ({ track: 1, pitch, start: b * STEPS, len: STEPS })),
-  ...VIOLIN.flatMap((pitch, b) => (pitch === null ? [] : [{ track: 2, pitch, start: b * STEPS, len: STEPS }])),
+  ...VIOLIN.map((v) => ({ track: 2, pitch: v.pitch, start: v.bar * STEPS, len: v.bars * STEPS })),
 ];
 
 /** The last eighth of bar 2: F double sharp (it sounds as G), the third of D#7. */
@@ -98,13 +107,13 @@ const LANE_ROLL = 56;
 export const TRACKS = [
   { lo: 62, hi: 79 },
   { lo: 33, hi: 48 },
-  { lo: 64, hi: 77 },
+  { lo: 66, hi: 75 },
 ] as const;
 
 export const REGIONS = [
-  { lane: 0, from: 0, to: 5 },
-  { lane: 1, from: 0, to: 5 },
-  { lane: 2, from: 1, to: 5 },
+  { lane: 0, from: 0, to: 6 },
+  { lane: 1, from: 0, to: 6 },
+  { lane: 2, from: 1, to: 6 },
 ] as const;
 
 /** Piano roll panel, local to its own top: a header, then one row per semitone, high at the top. */
@@ -114,11 +123,9 @@ export const rollY = (pitch: number) => ROLL.HEAD + (ROLL.HIGH - pitch) * ROLL.R
 /** Event log panel: a header row, then rows. */
 export const LOG = { HEAD: 26, ROW: 27 } as const;
 
-// ---- Keyboard: a 49-key controller, C2 to C6, drawn from the real one's top view.
+// ---- Keyboard: the Keystation drawing, in a 1000 x 228 box under the window.
 
-export const KEY_LOW = 36;
-export const KEY_HIGH = 84;
-export const KB = { w: 1000, h: 228 } as const;
+const KB = KEYSTATION;
 
 // ---- The security timeline.
 

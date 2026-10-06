@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ear } from "@/content/site";
 import { getEngine, type Engine } from "@/lib/epiano";
 import { ODD_NOTE, VOICINGS, inChord, inKey } from "@/lib/loop";
+import { KEYSTATION, Keystation } from "./Keystation";
 import styles from "./Instrument.module.css";
 
 const CHORDS = VOICINGS.length;
@@ -25,6 +26,9 @@ export default function Instrument() {
   // What the lone note turned out to be, given what was ringing under it.
   const [heard, setHeard] = useState<"outside" | "belongs" | null>(null);
   const [flagged, setFlagged] = useState(false);
+  const [noteDown, setNoteDown] = useState(false);
+  // A small reward for whoever presses things: the first hit drops the keyboard in above the pads.
+  const [dropped, setDropped] = useState(false);
 
   const engine = () => {
     // Created inside the gesture so every browser allows audio.
@@ -48,6 +52,7 @@ export default function Instrument() {
     timers.current[CHORDS + 2] = window.setTimeout(() => {
       currentRef.current = null;
       setCurrent(null);
+      setNoteDown(false);
     }, IDLE_MS);
   };
 
@@ -58,10 +63,12 @@ export default function Instrument() {
     setCurrent(index);
     setHeard(null);
     setFlagged(false);
+    setNoteDown(false);
+    setDropped(true);
     settle();
     const hist = [...historyRef.current, index].slice(-CHORDS);
     historyRef.current = hist;
-    if (hist.join() === "0,1,2,3,4") setFound(true);
+    if (hist.join() === VOICINGS.map((_, i) => i).join()) setFound(true);
   }, []);
 
   const playNote = useCallback(() => {
@@ -73,8 +80,13 @@ export default function Instrument() {
     const belongs = (chord !== null && inChord(ODD_NOTE, VOICINGS[chord])) || inKey(ODD_NOTE);
     setHeard(belongs ? "belongs" : "outside");
     setFlagged(!belongs);
+    setNoteDown(true);
+    setDropped(true);
     window.clearTimeout(timers.current[CHORDS + 1]);
-    if (!belongs) timers.current[CHORDS + 1] = window.setTimeout(() => setFlagged(false), FLAG_MS);
+    timers.current[CHORDS + 1] = window.setTimeout(() => {
+      setFlagged(false);
+      setNoteDown(false);
+    }, FLAG_MS);
   }, []);
 
   useEffect(() => {
@@ -120,67 +132,89 @@ export default function Instrument() {
           ? ear.idleLabel
           : ear.chords[current].label;
 
-  return (
-    <div ref={rootRef} className={`tile ${styles.instrument}`}>
-      <p className={styles.status} data-flag={flagged ? "true" : "false"} aria-hidden="true">
-        {status}
-      </p>
+  const held = [...(current !== null ? VOICINGS[current] : []), ...(noteDown ? [ODD_NOTE] : [])];
 
-      <div className={styles.pads} role="group" aria-label="Chord pads">
-        {ear.chords.map((chord, i) => (
-          <button
-            key={chord.name}
-            ref={(el) => {
-              padRefs.current[i] = el;
-            }}
-            type="button"
-            className={styles.pad}
-            data-hit="false"
-            aria-keyshortcuts={String(i + 1)}
-            onPointerDown={(e) => {
-              if (e.button !== 0) return;
-              play(i);
-            }}
-            onClick={(e) => {
-              // Keyboard activation (Enter or Space) arrives as a click with detail 0.
-              if (e.detail === 0) play(i);
-            }}
-          >
-            <span className={styles.padName}>{chord.name}</span>{" "}
-            <span className={styles.padDegree}>{chord.degree}</span>
-            <span className="visually-hidden">, play {chord.label}</span>
-          </button>
-        ))}
-        <button
-          ref={(el) => {
-            padRefs.current[NOTE_PAD] = el;
-          }}
-          type="button"
-          className={`${styles.pad} ${styles.padNote}`}
-          data-hit="false"
-          data-outside={heard === "outside" ? "true" : "false"}
-          aria-keyshortcuts={String(NOTE_PAD + 1)}
-          onPointerDown={(e) => {
-            if (e.button !== 0) return;
-            playNote();
-          }}
-          onClick={(e) => {
-            if (e.detail === 0) playNote();
-          }}
-        >
-          <span className={styles.padName}>{ear.note.name}</span>{" "}
-          <span className={styles.padDegree}>{ear.note.sub}</span>
-          <span className="visually-hidden">, {ear.note.play}</span>
-        </button>
+  return (
+    <>
+      <div className={styles.head}>
+        <h3 className={styles.label}>{ear.tryLabel}</h3>
+        <div className={styles.dock} aria-hidden="true">
+          {dropped ? (
+            <>
+              <span className={styles.shadow} />
+              <svg
+                className={styles.keys}
+                viewBox={`0 0 ${KEYSTATION.w} ${KEYSTATION.h}`}
+                focusable="false"
+              >
+                <Keystation pressed={held.join(",")} accent={heard === "outside" && flagged ? ODD_NOTE : null} />
+              </svg>
+            </>
+          ) : null}
+        </div>
       </div>
 
-      <p className={styles.caption}>
-        {ear.caption}
-        <span className={styles.keys}>{ear.captionKeys}</span>.
-      </p>
-      <p className={styles.found} aria-live="polite">
-        {heard === "outside" ? ear.note.outsideLine : heard === "belongs" ? ear.note.belongsLine : found ? ear.found : ""}
-      </p>
-    </div>
+      <div ref={rootRef} className={`tile ${styles.instrument}`}>
+        <p className={styles.status} data-flag={flagged ? "true" : "false"} aria-hidden="true">
+          {status}
+        </p>
+
+        <div className={styles.pads} role="group" aria-label="Chord pads">
+          {ear.chords.map((chord, i) => (
+            <button
+              key={chord.name}
+              ref={(el) => {
+                padRefs.current[i] = el;
+              }}
+              type="button"
+              className={styles.pad}
+              data-hit="false"
+              aria-keyshortcuts={String(i + 1)}
+              onPointerDown={(e) => {
+                if (e.button !== 0) return;
+                play(i);
+              }}
+              onClick={(e) => {
+                // Keyboard activation (Enter or Space) arrives as a click with detail 0.
+                if (e.detail === 0) play(i);
+              }}
+            >
+              <span className={styles.padName}>{chord.name}</span>{" "}
+              <span className={styles.padDegree}>{chord.degree}</span>
+              <span className="visually-hidden">, play {chord.label}</span>
+            </button>
+          ))}
+          <button
+            ref={(el) => {
+              padRefs.current[NOTE_PAD] = el;
+            }}
+            type="button"
+            className={`${styles.pad} ${styles.padNote}`}
+            data-hit="false"
+            data-outside={heard === "outside" ? "true" : "false"}
+            aria-keyshortcuts={String(NOTE_PAD + 1)}
+            onPointerDown={(e) => {
+              if (e.button !== 0) return;
+              playNote();
+            }}
+            onClick={(e) => {
+              if (e.detail === 0) playNote();
+            }}
+          >
+            <span className={styles.padName}>{ear.note.name}</span>{" "}
+            <span className={styles.padDegree}>{ear.note.sub}</span>
+            <span className="visually-hidden">, {ear.note.play}</span>
+          </button>
+        </div>
+
+        <p className={styles.caption}>
+          {ear.caption}
+          <span className={styles.shortcuts}>{ear.captionKeys}</span>.
+        </p>
+        <p className={styles.found} aria-live="polite">
+          {heard === "outside" ? ear.note.outsideLine : heard === "belongs" ? ear.note.belongsLine : found ? ear.found : ""}
+        </p>
+      </div>
+    </>
   );
 }

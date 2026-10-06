@@ -22,7 +22,6 @@ export default function ByEar() {
       </div>
 
       <div className={styles.try}>
-        <h3 className={styles.tryLabel}>{ear.tryLabel}</h3>
         <Instrument />
       </div>
     </Section>

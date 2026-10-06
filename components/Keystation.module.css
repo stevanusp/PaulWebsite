@@ -1,0 +1,84 @@
+/* Fixed colors: it is a black controller in both themes. */
+
+.body {
+  fill: #1c1c1f;
+  stroke: #343438;
+  stroke-width: 1;
+}
+
+.edge {
+  fill: #6c6d72;
+}
+
+.well {
+  fill: #0f0f11;
+}
+
+.button {
+  fill: #2b2b2f;
+  stroke: #3d3d42;
+  stroke-width: 0.8;
+}
+
+.glyph {
+  fill: #5d5e64;
+}
+
+.print {
+  fill: #8d8e94;
+  opacity: 0.75;
+}
+
+.cap {
+  fill: #3a3a3f;
+  stroke: #55565b;
+  stroke-width: 0.8;
+}
+
+.ledBlue {
+  fill: #5aa9ff;
+}
+
+.ledGreen {
+  fill: #59d27a;
+}
+
+.slot {
+  fill: #08080a;
+}
+
+.wheel {
+  fill: #2e2e33;
+}
+
+.grip {
+  fill: #3e3e44;
+}
+
+.white {
+  fill: #f7f7f5;
+  stroke: #d6d6d8;
+  stroke-width: 0.6;
+  transition: fill 90ms ease;
+}
+
+.white[data-down] {
+  fill: #c9cbd0;
+}
+
+.black {
+  fill: #141416;
+  stroke: #000;
+  stroke-width: 0.6;
+  transition: fill 90ms ease;
+}
+
+.black[data-down] {
+  fill: #55565d;
+}
+
+/* The amber note stays in its fixed color here too: the keyboard does not follow the theme. */
+.white[data-accent],
+.black[data-accent] {
+  fill: #e08a1e;
+}
