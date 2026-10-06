@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ear } from "@/content/site";
 import { getEngine, type Engine } from "@/lib/epiano";
 import { ODD_NOTE, VOICINGS, inChord, inKey } from "@/lib/loop";
-import { KEYSTATION, Keystation } from "./Keystation";
+import CloudDrop from "./secure-cloud/CloudDrop";
 import styles from "./Instrument.module.css";
 
 const CHORDS = VOICINGS.length;
@@ -27,7 +27,8 @@ export default function Instrument() {
   const [heard, setHeard] = useState<"outside" | "belongs" | null>(null);
   const [flagged, setFlagged] = useState(false);
   const [noteDown, setNoteDown] = useState(false);
-  // A small reward for whoever presses things: the first hit drops the keyboard in above the pads.
+  // A small reward for whoever presses things: the first hit drops the secure cloud in above the
+  // pads, and it breaks into the keyboard, which plays along.
   const [dropped, setDropped] = useState(false);
 
   const engine = () => {
@@ -140,16 +141,7 @@ export default function Instrument() {
         <h3 className={styles.label}>{ear.tryLabel}</h3>
         <div className={styles.dock} aria-hidden="true">
           {dropped ? (
-            <>
-              <span className={styles.shadow} />
-              <svg
-                className={styles.keys}
-                viewBox={`0 0 ${KEYSTATION.w} ${KEYSTATION.h}`}
-                focusable="false"
-              >
-                <Keystation pressed={held.join(",")} accent={heard === "outside" && flagged ? ODD_NOTE : null} />
-              </svg>
-            </>
+            <CloudDrop pressed={held.join(",")} accent={heard === "outside" && flagged ? ODD_NOTE : null} />
           ) : null}
         </div>
       </div>
@@ -211,7 +203,7 @@ export default function Instrument() {
           {ear.caption}
           <span className={styles.shortcuts}>{ear.captionKeys}</span>.
         </p>
-        {/* Only for whoever starts pressing: the fact arrives with the keyboard. */}
+        {/* Only for whoever starts pressing: the fact arrives once the keyboard has landed. */}
         {dropped ? <p className={styles.fact}>{ear.fact}</p> : null}
         <p className={styles.found} aria-live="polite">
           {heard === "outside" ? ear.note.outsideLine : heard === "belongs" ? ear.note.belongsLine : found ? ear.found : ""}

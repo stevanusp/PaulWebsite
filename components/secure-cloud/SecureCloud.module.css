@@ -1,0 +1,26 @@
+/* Keys keep the Keystation's real colors; as a cloud they take the theme's ink (white keys) and
+   background (black keys, cut out as the lock), so the mark inverts in dark mode. */
+
+.white {
+  fill: #f7f7f5;
+  stroke: #d6d6d8;
+  stroke-width: 0.6;
+}
+
+.black {
+  fill: #141416;
+}
+
+.ink {
+  fill: var(--ink);
+}
+
+.cut {
+  fill: var(--bg);
+}
+
+.shackle {
+  fill: none;
+  stroke: var(--bg);
+  stroke-linecap: round;
+}
