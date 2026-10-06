@@ -239,6 +239,20 @@
   line-height: var(--lh-small);
   color: var(--muted);
   max-width: 44em;
+  animation: fact 520ms var(--ease-out) 700ms both;
+}
+
+@keyframes fact {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fact {
+    animation: arrive 200ms ease both;
+  }
 }
 
 /* Touch devices have no number keys to press. */

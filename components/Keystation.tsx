@@ -20,6 +20,21 @@ for (let m = KEYSTATION.low; m <= KEYSTATION.high; m++) if (WHITE_PCS.has(m % 12
 const WW = (KEYS_X1 - KEYS_X0) / WHITES.length;
 const whiteX = new Map(WHITES.map((m, i) => [m, KEYS_X0 + i * WW]));
 
+/** The keys' rectangles in the drawing's own 1000 x 228 box, white then black, low to high. */
+export type KeyRect = { midi: number; x: number; y: number; w: number; h: number; r: number };
+export function keyRects(): { whites: KeyRect[]; blacks: KeyRect[] } {
+  const whites = WHITES.map((m) => ({ midi: m, x: (whiteX.get(m) ?? 0) + 0.75, y: KEYS_Y - 4, w: WW - 1.5, h: WHITE_LEN, r: 4 }));
+  const blacks: KeyRect[] = [];
+  for (let m = KEYSTATION.low; m <= KEYSTATION.high; m++) {
+    if (WHITE_PCS.has(m % 12)) continue;
+    const left = whiteX.get(m - 1);
+    if (left === undefined) continue;
+    const bw = WW * 0.58;
+    blacks.push({ midi: m, x: left + WW - bw / 2, y: KEYS_Y - 4, w: bw, h: BLACK_LEN, r: 3 });
+  }
+  return { whites, blacks };
+}
+
 const f1 = (n: number) => n.toFixed(1);
 const on = (v: boolean) => (v ? "" : undefined);
 
@@ -28,9 +43,11 @@ type Props = {
   pressed?: string;
   /** A held key to show in amber: the note that has nothing to belong to. */
   accent?: number | null;
+  /** Without keys, for drawings that move the keys themselves. */
+  keys?: boolean;
 };
 
-export const Keystation = memo(function Keystation({ pressed = "", accent = null }: Props) {
+export const Keystation = memo(function Keystation({ pressed = "", accent = null, keys = true }: Props) {
   const down = new Set(pressed ? pressed.split(",").map(Number) : []);
   const key = (m: number) => ({
     "data-key": m,
@@ -138,7 +155,8 @@ export const Keystation = memo(function Keystation({ pressed = "", accent = null
         height={KEYSTATION.h - KEYS_Y + 3}
         rx={4}
       />
-      {WHITES.map((m) => (
+      {keys
+        ? WHITES.map((m) => (
         <rect
           key={m}
           className={styles.white}
@@ -149,8 +167,9 @@ export const Keystation = memo(function Keystation({ pressed = "", accent = null
           height={WHITE_LEN}
           rx={4}
         />
-      ))}
-      {blacks}
+          ))
+        : null}
+      {keys ? blacks : null}
     </g>
   );
 });

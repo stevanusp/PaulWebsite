@@ -1,20 +1,32 @@
-// Geometry for "What I work on": a piano whose keys turn into a cloud with a padlock in it.
-// Pure function of scroll progress p (0 to 1), so the server and the client draw the same frame.
+// Geometry for "What I work on", as a pure function of scroll progress p (0 to 1), so the server
+// and the client draw the same frame. Every piece is one of the Keystation's 49 keys, all the way:
 //
-// 1. The keys go down in a wave, left to right, like devices being let in one by one.
-// 2. The white keys stand up into bars that trace the outline of a cloud.
-// 3. The bars close up into one cloud; the black keys gather into a padlock and it locks.
+// 1. The keys come loose from the controller and fall.
+// 2. On the way down they gather into a cloud (the white keys) with a padlock in it (the black
+//    keys), and it locks.
+// 3. The cloud falls to the floor and shatters; the pieces are the keys again, and they land back
+//    in a Keystation.
+//
+// The drawing is in "world" units, taller than the window; a camera follows a step behind, so the
+// falls read as falls while whatever matters stays in frame.
 
-/** The drawing's box, cropped to what is drawn: the piano's tray across, the cloud's top down. */
-export const VIEW = { x: 40, y: 140, w: 920, h: 400 } as const;
+import { KEYSTATION, keyRects } from "@/components/Keystation";
+
+/** The window onto the world. */
+export const VIEW = { w: 1000, h: 640 } as const;
 
 const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
 const ease = (t: number) => {
   const x = clamp(t);
   return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 };
+const easeOut = (t: number) => 1 - Math.pow(1 - clamp(t), 3);
 const span = (p: number, a: number, b: number) => ease((p - a) / (b - a));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const rand = (n: number) => {
+  const s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+  return s - Math.floor(s);
+};
 
 export type Rect = { x: number; y: number; w: number; h: number; r: number };
 const mix = (a: Rect, b: Rect, t: number): Rect => ({
@@ -25,25 +37,22 @@ const mix = (a: Rect, b: Rect, t: number): Rect => ({
   r: lerp(a.r, b.r, t),
 });
 
-// ---- The piano: 49 keys, C2 to C6, in a dark tray.
+// ---- The two Keystations: one at the top of the world, one on the floor.
 
-const WHITE_PCS = new Set([0, 2, 4, 5, 7, 9, 11]);
-const KX0 = 84;
-const KX1 = 916;
-const KY = 300;
-const WHITE_H = 210;
-const BLACK_H = 130;
-const WHITES: number[] = [];
-const BLACKS: { midi: number; left: number }[] = [];
-for (let m = 36; m <= 84; m++) {
-  if (WHITE_PCS.has(m % 12)) WHITES.push(m);
-  else BLACKS.push({ midi: m, left: WHITES.length - 1 });
-}
-const WW = (KX1 - KX0) / WHITES.length;
-const BW = WW * 0.58;
-export const TRAY: Rect = { x: KX0 - 16, y: KY - 16, w: KX1 - KX0 + 32, h: WHITE_H + 30, r: 22 };
+export const KS = { scale: 0.78, x: (VIEW.w - KEYSTATION.w * 0.78) / 2, h: KEYSTATION.h * 0.78 } as const;
+export const FLOOR = 900;
+export const KS_TOP = 0;
+export const KS_FLOOR = FLOOR - KS.h;
+const KEYS = keyRects();
+const onKs = (r: Rect, y0: number): Rect => ({
+  x: KS.x + r.x * KS.scale,
+  y: y0 + r.y * KS.scale,
+  w: r.w * KS.scale,
+  h: r.h * KS.scale,
+  r: r.r * KS.scale,
+});
 
-// ---- The cloud: three circles on a rounded base, all one shape once they share a fill.
+// ---- The cloud, drawn in its own units and placed in the world with CLOUD_FIT.
 
 export const CIRCLES = [
   { cx: 362, cy: 352, r: 100 },
@@ -51,9 +60,25 @@ export const CIRCLES = [
   { cx: 648, cy: 350, r: 110 },
 ] as const;
 export const BASE: Rect = { x: 262, y: 362, w: 496, h: 108, r: 54 };
-const BASE_MID = BASE.y + BASE.h / 2;
+export const LOCK = { x: 440, y: 374, w: 120, h: 86, r: 18 } as const;
+export const SHACKLE = { cx: 500, top: 312, half: 34, foot: 380, stroke: 16 } as const;
+export const KEYHOLE = { cx: 500, cy: 406, r: 10, stem: 22 } as const;
 
-/** Top and bottom of the cloud at a given x. */
+const CLOUD_SCALE = 0.8;
+const CLOUD_Y = 470; // where the cloud's middle sits in the world
+/** Cloud units to world: translate, then scale. */
+export const CLOUD_FIT = { x: 500 - 510 * CLOUD_SCALE, y: CLOUD_Y - 315 * CLOUD_SCALE, scale: CLOUD_SCALE } as const;
+const toWorld = (r: Rect): Rect => ({
+  x: CLOUD_FIT.x + r.x * CLOUD_SCALE,
+  y: CLOUD_FIT.y + r.y * CLOUD_SCALE,
+  w: r.w * CLOUD_SCALE,
+  h: r.h * CLOUD_SCALE,
+  r: r.r * CLOUD_SCALE,
+});
+/** How far the cloud falls: from where it forms until its base touches the floor. */
+const FALL = FLOOR - (CLOUD_FIT.y + (BASE.y + BASE.h) * CLOUD_SCALE);
+
+/** Top and bottom of the cloud at a given x, in cloud units. */
 function outline(x: number): [number, number] {
   let top = Infinity;
   let bottom = -Infinity;
@@ -64,94 +89,158 @@ function outline(x: number): [number, number] {
     top = Math.min(top, c.cy - dy);
     bottom = Math.max(bottom, c.cy + dy);
   }
+  const mid = BASE.y + BASE.h / 2;
   const l = BASE.x + BASE.r;
   const r = BASE.x + BASE.w - BASE.r;
   const dx = x < l ? l - x : x > r ? x - r : 0;
   if (dx < BASE.r) {
     const dy = Math.sqrt(BASE.r * BASE.r - dx * dx);
-    top = Math.min(top, BASE_MID - dy);
-    bottom = Math.max(bottom, BASE_MID + dy);
+    top = Math.min(top, mid - dy);
+    bottom = Math.max(bottom, mid + dy);
   }
   return [top, bottom];
 }
 
-const BAR_PITCH = BASE.w / WHITES.length;
+const PITCH = BASE.w / KEYS.whites.length;
+const SLICE = LOCK.w / KEYS.blacks.length;
 
-// ---- The padlock, cut out of the cloud.
+// ---- Each key's path through the story.
 
-export const LOCK = { x: 440, y: 374, w: 120, h: 86, r: 18 } as const;
-export const SHACKLE = { cx: 500, top: 312, half: 34, foot: 380, stroke: 16 } as const;
-export const KEYHOLE = { cx: 500, cy: 406, r: 10, stem: 22 } as const;
-const SLICE = LOCK.w / BLACKS.length;
+type Path = {
+  top: Rect; // in the first Keystation
+  open: Rect; // a bar in the cloud, with gaps
+  shut: Rect; // a bar in the cloud, closed up
+  floor: Rect; // in the Keystation on the floor
+  order: number; // 0..1, when it lets go
+  spin: number; // how much it turns in the air
+  burst: { dx: number; dy: number; turn: number }; // where it flies when the cloud breaks
+};
+
+const paths = (kind: "white" | "black"): Path[] =>
+  (kind === "white" ? KEYS.whites : KEYS.blacks).map((k, i) => {
+    const seed = (kind === "white" ? 0 : 100) + i;
+    let open: Rect;
+    let shut: Rect;
+    if (kind === "white") {
+      const cx = BASE.x + (i + 0.5) * PITCH;
+      const [top, bottom] = outline(cx);
+      open = toWorld({ x: cx - 5.5, y: top, w: 11, h: bottom - top, r: 5.5 });
+      shut = toWorld({ x: cx - PITCH / 2 - 0.6, y: top, w: PITCH + 1.2, h: bottom - top, r: PITCH / 2 + 0.6 });
+    } else {
+      open = toWorld({ x: LOCK.x + i * SLICE - 0.3, y: LOCK.y, w: SLICE + 0.6, h: LOCK.h, r: 3 });
+      shut = open;
+    }
+    const center = shut.x + shut.w / 2;
+    return {
+      top: onKs(k, KS_TOP),
+      open,
+      shut,
+      floor: onKs(k, KS_FLOOR),
+      order: rand(seed),
+      spin: (rand(seed + 7) - 0.5) * 70,
+      burst: {
+        dx: (center - 500) * 0.55 + (rand(seed + 13) - 0.5) * 180,
+        dy: -(50 + rand(seed + 21) * 190),
+        turn: (rand(seed + 29) - 0.5) * 150,
+      },
+    };
+  });
+
+const WHITE_PATHS = paths("white");
+const BLACK_PATHS = paths("black");
+
+// The camera's target height in the world, by progress. It trails each fall, then settles.
+const CAMERA: [number, number][] = [
+  [0, KS_TOP + KS.h / 2],
+  [0.1, KS_TOP + KS.h / 2],
+  [0.4, CLOUD_Y],
+  [0.64, CLOUD_Y],
+  [0.82, KS_FLOOR + KS.h / 2 - 60],
+  [0.96, KS_FLOOR + KS.h / 2],
+  [1, KS_FLOOR + KS.h / 2],
+];
+function camera(p: number) {
+  for (let i = 1; i < CAMERA.length; i++) {
+    const [p1, y1] = CAMERA[i];
+    const [p0, y0] = CAMERA[i - 1];
+    if (p <= p1) return lerp(y0, y1, ease((p - p0) / (p1 - p0)));
+  }
+  return CAMERA[CAMERA.length - 1][1];
+}
+
+export type Piece = Rect & { turn: number; tone: number };
 
 export type Frame = {
-  tray: number;
-  whites: (Rect & { light: number; dark: number })[];
-  blacks: (Rect & { light: number })[];
+  /** Vertical shift from world to window. */
+  shift: number;
+  ksTop: number;
+  ksFloor: number;
+  whites: Piece[];
+  blacks: Piece[];
   base: number;
-  bars: number;
   cloud: number;
-  slices: number;
   lock: number;
   shackleDraw: number;
   shackleDrop: number;
-  keyhole: number;
+  /** How far the formed cloud has fallen, in world units. */
+  drop: number;
+  shadow: { w: number; o: number };
 };
 
+// Beats, in progress.
+const IMPACT = 0.74;
+
 export function scene(p: number): Frame {
-  const wave = clamp(p / 0.24); // linear: the wave's position along the keys
-  const rise = span(p, 0.26, 0.56);
-  const merge = span(p, 0.6, 0.8);
-  const finish = span(p, 0.8, 0.9);
-  const draw = span(p, 0.72, 0.88);
-  const close = span(p, 0.9, 0.98);
+  const merge = span(p, 0.36, 0.44);
+  const solid = span(p, 0.42, 0.48);
+  const draw = span(p, 0.42, 0.5);
+  const close = span(p, 0.5, 0.54);
+  const fallT = clamp((p - 0.64) / (IMPACT - 0.64));
+  const drop = FALL * fallT * fallT; // gravity: slow, then fast
+  const burst = easeOut((p - IMPACT) / 0.07);
+  const broken = p >= IMPACT;
 
-  // How far down each key is: a soft bump that travels from the lowest key to the highest.
-  const front = wave * 56 - 4;
-  const pressAt = (k: number) => {
-    if (wave <= 0 || wave >= 1) return 0;
-    const d = (front - k) / 3.2;
-    return Math.abs(d) < 1 ? 1 - d * d : 0;
+  const move = (path: Path, kind: "white" | "black"): Piece => {
+    // Let go: a small hop out of the keybed, then the fall into the cloud.
+    const pop = span(p, 0.03 + path.order * 0.06, 0.08 + path.order * 0.06);
+    const g = clamp((p - (0.08 + path.order * 0.14)) / 0.18);
+    const eg = ease(g);
+    let r = mix(path.top, kind === "white" ? path.open : path.shut, eg);
+    r = { ...r, y: r.y - 7 * pop * (1 - eg) };
+    let turn = pop * (1 - eg) * path.spin * 0.08 + Math.sin(Math.PI * g) * path.spin;
+    r = mix(r, path.shut, merge);
+    r = { ...r, y: r.y + drop };
+    if (broken) {
+      r = { ...r, x: r.x + path.burst.dx * burst, y: r.y + path.burst.dy * burst };
+      turn = lerp(turn, path.burst.turn, burst);
+    }
+    // Land back in a keyboard, each key in its own time.
+    const a = ease((p - (0.8 + path.order * 0.06)) / 0.12);
+    r = mix(r, path.floor, a);
+    turn = lerp(turn, 0, a);
+    // tone: 0 is the key's own color, 1 is the cloud's (ink for white keys, background for black).
+    // Black keys go dark again as the cloud breaks, so their pieces show against the page.
+    const back = kind === "black" && broken ? burst : 0;
+    const tone = clamp((g - 0.5) / 0.5) * (1 - back) * (1 - a);
+    return { ...r, turn, tone };
   };
-  const order = new Map<number, number>();
-  for (let m = 36; m <= 84; m++) order.set(m, m - 36);
 
-  const whites = WHITES.map((m, i) => {
-    const press = pressAt(order.get(m) ?? 0);
-    const piano: Rect = { x: KX0 + i * WW + 1, y: KY, w: WW - 2, h: WHITE_H - 6 * press, r: 6 };
-    const cx = BASE.x + (i + 0.5) * BAR_PITCH;
-    const [top, bottom] = outline(cx);
-    const open: Rect = { x: cx - 5.5, y: top, w: 11, h: bottom - top, r: 5.5 };
-    const shut: Rect = { x: cx - BAR_PITCH / 2 - 0.6, y: top, w: BAR_PITCH + 1.2, h: bottom - top, r: BAR_PITCH / 2 + 0.6 };
-    // The middle keys move first; the ends follow, so it opens like a bloom rather than a slide.
-    const t = ease(clamp(rise * 1.5 - (Math.abs(i - 14) / 14) * 0.5));
-    const rect = mix(mix(piano, open, t), shut, merge);
-    const dark = Math.max(0.12 * press, clamp((t - 0.3) / 0.7));
-    return { ...rect, dark, light: 1 - clamp((t - 0.5) / 0.5) };
-  });
-
-  const blacks = BLACKS.map((b, j) => {
-    const press = pressAt(order.get(b.midi) ?? 0);
-    const left = KX0 + (b.left + 1) * WW;
-    const piano: Rect = { x: left - BW / 2, y: KY, w: BW, h: BLACK_H - 5 * press, r: 4 };
-    const slice: Rect = { x: LOCK.x + j * SLICE - 0.3, y: LOCK.y, w: SLICE + 0.6, h: LOCK.h, r: 3 };
-    const t = ease(clamp(rise * 1.4 - 0.15 - (j / (BLACKS.length - 1)) * 0.25));
-    return { ...mix(piano, slice, t), light: Math.max(0.28 * press, clamp((t - 0.45) / 0.55)) };
-  });
-
+  const shadowNear = broken ? 1 : fallT;
   return {
-    tray: 1 - span(p, 0.24, 0.36),
-    whites,
-    blacks,
-    base: merge,
-    // The smooth cloud and lock fade in on top of the bars and slices, which stay solid until
-    // they are covered: fading both ways at once would dip through gray in the middle.
-    bars: finish < 1 ? 1 : 0,
-    cloud: finish,
-    slices: finish < 1 ? 1 : 0,
-    lock: finish,
-    shackleDraw: draw,
+    shift: VIEW.h / 2 - camera(p),
+    ksTop: 1 - span(p, 0.12, 0.3),
+    ksFloor: span(p, 0.82, 0.92),
+    whites: WHITE_PATHS.map((path) => move(path, "white")),
+    blacks: BLACK_PATHS.map((path) => move(path, "black")),
+    base: broken ? 0 : merge,
+    cloud: broken ? 0 : solid,
+    lock: broken ? 0 : solid,
+    shackleDraw: broken ? 0 : draw,
     shackleDrop: lerp(-12, 0, close),
-    keyhole: finish,
+    drop,
+    shadow: {
+      w: broken ? lerp(420, 760, span(p, 0.8, 0.92)) : lerp(160, 420, shadowNear),
+      o: broken ? 0.5 + 0.5 * span(p, 0.82, 0.92) : shadowNear * 0.8,
+    },
   };
 }

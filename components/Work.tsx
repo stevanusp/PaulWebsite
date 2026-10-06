@@ -6,7 +6,8 @@ import Section, { sectionStyles as s } from "./Section";
 import CloudScene from "./work/CloudScene";
 import styles from "./work/Work.module.css";
 
-// The work, told beside one picture: a piano that becomes a cloud with a lock in it. CSS decides
+// The work, told beside one picture: the Keystation's keys fall into a locked cloud, which falls,
+// breaks, and lands as a Keystation again. CSS decides
 // the mode; script only follows it, so without it the tiles and two stills tell the same thing.
 export default function Work() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -67,7 +68,7 @@ export default function Work() {
           </div>
           <div className={styles.stills}>
             <CloudScene p={0} />
-            <CloudScene p={1} />
+            <CloudScene p={0.58} />
           </div>
         </div>
         <ul ref={listRef} className={styles.items}>

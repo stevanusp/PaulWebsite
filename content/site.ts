@@ -141,7 +141,7 @@ export const work = {
     },
   ],
   description:
-    "An illustration: a piano keyboard whose keys go down in a wave, then stand up into the outline of a cloud and close into one shape, while the black keys gather into a padlock at its center and it locks.",
+    "An illustration: the keys come loose from a 49-key MIDI keyboard and fall; on the way down the white keys gather into a cloud and the black keys into a padlock at its center, and it locks. Then the cloud falls to the floor and breaks, and the pieces land back in place as the keyboard.",
 } as const;
 
 export const notes = {
