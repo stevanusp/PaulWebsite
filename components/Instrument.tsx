@@ -2,18 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ear } from "@/content/site";
-import { getEngine, inKey, type Engine } from "@/lib/epiano";
+import { getEngine, type Engine } from "@/lib/epiano";
+import { ODD_NOTE, VOICINGS, inChord, inKey } from "@/lib/loop";
 import styles from "./Instrument.module.css";
 
-// Voicings with smooth voice leading: C, G, Am, F.
-const VOICINGS: readonly (readonly number[])[] = [
-  [48, 64, 67, 72],
-  [43, 62, 67, 71],
-  [45, 64, 69, 72],
-  [41, 65, 69, 72],
-];
-// A note outside the key of C: F sharp, a tritone above the tonic.
-const WRONG_NOTE = 66;
+const CHORDS = VOICINGS.length;
+const NOTE_PAD = CHORDS;
 const FLAG_MS = 1700;
 const IDLE_MS = 2600;
 
@@ -25,9 +19,11 @@ export default function Instrument() {
   const padRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const timers = useRef<number[]>([]);
 
+  const currentRef = useRef<number | null>(null);
   const [current, setCurrent] = useState<number | null>(null);
   const [found, setFound] = useState(false);
-  const [wrong, setWrong] = useState(false);
+  // What the lone note turned out to be, given what was ringing under it.
+  const [heard, setHeard] = useState<"outside" | "belongs" | null>(null);
   const [flagged, setFlagged] = useState(false);
 
   const engine = () => {
@@ -48,32 +44,37 @@ export default function Instrument() {
   };
 
   const settle = () => {
-    window.clearTimeout(timers.current[6]);
-    timers.current[6] = window.setTimeout(() => setCurrent(null), IDLE_MS);
+    window.clearTimeout(timers.current[CHORDS + 2]);
+    timers.current[CHORDS + 2] = window.setTimeout(() => {
+      currentRef.current = null;
+      setCurrent(null);
+    }, IDLE_MS);
   };
 
   const play = useCallback((index: number) => {
     engine().play(VOICINGS[index]);
     light(index);
+    currentRef.current = index;
     setCurrent(index);
-    setWrong(false);
+    setHeard(null);
+    setFlagged(false);
     settle();
-    const hist = [...historyRef.current, index].slice(-4);
+    const hist = [...historyRef.current, index].slice(-CHORDS);
     historyRef.current = hist;
-    if (hist.join() === "0,1,2,3") setFound(true);
+    if (hist.join() === "0,1,2,3,4") setFound(true);
   }, []);
 
-  const playWrong = useCallback(() => {
-    // Sounds on top of whatever is ringing, so the clash is audible.
-    engine().play([WRONG_NOTE], { keep: true });
-    light(4);
-    // The check is real: the pitch is tested against the key the pads are in.
-    if (!inKey(WRONG_NOTE)) {
-      setWrong(true);
-      setFlagged(true);
-      window.clearTimeout(timers.current[5]);
-      timers.current[5] = window.setTimeout(() => setFlagged(false), FLAG_MS);
-    }
+  const playNote = useCallback(() => {
+    // Sounds on top of whatever is ringing, so you hear it against the chord.
+    engine().play([ODD_NOTE], { keep: true });
+    light(NOTE_PAD);
+    // The check is real: the note is tested against the chord still ringing, then the key.
+    const chord = currentRef.current;
+    const belongs = (chord !== null && inChord(ODD_NOTE, VOICINGS[chord])) || inKey(ODD_NOTE);
+    setHeard(belongs ? "belongs" : "outside");
+    setFlagged(!belongs);
+    window.clearTimeout(timers.current[CHORDS + 1]);
+    if (!belongs) timers.current[CHORDS + 1] = window.setTimeout(() => setFlagged(false), FLAG_MS);
   }, []);
 
   useEffect(() => {
@@ -92,12 +93,12 @@ export default function Instrument() {
       const target = e.target as HTMLElement | null;
       if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
       const n = Number(e.key);
-      if (n >= 1 && n <= 4) {
+      if (n >= 1 && n <= CHORDS) {
         e.preventDefault();
         play(n - 1);
-      } else if (n === 5) {
+      } else if (n === CHORDS + 1) {
         e.preventDefault();
-        playWrong();
+        playNote();
       }
     };
     window.addEventListener("keydown", onKey);
@@ -108,9 +109,16 @@ export default function Instrument() {
       window.removeEventListener("keydown", onKey);
       pending.forEach((t) => window.clearTimeout(t));
     };
-  }, [play, playWrong]);
+  }, [play, playNote]);
 
-  const status = flagged ? ear.wrongLabel : current === null ? ear.idleLabel : ear.chords[current].label;
+  const status =
+    heard === "outside" && flagged
+      ? ear.note.outside
+      : heard === "belongs"
+        ? ear.note.belongs
+        : current === null
+          ? ear.idleLabel
+          : ear.chords[current].label;
 
   return (
     <div ref={rootRef} className={`tile ${styles.instrument}`}>
@@ -145,23 +153,24 @@ export default function Instrument() {
         ))}
         <button
           ref={(el) => {
-            padRefs.current[4] = el;
+            padRefs.current[NOTE_PAD] = el;
           }}
           type="button"
-          className={`${styles.pad} ${styles.padWrong}`}
+          className={`${styles.pad} ${styles.padNote}`}
           data-hit="false"
-          aria-keyshortcuts="5"
+          data-outside={heard === "outside" ? "true" : "false"}
+          aria-keyshortcuts={String(NOTE_PAD + 1)}
           onPointerDown={(e) => {
             if (e.button !== 0) return;
-            playWrong();
+            playNote();
           }}
           onClick={(e) => {
-            if (e.detail === 0) playWrong();
+            if (e.detail === 0) playNote();
           }}
         >
-          <span className={styles.padName}>{ear.wrongName}</span>{" "}
-          <span className={styles.padDegree}>{ear.wrongDegree}</span>
-          <span className="visually-hidden">, {ear.wrongPlay}</span>
+          <span className={styles.padName}>{ear.note.name}</span>{" "}
+          <span className={styles.padDegree}>{ear.note.sub}</span>
+          <span className="visually-hidden">, {ear.note.play}</span>
         </button>
       </div>
 
@@ -170,7 +179,7 @@ export default function Instrument() {
         <span className={styles.keys}>{ear.captionKeys}</span>.
       </p>
       <p className={styles.found} aria-live="polite">
-        {wrong ? ear.wrongLine : found ? ear.found : ""}
+        {heard === "outside" ? ear.note.outsideLine : heard === "belongs" ? ear.note.belongsLine : found ? ear.found : ""}
       </p>
     </div>
   );

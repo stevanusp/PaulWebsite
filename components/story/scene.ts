@@ -1,10 +1,11 @@
 // Geometry for the "How I listen" story, as a pure function of scroll progress p (0 to 1).
-// One amber object travels through it: an alert on a security timeline, then a region on a
-// piano track, then a wrong note in the piano roll, which is moved back into the key.
-// Everything is deterministic, so the server and the client draw the same frame.
+// One amber object travels through it: an upload flagged on a security timeline, then a note in
+// the song's xylophone part that sits outside B major until the chord under it shows up.
+// Everything here is deterministic, so the server and the client draw the same frame. The motion
+// that runs on its own (the event feed, playback, the keys) lives in Story.tsx and adds to this.
 
 export const VIEW_W = 1000;
-export const VIEW_H = 640;
+export const VIEW_H = 660;
 
 /** Where each caption begins, in progress. Six captions, six beats. */
 export const BEATS = [0, 0.16, 0.32, 0.48, 0.66, 0.84] as const;
@@ -28,257 +29,328 @@ const rand = (n: number) => {
   return s - Math.floor(s);
 };
 
-// Window layout, in view units.
-export const WIN = { x: 0, y: 0, w: 1000, h: 560, r: 22 };
-const BAR_H = 44;
-const TOOL_H = 48;
-const RULER_Y = BAR_H + TOOL_H; // 92
-const LANES_Y = RULER_Y + 26; // 118
-export const LABEL_W = 170;
-const LANES_X = LABEL_W + 4;
-const LANES_END = 990;
-const LANE_COUNT = 5;
+// ---- The song, as it sits in the project: 116 bpm, 3/4, B major. The loop is five bars.
 
-export const LANES_SECURITY = ["Proxy", "Branch 041", "HQ Wi-Fi", "VPN", "Data center"];
-export const LANES_MUSIC = ["Piano", "Bass", "Drums", "Strings", "Pad"];
+export const BPM = 116;
+export const METER = 3;
+export const BEAT_S = 60 / BPM;
+export const BAR_S = BEAT_S * METER;
+export const LOOP_BARS = 5;
+export const LOOP_S = BAR_S * LOOP_BARS;
+/** Eighth notes per bar. Notes and steps below count in eighths from the top of the loop. */
+export const STEPS = 6;
+export const STEP_S = BAR_S / STEPS;
+
+export { VOICINGS, inKey } from "@/lib/loop";
+
+export type Note = { track: number; pitch: number; start: number; len: number };
+
+// Xylophone: the chords broken into eighths. Bass: one note a bar. Violin: a falling line from bar 2.
+const XYLO = [
+  [64, 68, 71, 75, 71, 68],
+  [63, 67, 70, 73, 70, 67],
+  [68, 70, 71, 75, 78, 75],
+  [65, 68, 73, 77, 73, 68],
+  [66, 71, 75, 78, 75, 71],
+];
+const BASS = [40, 39, 44, 41, 35];
+const VIOLIN = [null, 73, 71, 68, 66];
+
+export const NOTES: Note[] = [
+  ...XYLO.flatMap((bar, b) => bar.map((pitch, s) => ({ track: 0, pitch, start: b * STEPS + s, len: 1 }))),
+  ...BASS.map((pitch, b) => ({ track: 1, pitch, start: b * STEPS, len: STEPS })),
+  ...VIOLIN.flatMap((pitch, b) => (pitch === null ? [] : [{ track: 2, pitch, start: b * STEPS, len: STEPS }])),
+];
+
+/** The last eighth of bar 2: F double sharp (it sounds as G), the third of D#7. */
+export const ODD = 11;
+/** Where it goes next: G# at the top of bar 3. */
+export const RESOLVE = 12;
+
+// ---- Window layout, in view units.
+
+export const WIN = { w: 1000, h: 560, r: 22 };
+export const LAYOUT = {
+  BAR_H: 40,
+  TOOL_H: 52,
+  RULER_Y: 92,
+  STRIP_Y: 116,
+  STRIP_H: 36,
+  LANES_Y: 152,
+  LABEL_W: 170,
+  LANES_X: 174,
+  LANES_END: 990,
+  LANE_COUNT: 3,
+} as const;
+const { STRIP_Y, STRIP_H, LANES_Y, LANES_X, LANES_END } = LAYOUT;
+
+export const SPAN_W = LANES_END - LANES_X;
+export const BAR_W = SPAN_W / LOOP_BARS;
+export const STEP_W = BAR_W / STEPS;
+export const xAt = (step: number) => LANES_X + step * STEP_W;
+
+// Lane heights: short above the event log, tall once it is a song, short again above the piano roll.
+const LANE_SEC = 64;
+const LANE_MUS = 136;
+const LANE_ROLL = 56;
+
+/** Each track's pitch range, for the small notes drawn inside its regions. */
+export const TRACKS = [
+  { lo: 62, hi: 79 },
+  { lo: 33, hi: 48 },
+  { lo: 64, hi: 77 },
+] as const;
+
+export const REGIONS = [
+  { lane: 0, from: 0, to: 5 },
+  { lane: 1, from: 0, to: 5 },
+  { lane: 2, from: 1, to: 5 },
+] as const;
+
+/** Piano roll panel, local to its own top: a header, then one row per semitone, high at the top. */
+export const ROLL = { HEAD: 24, LOW: 62, HIGH: 79, ROW: 12 } as const;
+export const rollY = (pitch: number) => ROLL.HEAD + (ROLL.HIGH - pitch) * ROLL.ROW;
+
+/** Event log panel: a header row, then rows. */
+export const LOG = { HEAD: 26, ROW: 27 } as const;
+
+// ---- Keyboard: a 49-key controller, C2 to C6, drawn from the real one's top view.
+
+export const KEY_LOW = 36;
+export const KEY_HIGH = 84;
+export const KB = { w: 1000, h: 228 } as const;
+
+// ---- The security timeline.
 
 type Rect = { x: number; y: number; w: number; h: number; r: number };
 
-type Event = { lane: number; x: number; w: number; region: number | null };
+const ANOMALY_X = xAt(ODD) + 2;
 
-// The security timeline: a steady rhythm per source, with small natural jitter.
-const EVENTS: Event[] = [];
-for (let lane = 0; lane < LANE_COUNT; lane++) {
-  for (let k = 0; k < 15; k++) {
-    const x = LANES_X + 18 + k * 55 + (rand(lane * 31 + k) - 0.5) * 22;
-    if (x > LANES_END - 24) continue;
-    EVENTS.push({ lane, x, w: 9 + rand(lane * 7 + k * 3) * 9, region: null });
+type Ev = { lane: number; x: number; w: number; region: number | null; to: number };
+const EVENTS: Ev[] = [];
+const GAP = [30, 52, 88]; // the proxy is busy, access is steady, intrusion prevention is quiet
+for (let lane = 0; lane < 3; lane++) {
+  let x = LANES_X + 10 + rand(lane + 4) * 16;
+  let k = 0;
+  while (x < LANES_END - 22) {
+    const w = 9 + rand(lane * 7 + k * 3) * 9;
+    if (!(lane === 0 && Math.abs(x - ANOMALY_X) < 30)) {
+      const region = REGIONS.findIndex(
+        (r) => r.lane === lane && x >= xAt(r.from * STEPS) && x + w <= xAt(r.to * STEPS),
+      );
+      EVENTS.push({ lane, x, w, region: region >= 0 ? region : null, to: 0 });
+    }
+    x += GAP[lane] * (0.7 + rand(lane * 31 + k) * 0.6);
+    k++;
   }
 }
+// In the change to music, each event widens to meet the next one in its region, so together
+// they tile the region instead of piling up on top of each other.
+EVENTS.forEach((e, i) => {
+  if (e.region === null) return;
+  const r = REGIONS[e.region];
+  const next = EVENTS[i + 1];
+  e.to = next && next.lane === e.lane && next.region === e.region ? next.x : xAt(r.to * STEPS);
+});
 
-// The song's arrangement: where each track has a region, in view x.
-const REGIONS: { lane: number; x0: number; x1: number }[] = [
-  { lane: 0, x0: LANES_X, x1: LANES_END },
-  { lane: 1, x0: LANES_X, x1: 590 },
-  { lane: 1, x0: 600, x1: LANES_END },
-  { lane: 2, x0: LANES_X, x1: LANES_END },
-  { lane: 3, x0: 380, x1: LANES_END },
-  { lane: 4, x0: LANES_X, x1: 480 },
-  { lane: 4, x0: 700, x1: LANES_END },
-];
-for (const e of EVENTS) {
-  const i = REGIONS.findIndex((r) => r.lane === e.lane && e.x >= r.x0 && e.x + e.w <= r.x1);
-  e.region = i >= 0 ? i : null;
-}
+// Event volume over time, one bar per bucket, with a spike where the upload happened.
+const HIST_N = 34;
+const HIST_W = SPAN_W / HIST_N;
+const HIST = Array.from({ length: HIST_N }, (_, i) => 0.28 + 0.34 * rand(i * 13 + 5) + 0.14 * Math.sin(i * 0.55));
+const SPIKE = Math.floor((ANOMALY_X - LANES_X) / HIST_W);
 
-// The anomaly: a single event on the proxy lane, late in the window.
-const ANOMALY = { lane: 0, x: 786 };
-
-// Piano roll: one octave, C at the bottom. Rows are pitch classes 0 to 11.
-const ROLL = { x: LABEL_W + 40, y: 336, w: LANES_END - LABEL_W - 40, h: 196 };
-const ROW_H = ROLL.h / 12;
-const rowY = (pc: number) => ROLL.y + ROLL.h - (pc + 1) * ROW_H;
-const BLACK = new Set([1, 3, 6, 8, 10]);
-// A short phrase in C major: [pitch class, start x, width].
-const PHRASE: [number, number, number][] = [
-  [4, 0.02, 0.09],
-  [7, 0.12, 0.09],
-  [0, 0.22, 0.18],
-  [2, 0.42, 0.09],
-  [4, 0.52, 0.09],
-  [9, 0.72, 0.09],
-  [7, 0.82, 0.16],
-];
-const WRONG_PC = 6; // F sharp: outside the key
-const RIGHT_PC = 7; // G: where it belongs
-const WRONG_X = 0.62;
-const WRONG_W = 0.08;
-
-// Keyboard: 49 keys, C2 (MIDI 36) to C6 (MIDI 84).
-export const KEY_LOW = 36;
-export const KEY_HIGH = 84;
-export const CHORDS: readonly (readonly number[])[] = [
-  [48, 64, 67, 72],
-  [43, 62, 67, 71],
-  [45, 64, 69, 72],
-  [41, 65, 69, 72],
-];
+// ---- One frame.
 
 export type Frame = {
-  // window
   winScale: number;
   winX: number;
-  securityOn: number; // 1 = security, 0 = music (for shapes that morph)
-  secText: number; // security words fade out in the first half of the change
-  musText: number; // music words fade in during the second half, so the two never overlap
-  scan: number; // x of the scan line in the security phase
-  scanOn: number;
-  playhead: number;
-  playheadOn: number;
-  laneY: number;
+  winY: number;
+  sec: number;
+  mus: number;
+  morph: number;
   laneH: number;
-  events: { x: number; y: number; w: number; h: number; r: number; o: number }[];
+  laneTop: (lane: number) => number;
+  lanesBottom: number;
+  scan: number;
+  scanOn: number;
+  playheadOn: number;
+  events: (Rect & { o: number })[];
+  hist: { x: number; y: number; w: number; h: number; o: number; spike: boolean }[];
+  histAlert: number;
+  chordsOn: number;
+  chordFocus: number;
   regions: (Rect & { o: number })[];
-  regionNotes: { x: number; y: number; w: number; o: number }[];
-  /** Three looks in turn: an ordinary event, flagged amber, then an ordinary note once fixed. */
-  anomaly: Rect & { plain: number; alert: number; fixed: number; o: number };
+  minis: (Rect & { o: number })[];
+  anomaly: Rect & { plain: number; alert: number; belongs: number; o: number };
   ring: Rect & { o: number };
-  card: { x: number; y: number; o: number; contained: number };
-  rollOn: number;
-  roll: typeof ROLL;
-  rows: { y: number; h: number; black: boolean }[];
-  phrase: (Rect & { o: number })[];
-  keysOn: number;
+  ping: number;
+  card: { x: number; y: number; o: number; contained: number; from: { x: number; y: number } };
+  logO: number;
+  flagRow: number;
+  contained: number;
+  rollTop: number;
+  rollO: number;
+  /** Opacity of each note in the roll, indexed like NOTES (the xylophone is the first 30). */
+  rollNotes: number[];
+  band: number;
+  tagAlone: number;
+  tagBelongs: number;
+  arrow: number;
+  keysO: number;
   keysY: number;
-  pressed: readonly number[];
 };
 
 export function scene(p: number): Frame {
   // Beats
   const reveal = span(p, 0, 0.12); // the timeline fills in
-  const flag = span(p, 0.17, 0.24); // one event turns amber
+  const flag = span(p, 0.17, 0.24); // one upload turns amber
   const contain = span(p, 0.33, 0.4); // it is contained
-  const morph = span(p, 0.48, 0.62); // security becomes music
-  const roll = span(p, 0.64, 0.72); // the piano roll opens
-  const fix = span(p, 0.74, 0.8); // the wrong note moves into the key
-  const keys = span(p, 0.84, 0.9); // the keyboard arrives
+  const morph = span(p, 0.48, 0.62); // the console becomes the song
+  const roll = span(p, 0.66, 0.72); // the piano roll opens on one note
+  const ctx = span(p, 0.74, 0.8); // its chord arrives around it
+  const keys = span(p, 0.84, 0.9); // the keyboard
 
-  const laneH = lerp(84, 40, roll);
-  const laneY = LANES_Y;
-  const center = (lane: number) => laneY + lane * laneH + laneH / 2;
+  const laneH = lerp(lerp(LANE_SEC, LANE_MUS, morph), LANE_ROLL, roll);
+  const laneTop = (lane: number) => LANES_Y + lane * laneH;
+  const center = (lane: number) => laneTop(lane) + laneH / 2;
+  const lanesBottom = LANES_Y + 3 * laneH;
 
   const scan = lerp(LANES_X, LANES_END, reveal);
+  const seenAt = (x: number) => clamp((scan - x) / 40);
 
-  // Events fade in behind the scan line, then melt into the regions they belong to.
-  const events = EVENTS.map((e) => {
-    const seen = clamp((scan - e.x) / 40);
-    const reg = e.region !== null ? REGIONS[e.region] : null;
-    const from = { x: e.x, y: center(e.lane) - 7, w: e.w, h: 14, r: 7 };
-    const to = reg
-      ? { x: reg.x0, y: laneY + e.lane * laneH + 6, w: reg.x1 - reg.x0, h: laneH - 12, r: 10 }
-      : from;
-    // Stagger the melt a little from left to right.
-    const t = clamp(morph * 1.25 - (e.x / LANES_END) * 0.25);
-    // They dissolve as they stretch, so the change reads as one thing melting into another.
-    const o = seen * (reg ? Math.pow(1 - t, 1.6) : 1 - morph);
+  const regionRect = (i: number): Rect => {
+    const r = REGIONS[i];
     return {
-      x: lerp(from.x, to.x, t),
-      y: lerp(from.y, to.y, t),
-      w: lerp(from.w, to.w, t),
-      h: lerp(from.h, to.h, t),
-      r: lerp(from.r, to.r, t),
-      o,
+      x: xAt(r.from * STEPS) + 1.5,
+      y: laneTop(r.lane) + 5,
+      w: (r.to - r.from) * BAR_W - 3,
+      h: laneH - 10,
+      r: 8,
     };
-  });
-
-  const regions = REGIONS.map((r) => ({
-    x: r.x0,
-    y: laneY + r.lane * laneH + 6,
-    w: r.x1 - r.x0,
-    h: laneH - 12,
-    r: lerp(10, 8, roll),
-    o: span(morph, 0.3, 0.85),
-  }));
-
-  // Little note dashes inside the regions, so they read as MIDI.
-  const regionNotes: Frame["regionNotes"] = [];
-  REGIONS.forEach((r, ri) => {
-    const top = laneY + r.lane * laneH + 6;
-    const h = laneH - 12;
-    for (let x = r.x0 + 10; x < r.x1 - 18; x += 22) {
-      const k = ri * 97 + x;
-      regionNotes.push({
-        x,
-        y: top + 6 + rand(k) * (h - 14),
-        w: 8 + rand(k + 1) * 10,
-        o: span(morph, 0.8, 1) * (1 - roll * 0.4),
-      });
-    }
-  });
-
-  // The amber object: an event, then a region note, then a note in the roll.
-  const aEvent = { x: ANOMALY.x, y: center(ANOMALY.lane) - 7, w: 22, h: 14, r: 7 };
-  const aGrow = { x: ANOMALY.x - 4, y: center(ANOMALY.lane) - 9, w: 30, h: 18, r: 9 };
-  const aRegion = { x: ANOMALY.x - 6, y: center(ANOMALY.lane) - 5, w: 30, h: 10, r: 5 };
-  const pcY = lerp(rowY(WRONG_PC), rowY(RIGHT_PC), fix);
-  const aRoll = {
-    x: ROLL.x + WRONG_X * ROLL.w,
-    y: pcY + 2,
-    w: WRONG_W * ROLL.w,
-    h: ROW_H - 4,
-    r: (ROW_H - 4) / 2,
   };
-  let a = aEvent;
+
+  // Events fade in behind the scan line, then join up into the region they fall in.
+  const events = EVENTS.map((e, i) => {
+    const from = { x: e.x, y: center(e.lane) - 7, w: e.w, h: 14, r: 7 };
+    let to: Rect = from;
+    if (e.region !== null) {
+      const box = regionRect(e.region);
+      const first = EVENTS[i - 1]?.region !== e.region || EVENTS[i - 1]?.lane !== e.lane;
+      const x0 = first ? box.x : e.x;
+      to = { x: x0, y: box.y, w: Math.max(4, e.to - x0 - 2), h: box.h, r: 8 };
+    }
+    const t = clamp(morph * 1.25 - ((e.x - LANES_X) / SPAN_W) * 0.25);
+    const o = seenAt(e.x) * (e.region !== null ? Math.pow(1 - t, 1.2) * 0.9 : 1 - morph);
+    return { ...mix(from, to, t), o };
+  });
+
+  const histTop = STRIP_Y + 6;
+  const histH = STRIP_H - 12;
+  const hist = HIST.map((v, i) => {
+    const x = LANES_X + i * HIST_W + 3;
+    const spike = i === SPIKE;
+    const h = histH * (spike ? lerp(v, 1, flag) : v) * (1 - morph * 0.85);
+    return { x, y: histTop + histH - h, w: HIST_W - 6, h, o: seenAt(x) * (1 - span(morph, 0, 0.6)), spike };
+  });
+
+  const regions = REGIONS.map((_, i) => ({ ...regionRect(i), o: span(morph, 0.3, 0.85) }));
+
+  // The small notes inside each region, so they read as MIDI.
+  const mini = (n: Note): Rect => {
+    const t = TRACKS[n.track];
+    const top = laneTop(n.track) + 22;
+    const bottom = laneTop(n.track) + laneH - 9;
+    const h = clamp((bottom - top) / (t.hi - t.lo + 1), 2.5, 4);
+    return {
+      x: xAt(n.start) + 1.5,
+      y: lerp(top, bottom - h, (t.hi - n.pitch) / (t.hi - t.lo)),
+      w: n.len * STEP_W - 3,
+      h,
+      r: h / 2,
+    };
+  };
+  const miniO = span(morph, 0.75, 1);
+  const minis = NOTES.map((n, i) => ({ ...mini(n), o: i === ODD ? 0 : miniO }));
+
+  // Piano roll panel: slides up from the bottom as the lanes make room.
+  const rollTop = lanesBottom;
+  const rollO = roll;
+  const rollNotes = NOTES.map((n, i) => {
+    if (n.track !== 0 || i === ODD) return 0;
+    const bar = Math.floor(n.start / STEPS);
+    return bar === 1 ? span(ctx, 0, 0.55) : span(ctx, 0.3, 1);
+  });
+
+  // The amber object: an event, then a note in the xylophone region, then a note in the roll.
+  const aEvent = { x: ANOMALY_X, y: center(0) - 7, w: 22, h: 14, r: 7 };
+  const aGrow = { x: ANOMALY_X - 4, y: center(0) - 9, w: 30, h: 18, r: 9 };
+  const m = mini(NOTES[ODD]);
+  const aMini = { ...m, h: 5, y: m.y - 1, r: 2.5 };
+  const rollH = ROLL.ROW - 4;
+  const aRoll = { x: xAt(NOTES[ODD].start) + 1.5, y: rollTop + rollY(NOTES[ODD].pitch) + 2, w: STEP_W - 3, h: rollH, r: rollH / 2 };
+  let a: Rect = aEvent;
   a = mix(a, aGrow, flag * (1 - morph));
-  a = mix(a, aRegion, morph);
+  a = mix(a, aMini, morph);
   a = mix(a, aRoll, roll);
   const anomaly = {
     ...a,
     plain: 1 - flag,
-    alert: flag * (1 - fix),
-    fixed: fix,
-    o: clamp((scan - ANOMALY.x) / 40),
+    alert: flag * (1 - ctx),
+    belongs: ctx,
+    o: seenAt(ANOMALY_X),
   };
 
-  const ring = {
-    x: a.x - 8,
-    y: a.y - 8,
-    w: a.w + 16,
-    h: a.h + 16,
-    r: a.h / 2 + 8,
-    o: contain * (1 - morph),
-  };
+  const ring = { x: a.x - 8, y: a.y - 8, w: a.w + 16, h: a.h + 16, r: a.h / 2 + 8, o: contain * (1 - morph) };
 
   const card = {
-    x: ANOMALY.x - 250,
-    y: center(1) + 18,
+    x: ANOMALY_X + 44,
+    y: center(0) + 22,
     o: flag * (1 - span(p, 0.44, 0.5)),
     contained: contain,
+    from: { x: a.x + a.w / 2, y: a.y + a.h },
   };
 
-  const rows = Array.from({ length: 12 }, (_, pc) => ({ y: rowY(pc), h: ROW_H, black: BLACK.has(pc) }));
-  const phrase = PHRASE.map(([pc, sx, sw]) => ({
-    x: ROLL.x + sx * ROLL.w,
-    y: rowY(pc) + 2,
-    w: sw * ROLL.w,
-    h: ROW_H - 4,
-    r: (ROW_H - 4) / 2,
-    o: span(roll, 0.4, 1),
-  }));
-
-  // The window steps back to make room for the keyboard.
-  const winScale = lerp(1, 0.78, keys);
+  // The window steps back and up to make room for the keyboard.
+  const winScale = lerp(1, 0.74, keys);
   const winX = (VIEW_W - VIEW_W * winScale) / 2;
-
-  // Once the keyboard is in, it plays I, V, vi, IV.
-  let pressed: readonly number[] = [];
-  if (p >= 0.9) pressed = CHORDS[Math.min(3, Math.floor((p - 0.9) / 0.025))];
+  const winY = lerp((VIEW_H - WIN.h) / 2, 0, keys);
 
   return {
     winScale,
     winX,
-    securityOn: 1 - morph,
-    secText: 1 - span(morph, 0, 0.45),
-    musText: span(morph, 0.55, 1),
+    winY,
+    sec: 1 - span(morph, 0, 0.45),
+    mus: span(morph, 0.55, 1),
+    morph,
+    laneH,
+    laneTop,
+    lanesBottom,
     scan,
     scanOn: reveal > 0 && reveal < 1 ? 1 : 0,
-    playhead: lerp(LANES_X, LANES_END, clamp((p - 0.6) / 0.38)),
-    playheadOn: span(p, 0.58, 0.64),
-    laneY,
-    laneH,
+    playheadOn: span(p, 0.6, 0.65),
     events,
+    hist,
+    histAlert: flag,
+    chordsOn: span(morph, 0.5, 1),
+    chordFocus: ctx * (1 - keys),
     regions,
-    regionNotes,
+    minis,
     anomaly,
     ring,
+    ping: flag * (1 - contain) * (1 - morph),
     card,
-    rollOn: roll,
-    roll: ROLL,
-    rows,
-    phrase,
-    keysOn: keys,
-    keysY: lerp(VIEW_H + 40, 476, keys),
-    pressed,
+    logO: 1 - span(morph, 0, 0.5),
+    flagRow: flag,
+    contained: contain,
+    rollTop,
+    rollO,
+    rollNotes,
+    band: ctx * (1 - keys),
+    tagAlone: span(roll, 0.6, 1) * (1 - span(ctx, 0, 0.4)),
+    tagBelongs: span(ctx, 0.5, 1) * (1 - keys),
+    arrow: span(ctx, 0.6, 1) * (1 - keys),
+    keysO: clamp(keys * 1.6),
+    keysY: lerp(VIEW_H + 20, VIEW_H - KB.h, keys),
   };
 }
 
@@ -291,5 +363,3 @@ function mix(a: Rect, b: Rect, t: number): Rect {
     r: lerp(a.r, b.r, t),
   };
 }
-
-export const LAYOUT = { BAR_H, TOOL_H, RULER_Y, LANES_Y, LANES_X, LANES_END, LANE_COUNT };

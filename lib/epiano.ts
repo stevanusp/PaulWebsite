@@ -10,10 +10,6 @@ export type Engine = {
   play: (notes: readonly number[], opts?: { keep?: boolean }) => void;
 };
 
-// The key the pads live in. A note outside it "doesn't belong".
-const C_MAJOR = new Set([0, 2, 4, 5, 7, 9, 11]);
-export const inKey = (midi: number) => C_MAJOR.has(((midi % 12) + 12) % 12);
-
 let engine: Engine | null = null;
 
 const mtof = (m: number) => 440 * Math.pow(2, (m - 69) / 12);

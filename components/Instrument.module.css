@@ -3,7 +3,7 @@
   gap: var(--s-4);
 }
 
-/* What is playing, said plainly. Amber only when the note does not belong. */
+/* What is playing, said plainly. Amber only when the lone note has nothing to belong to. */
 .status {
   min-height: 1.5em;
   font-size: var(--fs-small);
@@ -18,7 +18,7 @@
 
 .pads {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 0.6fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr)) minmax(0, 0.7fr);
   gap: clamp(8px, 1.2vw, 12px);
 }
 
@@ -55,14 +55,15 @@
   transition: none;
 }
 
-/* The odd one out: quiet by default, amber only when it is played. */
-.padWrong {
+/* The lone note: quiet by default. Its hit is amber when nothing under it gives it a place,
+   and plain ink when the chord still ringing does. */
+.padNote {
   background: transparent;
   box-shadow: inset 0 0 0 1.5px var(--line-strong);
   color: var(--muted);
 }
 
-.pad.padWrong[data-hit="true"] {
+.pad.padNote[data-hit="true"][data-outside="true"] {
   background: var(--alert);
   color: var(--bg);
 }
@@ -86,16 +87,10 @@
   }
 }
 
+/* Phones: three by two, the lone note in the last cell. */
 @media (max-width: 639px) {
   .pads {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .padWrong {
-    grid-column: 1 / -1;
-    height: 56px;
-    grid-auto-flow: column;
-    gap: 10px;
-    align-content: center;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
