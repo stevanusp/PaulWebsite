@@ -1,89 +1,95 @@
-# PLAN: Stevanus Paulus, personal site (as built, v2)
+# PLAN: Stevanus Paulus, personal site (as built, v3)
 
-Status: built and verified by Opus on 30 Sep 2026. This file is now the as-built spec.
-The original plan (v1) is kept in `docs/plan-v1.md`. Use this file for any future change.
+Status: redesigned on 6 Oct 2026 on branch `redesign-v3`. This file is the as-built spec.
+Earlier versions: `docs/plan-v1.md` (original plan), `docs/plan-v2.md` (light and dark, motion v2).
 House rule: no em dash characters anywhere (copy, code, comments, commits).
 
-## 1. Decisions from Paulus (30 Sep 2026)
+## 1. Decisions from Paulus (6 Oct 2026)
 
-1. Relocation line in the hero: yes.
-2. "83+ branches" field note: yes.
-3. AI traffic inspection field note: removed for now.
-4. Master's plan in Path: not shown for now.
-5. Dates follow the CV: BCA from 2023, BINUS 2018 to 2023, Zalmon Fabric 2017 to 2023.
-6. paulus.dev is not his domain. Canonical is `https://aboutspm.vercel.app` (override with `NEXT_PUBLIC_SITE_URL`).
-7. Résumé: reuse `resume.pdf` from the old project.
+1. Redesign because the old look felt generic. Direction: a dark control room.
+2. Always dark. The light theme is gone; print keeps its own light styles.
+3. Instrument chrome (graticules, readouts, scopes) only where something is interactive: hero, method stage, By ear.
+4. The quieter sections get their character from type plus one connecting line, not from panels.
+5. Mono for headlines, sans for reading text. Open-source fonts only, self-hosted.
+6. Amber stays for what does not belong. A dim phosphor green is added for the normal signal and live status, used only on signals and indicators, never on text blocks or buttons.
+7. Section order unchanged.
+
+Everything from v2 section 1 (dates, canonical URL, résumé, field notes) still holds.
 
 ## 2. Concept
 
-One line tells the whole story. Paulus listens for what doesn't belong, in networks and at the piano.
+One line tells the whole story, and now the whole page listens with it.
 
-- Hero: a live signal line. Every 6.5 s a burst breaks the pattern, a detection box locks onto it and it turns amber with the label "anomaly". The burst fades, the box lingers, the next one appears somewhere else.
-- Method stage ("How I listen"): a dark instrument screen, pinned while you scroll through 3 steps. The same line learns a "normal" band, a burst breaks out and is locked ("doesn't belong"), then it is boxed into a cell and quieted ("contained") while the rest of the line keeps moving.
-- By ear: a small instrument. Four pads (C, G, Am, F) play an FM electric piano synthesized in the browser; the screen is a triggered oscilloscope of the real audio. Playing I, V, vi, IV in order reveals a quiet line: "You found it".
-- 404: "This page doesn't belong." with a flagged burst labelled 404.
+- Hero: the headline is part of the signal. Every 6.5 s the hero line bursts; it announces the burst on an event bus (`lib/anomaly.ts`), the headline glyph nearest to it jitters, turns amber and is locked by corner brackets, and a dashed tether runs from the glyph down to the burst. A readout above the headline (`listening`, `flagged 03`) counts every anomaly flagged anywhere on the page. A tap or click on the line still makes one on demand.
+- Rail: on wide screens a thread runs down the left gutter. It grows out of the bottom of the hero, branches into every section title, lights the branch being read and ends at "Say hello." It is still while the reader is still, stirs with scroll speed, and rings amber when the piano plays the wrong note.
+- Method stage: unchanged mechanics, now on a scope graticule with a green trace and a green normal band.
+- Section intros come up line by line as they scroll into the reading zone.
+- By ear: the same instrument, now with a graticule screen and mono pads.
+- 404: the same flagged burst, in the new palette.
 
-Color rule: amber is used only for things that don't belong. Everything else is monochrome.
+Color rule: green means normal and alive, amber means it does not belong, everything else is grey on near black.
 
-## 3. What changed from v1
+## 3. What changed from v2
 
-| v1 plan | v2 as built | Why |
+| v2 | v3 | Why |
 |---|---|---|
-| Static SVG line with a one-time draw | Live line with a detection lock loop, paused offscreen, still frame under reduced motion | The concept is detection; seeing it happen says it faster than copy |
-| No method section | Pinned, scroll-driven "How I listen" stage | Shows judgment visually; replaces the old "How I work" list |
-| Clean line under "By ear" | Playable pads plus oscilloscope | A personal, memorable moment that is true to him |
-| Accent on the primary button | Black pill buttons; amber only for anomalies | Keeps the one color meaningful |
-| Next.js server output | Static export plus a post-build hash CSP | Strict CSP without `unsafe-inline`, served from a CDN |
-| Google Fonts via next/font | Self-hosted woff2 in `app/fonts/` | No third-party requests; builds offline |
+| Light and dark themes | Always dark | One identity; the instrument metaphor is strongest in the dark |
+| Instrument Sans for everything, Plex Mono for labels | Martian Mono for headlines and readouts, Instrument Sans for reading | Mono headlines give the page its voice; one mono file (weight and width axes) replaces two |
+| Monochrome plus amber | Green for normal signal and live state, amber for anomalies | The line needed a "normal" color to make the anomaly read as a change of state |
+| Headline only animates in | Headline glyphs get flagged in sync with the line | The concept happens to the words, not just next to them |
+| Hero line below the copy on every screen | On phones the line sits right under the headline | Glyph, tether and burst share the first screen |
+| Section title left, body right | Wide title, large lit intro offset to column 5, shared row grammar | Fewer template tells, stronger rhythm |
+| No connection between sections | Rail thread with branches | The agreed "connecting line" |
+| Pill buttons | Square mono buttons (4 px radius) | Matches the instrument language |
 
 ## 4. Tokens
 
 All tokens live at the top of `app/globals.css`. Key values:
 
-- Light: bg `#f3f4f1`, surface `#ffffff`, ink `#15171a`, muted `#565c63` (6.12:1), line `#dcdfda`, alert stroke `#c25e00` (3.89:1, graphics only), alert text `#b45309` (4.55:1).
-- Dark: bg `#0e1012`, ink `#ecede9` (16.21:1), muted `#a0a6ac` (7.76:1), alert `#f2a23a` (9.08:1).
-- Stage (dark in both themes): `#0b0c0d` light theme, `#000000` dark theme; stage ink `#ecede9`, stage alert `#f2a23a`.
-- Type: Instrument Sans variable (400 to 700) for everything; IBM Plex Mono 400/500 only for technical annotations (signal labels, years, stacks, footer note).
-- Display size: `clamp(3rem, min(1.2rem + 7.2vw, 14.5vh), 7.75rem)`, tracking -0.045em.
+- Ground `#070908`, surface `#0d1210`, surface-2 `#141b18`, line `#1a231f`, line-strong `#2b3832`.
+- Ink `#e8ece7` (16.3:1), muted `#94a199` (7.4:1), faint `#56635b` (decoration only).
+- Signal `#4fc48b` (9.1:1), signal-dim `#2a7050`. Alert `#f2a23a` (9.3:1).
+- Stage `#020403` with stage-line `#17201c` for graticules.
+- Type: Martian Mono variable (`--font-mono`, weight 100 to 800, width 75% to 112.5%), Instrument Sans variable (`--font-sans`).
+- Display `clamp(2.5rem, 0.9rem + 6.6vw, 7.5rem)`, tracking -0.055em. H2 `clamp(2.125rem, 0.9rem + 4.4vw, 5.25rem)`, tracking -0.05em.
+- Radius: 4 px for buttons and pads, 6 px for panels. Pills only for status dots.
 - Motion: `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)`, `--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1)`, press 120 ms.
 
 ## 5. Page order
 
-1. Nav (translucent, turns dark over the stage, active section highlight).
-2. Hero (`#top`): headline word reveal, lead, relocation line, Email me, Résumé, live signal.
-3. How I listen (`#method`): 300svh pinned stage; static 3-panel diagram under reduced motion, without JS and in print.
-4. What I work on (`#work`): 3 domains, category level only, no vendor names.
-5. Field notes (`#notes`): 83+ branches, the ransomware that wasn't, making process legible.
-6. Built after hours (`#built`): Hermes, Mission Control, Self-audit kit, Respawn.
-7. Path (`#path`): 2023 to now back to 2017.
-8. By ear (`#ear`): text plus the instrument.
-9. Say hello (`#contact`): email, copy button, LinkedIn, résumé.
-10. Footer: "No cookies. No trackers. Strict CSP."
+1. Nav: signal mark, mono links with a live underline on the active section, Contact as a small button.
+2. Hero (`#top`): readout, flaggable headline, live line, lead, Email me, Résumé.
+3. How I listen (`#method`): pinned stage on a graticule; static three-panel diagram under reduced motion, without JS and in print.
+4. What I work on (`#work`).
+5. Field notes (`#notes`): text beside full-width scenes.
+6. Built after hours (`#built`): name, story, stack.
+7. Path (`#path`): the present role is marked live.
+8. By ear (`#ear`).
+9. Say hello (`#contact`): the end of the rail.
+10. Footer.
 
-## 6. Security
+## 6. Moving parts
 
-- Static export (`output: "export"`), no server code, no cookies, no third-party requests.
-- `scripts/csp.mjs` adds per page: `default-src 'self'; script-src 'self' <sha256 hashes>; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self'; manifest-src 'self'; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'`.
-- The build fails if an inline `style=""` or `on*=` handler appears. Keep styles in CSS modules.
-- `vercel.json`: HSTS, X-Frame-Options DENY, `frame-ancestors 'none'`, nosniff, referrer policy, permissions policy, COOP.
-- `public/.well-known/security.txt` (RFC 9116). Renew `Expires` yearly.
+- `lib/anomaly.ts`: `emitAnomaly(x, { y, still })` and `onAnomaly(fn)`. Sources: `HeroSignal` (no y), `Instrument` wrong note (with y). Listeners: `HeroHead` (glyph and tether for hero bursts, counter for all), `Rail` (bursts that carry a y).
+- `components/HeroHead.tsx`: headline glyph spans, the flag classes and the tether. Word masks are a `clip-path` released after the rise, so a flagged glyph can leave its box.
+- `components/Rail.tsx`: one fixed canvas, hidden under 1024 px. Reads layout in `measure()` (resize, font load), draws only on scroll, resize or while energy or a burst is decaying.
+- `components/Lit.tsx`: words as spans with a CSS `view()` timeline, guarded by `@supports` and reduced motion.
 
-## 7. Verified (30 Sep 2026)
+## 7. Security
 
-- Viewports 390, 768, 1024, 1366x650, 1440; light and dark; reduced motion; print (4 A4 pages); 404.
-- Zero CSP violations and zero console errors in Chromium; no horizontal overflow.
-- Lighthouse (local, gzip): desktop 100 / 100 / 100 / 100; mobile 94 / 100 / 100 / 100.
-- `tsc` and `eslint` clean. No em dash in authored files.
+Unchanged from v2: static export, per-page hash CSP from `scripts/csp.mjs`, no inline `style=""` or `on*=` in markup (dynamic values go through CSSOM, which the policy allows), security headers in `vercel.json`.
 
-## 8. Open items
+## 8. Verified (6 Oct 2026)
 
-- Optional: a 30 to 60 s recording of Paulus playing by ear. The instrument can play it through the same oscilloscope ("Hear me play").
-- Optional: a real photo. The design does not need one.
-- Deploy is manual and up to Paulus (see README).
+- Chromium (built-in browser): 375x812 and 1440x900, dev server and the production export via `npm run preview`.
+- Hero flag, tether and counter; rail growth, branches and an amber burst; method stage; 404.
+- Production export: zero CSP violations, zero console errors, no horizontal overflow at 375.
+- `npm run build` protects every page (0 inline styles). `tsc` and `eslint` clean. No em dash in authored files.
+- Not yet re-run for v3: Lighthouse, print, a live reduced-motion pass, Safari and Firefox.
 
 ## 9. How to change things
 
-- Copy: edit `content/site.ts` only.
-- A new section: follow `components/Section.tsx` and the row pattern in `Section.module.css`.
-- Signal feel: `lib/signal.ts` (`normal`, `burst`, `BURST` timings, `HERO_SPOTS`) and `lib/stage.ts` (scroll thresholds).
-- After any change: `npm run build && npm run preview`, check 390 and 1440 in both themes, and confirm the build log says every page is protected.
+- Copy: `content/site.ts` only.
+- A new section: `components/Section.tsx` (add `data-rail` to its title, which `Section` already does) and the row pattern in `Section.module.css`.
+- Signal feel: `lib/signal.ts` and `lib/stage.ts`. Rail feel: `BURST_LIFE`, `READ_LINE` and the energy constants in `components/Rail.tsx`.
+- After any change: `npm run build && npm run preview`, check 375 and 1440, and confirm the build log says every page is protected.
