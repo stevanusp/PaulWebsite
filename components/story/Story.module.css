@@ -1,0 +1,389 @@
+/* "How I listen": static by default (no JS, reduced motion, print), pinned and scrubbed
+   by scroll when scripting is on and motion is welcome. JS reads --story-mode and follows. */
+.story {
+  --story-mode: static;
+  padding-block: var(--section-y);
+}
+
+.layout {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+}
+
+.title {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  letter-spacing: var(--ls-h2);
+}
+
+.steps {
+  display: grid;
+  gap: var(--s-6);
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  gap: var(--s-3);
+  align-content: start;
+}
+
+.stepTitle {
+  font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.375rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.stepBody {
+  max-width: 28em;
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  letter-spacing: var(--ls-lead);
+  color: var(--muted);
+}
+
+.listen {
+  justify-self: start;
+  margin-top: var(--s-3);
+}
+
+.stage {
+  min-width: 0;
+}
+
+.live {
+  display: none;
+}
+
+.stills {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .stills {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  font-family: var(--font-sans);
+}
+
+/* Live: the stage stays put while the page scrolls under it. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .story {
+    --story-mode: live;
+    height: 620svh;
+    padding-block: 0;
+  }
+
+  .sticky {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    height: 100svh;
+    padding-top: var(--nav-h);
+    padding-bottom: clamp(1rem, 3vh, 2rem);
+    overflow: hidden;
+  }
+
+  .layout {
+    width: 100%;
+    align-items: center;
+    gap: clamp(1rem, 3vh, 2rem);
+  }
+
+  .title {
+    font-size: var(--fs-small);
+    line-height: var(--lh-small);
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+
+  .steps {
+    grid-template-areas: "step";
+    margin-top: var(--s-3);
+  }
+
+  /* The outgoing caption leaves quickly; the next one waits for it, so they never overlap. */
+  .step {
+    grid-area: step;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition:
+      opacity 160ms ease,
+      transform 160ms ease;
+  }
+
+  .story[data-step="0"] .step:nth-child(1),
+  .story[data-step="1"] .step:nth-child(2),
+  .story[data-step="2"] .step:nth-child(3),
+  .story[data-step="3"] .step:nth-child(4),
+  .story[data-step="4"] .step:nth-child(5),
+  .story[data-step="5"] .step:nth-child(6) {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    transition:
+      opacity 380ms ease 160ms,
+      transform 520ms var(--ease-out) 160ms;
+  }
+
+  .live {
+    display: block;
+  }
+
+  .stills {
+    display: none;
+  }
+
+  /* Phones: the picture first, the words under it. */
+  .stage {
+    order: -1;
+  }
+
+  @media (min-width: 900px) {
+    .layout {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      column-gap: clamp(2rem, 4vw, 4rem);
+    }
+    .stage {
+      order: 0;
+    }
+  }
+
+  @media (max-height: 640px) and (max-width: 899px) {
+    .stepBody {
+      font-size: var(--fs-small);
+      line-height: var(--lh-small);
+    }
+  }
+}
+
+/* ---- SVG parts. Window and lanes follow the theme; the keyboard is dark like the real one. */
+
+.win {
+  fill: var(--surface);
+}
+
+.winEdge {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.bar,
+.side {
+  fill: var(--surface-2);
+}
+
+.dot {
+  fill: var(--line-strong);
+}
+
+.winTitle {
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.rule,
+.tick {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.chip {
+  fill: var(--bg);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.chipText {
+  font-size: 13px;
+  font-weight: 500;
+  fill: var(--muted);
+}
+
+.glyph {
+  fill: var(--ink);
+}
+
+.lcd {
+  fill: var(--bg);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.lcdText {
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: pre;
+}
+
+.lane {
+  font-size: 15px;
+  font-weight: 500;
+  fill: var(--ink);
+}
+
+.ruler {
+  font-size: 11px;
+  font-weight: 500;
+  fill: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.event {
+  fill: var(--faint);
+}
+
+.region {
+  fill: var(--surface-2);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.regionNote {
+  fill: var(--muted);
+}
+
+.rowWhite {
+  fill: var(--surface);
+}
+
+.rowBlack {
+  fill: var(--surface-2);
+}
+
+.miniWhite {
+  fill: var(--bg);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.miniBlack {
+  fill: var(--ink);
+}
+
+.note {
+  fill: var(--ink);
+}
+
+.alert {
+  fill: var(--alert);
+}
+
+.ring {
+  fill: none;
+  stroke: var(--alert);
+  stroke-width: 2;
+}
+
+.card {
+  fill: var(--bg);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.cardDot {
+  fill: var(--ink);
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.cardSub {
+  font-size: 13px;
+  fill: var(--muted);
+}
+
+.scan {
+  stroke: var(--ink);
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+}
+
+.playhead {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.kbBody {
+  fill: #1e1e21;
+  stroke: #3b3b3f;
+  stroke-width: 1;
+}
+
+.kbWell {
+  fill: #111113;
+}
+
+.kbWheel {
+  fill: #3b3b40;
+}
+
+.kbKnob {
+  fill: #a2a2a8;
+}
+
+.kbButton {
+  fill: #2d2d31;
+}
+
+.white {
+  fill: #f7f7f5;
+}
+
+.whiteDown {
+  fill: #c9cacd;
+}
+
+.black {
+  fill: #141416;
+}
+
+.blackDown {
+  fill: #5b5b62;
+}
+
+@media print {
+  .story {
+    padding-block: 14pt;
+    height: auto !important;
+  }
+  .sticky {
+    position: static !important;
+    height: auto !important;
+    display: block !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  .step {
+    opacity: 1 !important;
+    transform: none !important;
+    grid-area: auto !important;
+  }
+  .live,
+  .listen {
+    display: none !important;
+  }
+  .stills {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

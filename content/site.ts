@@ -45,6 +45,7 @@ export const hero = {
 
 export type Step = { title: string; body: string };
 
+// The story under the hero: three beats at work, then the same habit at the piano.
 export const method = {
   title: "How I listen",
   steps: [
@@ -60,7 +61,36 @@ export const method = {
       title: "Respond without breaking work.",
       body: "Contain what's wrong and keep everyone else working. Then explain the decision in plain words, so it can be audited and maintained.",
     },
+    {
+      title: "After hours, the same ears.",
+      body: "At night the timeline is a song in Logic Pro. Different lanes, same habit: listen to the whole thing, then look closer.",
+    },
+    {
+      title: "A wrong note is just another alert.",
+      body: "One note sits outside the key. Find it, move it where it belongs, and the phrase settles.",
+    },
+    {
+      title: "Then I play it.",
+      body: "On an M-Audio Keystation 49, by ear, one chord at a time.",
+    },
   ] satisfies Step[],
+  listen: "Listen to It's been a while",
+  description:
+    "An illustration in six steps: a timeline of network events with one unusual upload flagged in amber and contained; the same window turning into a music project with tracks and regions; the flagged event becoming a wrong note in a piano roll that is moved into the key; and a 49-key MIDI keyboard playing four chords.",
+  scene: {
+    securityTitle: "Network events",
+    musicTitle: "It's been a while",
+    range: "Last 15 minutes",
+    sources: "All sources",
+    tempo: "120 bpm",
+    meter: "4/4",
+    key: "C major",
+    cardAlert: "Unusual upload",
+    cardAlertSub: "2.3 GB to an unknown host",
+    cardContained: "Contained",
+    cardContainedSub: "Everyone else keeps working",
+    times: ["14:00", "14:02", "14:04", "14:06", "14:08", "14:10", "14:12", "14:14"],
+  },
 } as const;
 
 export const work = {

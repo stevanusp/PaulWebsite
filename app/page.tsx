@@ -1,6 +1,6 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
-import Method from "@/components/Method";
+import Story from "@/components/story/Story";
 import Work from "@/components/Work";
 import FieldNotes from "@/components/FieldNotes";
 import Built from "@/components/Built";
@@ -15,7 +15,7 @@ export default function Home() {
       <Nav />
       <main id="main" tabIndex={-1}>
         <Hero />
-        <Method />
+        <Story />
         <Work />
         <FieldNotes />
         <Built />

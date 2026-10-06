@@ -12,6 +12,7 @@ House rule: no em dash characters anywhere (copy, code, comments, commits).
 4. Motion is welcome if it is classic. No waveforms.
 5. A real photo (playing live) and his own song, "It's been a while" (a song he wrote; no other performers), stay.
 6. The ransomware field note stays out.
+7. Later the same day: "How I listen" becomes a scrollytelling story that starts as a security event view and slowly turns into a music project, ending on his M-Audio Keystation 49.
 
 Everything from v2 section 1 (dates, canonical URL, résumé) still holds.
 
@@ -21,7 +22,20 @@ Plain, kind, rounded. The headline still says the one idea, "I listen for what d
 
 - Color: a near white and a near black, one gray scale, and amber as the only accent, used only for what does not belong (the wrong note on the pads, the 404 badge).
 - Type: Instrument Sans only. Large titles are semibold and set tight; the hero and contact titles carry a soft top to bottom sheen.
-- Motion: one entrance on load (the headline words rise, the copy settles, the photo arrives), section intros that come up line by line as they scroll in, press feedback on buttons and pads. Nothing loops.
+- Motion: one entrance on load (the headline words rise, the copy settles, the photo arrives), one scroll story, section intros that come up line by line as they scroll in, press feedback on buttons and pads. Nothing loops.
+
+### The story ("How I listen", `components/story/`)
+
+A pinned stage (620svh of scroll) with six captions beside one illustration. One amber object travels through all of it:
+
+1. Learn what normal sounds like: a "Network events" window fills in behind a scan line, five sources, steady rhythm.
+2. Notice what doesn't belong: one proxy event turns amber and grows; a card says "Unusual upload".
+3. Respond without breaking work: a ring contains it; the card says "Contained".
+4. After hours, the same ears: the events dissolve into the regions of a song ("It's been a while"), lanes become Piano, Bass, Drums, Strings, Pad, the ruler becomes bars, filters become a transport.
+5. A wrong note is just another alert: the lanes compress, a piano roll opens, and the amber object is now an F sharp in a C major phrase; it slides up to G and turns ordinary.
+6. Then I play it: the window steps back and a 49-key controller rises, pressing I, V, vi, IV. A pill links to the song.
+
+The interface is drawn in the style of a DAW, not copied from Logic Pro, and carries no Apple or M-Audio marks; the product names appear only in the copy. Everything is a pure function of progress (`scene.ts`), rendered by React (`StoryScene.tsx`); captions swap with a short exit before the next entrance so they never overlap. Without script, with reduced motion and in print, the captions are a plain list next to two still frames (beats 2 and 6).
 
 ## 3. What changed from v3
 
@@ -29,7 +43,7 @@ Plain, kind, rounded. The headline still says the one idea, "I listen for what d
 |---|---|---|
 | Always dark | Light and dark, follows the device, toggle in the nav | Asked for both |
 | Live signal line, flagged headline glyph, tether, rail, scope graticules | Removed | Simple and classic, no waveforms |
-| Pinned method stage | Three numbered tiles | The steps are a real sequence; no scroll-jacking |
+| Pinned method stage | A pinned scroll story (security view to music project to keyboard) | Asked for scrollytelling that joins the two kinds of listening |
 | Field note scenes (animated SVG) | Text tiles | Simpler |
 | Photo in By ear | Photo in the hero | The person is the first thing you meet |
 | Song waveform slider | Classic rounded progress bar (`<input type="range">`) | Simpler, accessible by default |
@@ -52,7 +66,7 @@ All tokens live at the top of `app/globals.css`, written once with `light-dark()
 
 1. Nav: a floating capsule with the name, section links (the current one in a soft capsule), the theme toggle and a Contact pill. Phones keep the name, toggle and Contact.
 2. Hero (`#top`): name, headline, lead, status, Email me, Résumé; the photo on the right (below on phones).
-3. How I listen (`#method`): three numbered tiles.
+3. How I listen (`#method`): the scroll story.
 4. What I work on (`#work`): lit intro, three tiles.
 5. Field notes (`#notes`): lit intro, two tiles.
 6. Built after hours (`#built`): four tiles, the stack at the foot of each.
@@ -78,15 +92,17 @@ Unchanged: static export, per-page hash CSP from `scripts/csp.mjs` (the theme sc
 - Chromium (built-in browser) at 375x812 and 1440x900, in light and dark.
 - Theme toggle switches, persists across reloads and is applied before paint in the production export.
 - Production export: zero CSP violations, zero console errors, no horizontal overflow at 375. `tsc` and `eslint` clean. No em dash in authored files.
+- The story at each beat at 1440x900 (light and dark) and 375x812; the production export protects every page with zero CSP violations.
+- Share image `public/og.jpg` (1200 x 630, 86 KB) is wired into Open Graph and Twitter metadata.
 - Not yet run for v4: Lighthouse, print, a live reduced-motion pass, Safari and Firefox.
 
 ## 9. Open items
 
 - The photo is the 360 x 540 copy from chat. Replace `public/media/paulus-at-the-keys.jpg` with the original (at least 900 px wide) and update `hero.photo.width/height` in `content/site.ts`; it is slightly soft on large screens until then.
-- `public/og.png` still shows an earlier design.
 
 ## 10. How to change things
 
 - Copy: `content/site.ts` only.
 - A new section: `components/Section.tsx` plus `.tile` and the `tiles` grid classes in `Section.module.css`.
+- Story timing: `BEATS` and the `span(...)` ranges in `components/story/scene.ts`; captions in `method.steps` in `content/site.ts`.
 - After any change: `npm run build && npm run preview`, check 375 and 1440 in both themes, and confirm the build log says every page is protected.
