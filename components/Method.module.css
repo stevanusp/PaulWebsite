@@ -1,4 +1,4 @@
-/* The instrument stage. Dark in both themes.
+/* The instrument stage, one step deeper than the page.
    Static by default (no JS, reduced motion, print); pinned and live when scripting is on. */
 .stage {
   --stage-mode: static;
@@ -20,7 +20,7 @@
   font-size: var(--fs-h2);
   line-height: var(--lh-h2);
   letter-spacing: var(--ls-h2);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .bars {
@@ -44,7 +44,7 @@
   font-size: var(--fs-h3);
   line-height: var(--lh-h3);
   letter-spacing: var(--ls-h3);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .stepBody {
@@ -79,12 +79,12 @@
 }
 
 .bandFill {
-  fill: var(--stage-ink);
-  fill-opacity: 0.05;
+  fill: var(--stage-signal);
+  fill-opacity: 0.06;
 }
 
 .bandEdge {
-  stroke: var(--stage-faint);
+  stroke: var(--signal-dim);
   stroke-width: 1;
   stroke-dasharray: 2 5;
   vector-effect: non-scaling-stroke;
@@ -92,7 +92,7 @@
 
 .base {
   fill: none;
-  stroke: var(--stage-ink);
+  stroke: var(--stage-signal);
   stroke-width: 1.5;
   stroke-linejoin: round;
   stroke-linecap: round;
@@ -136,13 +136,13 @@
 
 .label {
   font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 .labelNormal {
-  fill: var(--stage-muted);
+  fill: var(--stage-signal);
 }
 
 .labelAlert {
@@ -207,7 +207,7 @@
   .bars i {
     position: absolute;
     inset: 0;
-    background: var(--stage-ink);
+    background: var(--stage-signal);
     transform: scaleX(0);
     transform-origin: left center;
   }
@@ -260,6 +260,21 @@
     margin-top: clamp(1rem, 4vh, 3rem);
   }
 
+  /* A scope graticule behind the trace, fading out toward the edges. */
+  .visual::before {
+    content: "";
+    position: absolute;
+    inset: -24px 0;
+    background-image:
+      linear-gradient(var(--stage-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--stage-line) 1px, transparent 1px);
+    background-size: 56px 56px;
+    background-position: center;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 30%, transparent 100%);
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 30%, transparent 100%);
+    pointer-events: none;
+  }
+
   .svg {
     position: absolute;
     inset: 0;
@@ -292,6 +307,7 @@
     --stage-faint: #999999;
     --stage-line: #dddddd;
     --stage-alert: #b45309;
+    --stage-signal: #1f6b47;
     height: auto !important;
     background: #ffffff;
     color: #000000;

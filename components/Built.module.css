@@ -1,8 +1,21 @@
-.text {
-  display: grid;
-  gap: var(--s-3);
-}
-
 .stack {
   color: var(--muted);
+}
+
+@media (min-width: 900px) {
+  .item {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: baseline;
+  }
+  .name {
+    grid-column: 1 / span 4;
+    padding-right: var(--s-5);
+  }
+  .body {
+    grid-column: 5 / span 5;
+  }
+  .stack {
+    grid-column: 10 / -1;
+    padding-left: var(--s-4);
+  }
 }

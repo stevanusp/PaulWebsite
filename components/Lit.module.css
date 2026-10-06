@@ -1,0 +1,28 @@
+.lit {
+  color: var(--ink);
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .w {
+      animation: lit linear both;
+      animation-timeline: view();
+      animation-range: cover 14% cover 40%;
+    }
+  }
+}
+
+@keyframes lit {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media print {
+  .w {
+    animation: none;
+  }
+}

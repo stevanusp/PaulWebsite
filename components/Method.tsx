@@ -249,7 +249,7 @@ export default function Method() {
       <div className={styles.sticky}>
         <div className={`container ${styles.top}`}>
           <div className={styles.head}>
-            <h2 id="method-title" className={styles.title}>
+            <h2 id="method-title" className={styles.title} data-rail="">
               {method.title}
             </h2>
             <span ref={barsRef} className={styles.bars} aria-hidden="true">

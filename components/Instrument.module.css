@@ -2,22 +2,24 @@
   margin-top: var(--s-8);
 }
 
-/* A small piece of hardware: a light body around a dark screen. */
+/* A small piece of hardware: a raised body around a deep screen with a graticule. */
 .panel {
-  padding: clamp(12px, 2vw, 20px);
+  padding: clamp(10px, 1.6vw, 16px);
   border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow:
-    inset 0 0 0 1px var(--line),
-    0 1px 2px rgba(21, 23, 26, 0.04),
-    0 12px 32px -12px rgba(21, 23, 26, 0.12);
+  box-shadow: inset 0 0 0 1px var(--line);
 }
 
 .screen {
   position: relative;
-  height: 160px;
-  border-radius: calc(var(--radius-panel) - 10px);
-  background: var(--stage-bg);
+  height: clamp(150px, 20vw, 200px);
+  border-radius: var(--radius-pad);
+  background-color: var(--stage-bg);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--stage-line) 60%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--stage-line) 60%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center;
   overflow: hidden;
 }
 
@@ -26,8 +28,8 @@
   position: absolute;
   top: 12px;
   font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-weight: 400;
+  letter-spacing: 0;
   z-index: 1;
 }
 
@@ -56,7 +58,7 @@
 
 .trace {
   fill: none;
-  stroke: var(--stage-ink);
+  stroke: var(--stage-signal);
   stroke-width: 1.5;
   stroke-linejoin: round;
   stroke-linecap: round;
@@ -173,9 +175,10 @@
 }
 
 .padName {
-  font-size: clamp(1.25rem, 1rem + 0.8vw, 1.625rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-family: var(--font-mono);
+  font-size: clamp(1.125rem, 0.9rem + 0.8vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
   line-height: 1;
 }
 
@@ -216,12 +219,6 @@
   line-height: var(--lh-small);
   font-weight: 500;
   color: var(--ink);
-}
-
-@media (prefers-color-scheme: dark) {
-  .panel {
-    box-shadow: inset 0 0 0 1px var(--line);
-  }
 }
 
 @media print {

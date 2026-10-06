@@ -8,11 +8,13 @@ import Path from "@/components/Path";
 import ByEar from "@/components/ByEar";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import Rail from "@/components/Rail";
 
 export default function Home() {
   return (
     <>
       <Nav />
+      <Rail />
       <main id="main" tabIndex={-1}>
         <Hero />
         <Method />

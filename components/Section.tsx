@@ -1,3 +1,4 @@
+import Lit from "./Lit";
 import styles from "./Section.module.css";
 
 type Props = {
@@ -11,14 +12,14 @@ type Props = {
 export default function Section({ id, title, intro, children, className }: Props) {
   return (
     <section id={id} className={`${styles.section} ${className ?? ""}`} aria-labelledby={`${id}-title`}>
-      <div className={`container ${styles.grid}`}>
-        <h2 id={`${id}-title`} className={styles.title}>
-          {title}
-        </h2>
-        <div className={styles.body}>
-          {intro ? <p className={styles.intro}>{intro}</p> : null}
-          {children}
+      <div className="container">
+        <div className={styles.head}>
+          <h2 id={`${id}-title`} className={styles.title} data-rail="">
+            {title}
+          </h2>
+          {intro ? <Lit className={styles.intro} text={intro} /> : null}
         </div>
+        {children ? <div className={styles.body}>{children}</div> : null}
       </div>
     </section>
   );

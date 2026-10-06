@@ -77,7 +77,7 @@ export default function HeroSignal({ label, description, hint }: Props) {
     let lastKey = "";
     // Tell the rest of the page where a burst begins, in viewport pixels.
     const announce = (cx: number, still = false) => {
-      emitAnomaly(svg.getBoundingClientRect().left + cx, still);
+      emitAnomaly(svg.getBoundingClientRect().left + cx, { still });
     };
     const sigmaFor = () => (W < 640 ? 13 : 19);
 

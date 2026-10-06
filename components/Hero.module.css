@@ -7,10 +7,8 @@
   padding-bottom: clamp(0.75rem, 2.5vh, 2rem);
 }
 
-.inner {
-  display: grid;
-  gap: clamp(1.5rem, 4.5vh, 3.25rem);
-  margin-block: 0 auto;
+.top {
+  width: 100%;
 }
 
 /* The live readout above the headline: one dot, one word, one counter. */
@@ -232,12 +230,20 @@
   display: grid;
   gap: var(--s-5);
   align-items: end;
+  padding-top: var(--s-5);
 }
 
+/* Wider screens: headline and copy up top, the line along the bottom edge. */
 @media (min-width: 900px) {
   .meta {
+    order: 1;
     grid-template-columns: minmax(0, 36em) auto;
     justify-content: space-between;
+    padding-top: clamp(1.5rem, 4.5vh, 3.25rem);
+  }
+  .signal {
+    order: 2;
+    margin-top: auto;
   }
 }
 
@@ -314,7 +320,7 @@
 }
 
 .signal {
-  padding-top: clamp(1.25rem, 4.5vh, 3.5rem);
+  padding-top: clamp(0.5rem, 3vh, 3.5rem);
 }
 
 @media (max-width: 639px) {

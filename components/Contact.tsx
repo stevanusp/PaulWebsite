@@ -14,7 +14,7 @@ export default function Contact() {
   return (
     <section id="contact" className={styles.contact} aria-labelledby="contact-title">
       <div className="container">
-        <h2 id="contact-title" className={styles.title}>
+        <h2 id="contact-title" className={styles.title} data-rail="">
           {contact.title}
         </h2>
         <p className={styles.line}>{contact.line}</p>

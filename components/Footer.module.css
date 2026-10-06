@@ -9,8 +9,9 @@
   align-items: baseline;
   gap: var(--s-2) var(--s-5);
   padding-block: var(--s-6) var(--s-7);
-  font-size: var(--fs-small);
-  line-height: var(--lh-small);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  line-height: var(--lh-mono);
   color: var(--muted);
 }
 

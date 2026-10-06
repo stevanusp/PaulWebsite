@@ -34,7 +34,12 @@ export default function HeroHead({ title, words, live, flagged }: Props) {
       current = null;
     };
 
-    const off = onAnomaly(({ x, still }) => {
+    const off = onAnomaly(({ x, y, still }) => {
+      // Anomalies from elsewhere on the page (they know their own y) only move the counter.
+      if (y !== undefined) {
+        if (!still) setCount((c) => c + 1);
+        return;
+      }
       const glyphs = Array.from(root.querySelectorAll<HTMLElement>("[data-ch]"));
       if (!glyphs.length || !hero) return;
       window.clearTimeout(timer);
@@ -48,7 +53,8 @@ export default function HeroHead({ title, words, live, flagged }: Props) {
           return { el, r, dx: Math.abs(r.left + r.width / 2 - x), row: Math.round(r.top) };
         })
         .sort((a, b) => a.dx - b.dx);
-      const pick = ranked.find((g) => g.row !== lastRow) ?? ranked[0];
+      // A still frame is announced again on every resize; keep it on the same glyph.
+      const pick = still ? ranked[0] : (ranked.find((g) => g.row !== lastRow) ?? ranked[0]);
       lastRow = pick.row;
 
       current = pick.el;

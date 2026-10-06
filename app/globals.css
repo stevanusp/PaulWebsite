@@ -41,7 +41,7 @@
   --fs-display: clamp(2.5rem, 0.9rem + 6.6vw, 7.5rem);
   --lh-display: 1;
   --ls-display: -0.055em;
-  --fs-h2: clamp(1.75rem, 1.1rem + 2.4vw, 3.25rem);
+  --fs-h2: clamp(2.125rem, 0.9rem + 4.4vw, 5.25rem);
   --lh-h2: 1.08;
   --ls-h2: -0.05em;
   --fs-step: clamp(1.75rem, 1rem + 3vw, 3.5rem);
@@ -296,12 +296,15 @@ main:focus {
 .nf-button {
   display: inline-flex;
   align-items: center;
-  min-height: 48px;
+  min-height: 52px;
   margin-top: var(--s-6);
   padding: 0 24px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-pad);
   background: var(--ink);
   color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: -0.02em;
   font-weight: 500;
   text-decoration: none;
   transition: transform var(--dur-press) var(--ease-out);
@@ -353,7 +356,7 @@ main:focus {
 
 .nf-label {
   font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 400;
   fill: var(--alert-text);
 }

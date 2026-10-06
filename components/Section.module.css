@@ -6,47 +6,48 @@
   padding-top: 0;
 }
 
-.grid {
+/* Head: a wide mono title, then the intro set large and offset to the right,
+   so the eye steps down and in, the way the rail steps into each section. */
+.head {
   display: grid;
-  gap: var(--s-6);
+  gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+  margin-bottom: clamp(3rem, 2rem + 4vw, 6rem);
 }
 
 .title {
   font-size: var(--fs-h2);
   line-height: var(--lh-h2);
   letter-spacing: var(--ls-h2);
-  font-weight: 600;
+  font-weight: 500;
+  max-width: 14em;
+}
+
+.intro {
+  font-size: clamp(1.375rem, 1rem + 1.5vw, 2.25rem);
+  line-height: 1.28;
+  letter-spacing: -0.022em;
+  font-weight: 450;
+  max-width: 23em;
 }
 
 .body {
   min-width: 0;
 }
 
-.intro {
-  font-size: var(--fs-lead);
-  line-height: var(--lh-lead);
-  letter-spacing: var(--ls-lead);
-  color: var(--muted);
-  max-width: 30em;
-  margin-bottom: var(--s-7);
-}
-
 @media (min-width: 1024px) {
-  .grid {
+  .head {
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: 24px;
   }
   .title {
-    grid-column: 1 / span 4;
-    padding-right: var(--s-5);
+    grid-column: 1 / -1;
   }
-  .body {
+  .intro {
     grid-column: 5 / -1;
-    padding-top: 0.45em;
   }
 }
 
-/* Shared row pattern: a hairline, a heading and its text. */
+/* Shared row pattern: a hairline, a mono heading and its text. */
 .rows {
   list-style: none;
   padding: 0;
@@ -55,8 +56,8 @@
 
 .row {
   display: grid;
-  gap: var(--s-2) var(--s-5);
-  padding-block: var(--s-6);
+  gap: var(--s-3) 24px;
+  padding-block: clamp(1.75rem, 1.25rem + 1.5vw, 2.75rem);
   border-top: 1px solid var(--line);
 }
 
@@ -64,7 +65,7 @@
   font-size: var(--fs-h3);
   line-height: var(--lh-h3);
   letter-spacing: var(--ls-h3);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .rowText {
@@ -79,32 +80,31 @@
 
 @media (min-width: 768px) {
   .row.split {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 5fr);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .row.split > :first-child {
+    grid-column: 1 / span 4;
+    padding-right: var(--s-5);
+  }
+  .row.split > :last-child {
+    grid-column: 5 / -1;
   }
 }
-
 
 @media print {
   .section {
     padding-block: 14pt;
     break-inside: auto;
   }
-  .grid {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: 12pt;
+  .head {
+    margin-bottom: 10pt;
+    gap: 6pt;
   }
-  .title {
-    grid-column: 1 / span 3;
-  }
-  .body {
-    grid-column: 4 / -1;
-    padding-top: 0.2em;
+  .intro {
+    font-size: var(--fs-lead);
   }
   .row {
     break-inside: avoid;
     padding-block: 10pt;
-  }
-  .intro {
-    margin-bottom: 12pt;
   }
 }

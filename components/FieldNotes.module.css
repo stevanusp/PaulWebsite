@@ -1,4 +1,29 @@
 .text {
   display: grid;
-  gap: var(--s-5);
+  align-content: start;
+  gap: var(--s-4);
+}
+
+.scene {
+  min-width: 0;
+  padding-top: var(--s-4);
+}
+
+.scene > svg {
+  max-width: none;
+}
+
+@media (min-width: 900px) {
+  .note {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: start;
+  }
+  .text {
+    grid-column: 1 / span 5;
+    padding-right: var(--s-5);
+  }
+  .scene {
+    grid-column: 7 / -1;
+    padding-top: 0.25rem;
+  }
 }

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ear } from "@/content/site";
 import { cornersPath } from "@/lib/signal";
 import { getEngine, inKey, type Engine } from "@/lib/epiano";
+import { emitAnomaly } from "@/lib/anomaly";
 import styles from "./Instrument.module.css";
 
 // Voicings with smooth voice leading: C, G, Am, F.
@@ -153,7 +154,11 @@ export default function Instrument() {
     if (!inKey(WRONG_NOTE)) {
       setWrong(true);
       setFlagged(true);
-      if (screenRef.current) screenRef.current.dataset.flag = "true";
+      if (screenRef.current) {
+        screenRef.current.dataset.flag = "true";
+        const r = screenRef.current.getBoundingClientRect();
+        emitAnomaly(r.left + r.width / 2, { y: r.top + r.height / 2 });
+      }
       window.clearTimeout(hitTimers.current[5]);
       hitTimers.current[5] = window.setTimeout(() => {
         setFlagged(false);
