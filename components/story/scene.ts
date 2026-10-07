@@ -129,7 +129,7 @@ const ANOMALY_X = xAt(ODD) + 2;
 
 type Ev = { lane: number; x: number; w: number; region: number | null; to: number };
 const EVENTS: Ev[] = [];
-const GAP = [30, 52, 88, 40]; // the proxy is busy, access is steady, intrusion prevention is quiet, DNS hums
+const GAP = [30, 52, 88, 40]; // the proxy is busy, access is steady, VPN is quiet, DNS hums
 for (let lane = 0; lane < 4; lane++) {
   let x = LANES_X + 10 + rand(lane + 4) * 16;
   let k = 0;

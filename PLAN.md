@@ -32,7 +32,7 @@ Plain, kind, rounded. The headline still says the one idea, "I listen for what d
 
 A pinned stage (620svh of scroll) with six captions beside one illustration. One amber object travels through all of it:
 
-1. Learn what normal sounds like: a "Network events" console fills in behind a scan line. Filters, a search field and a Live chip; an event-volume histogram; three sources (Web proxy, Network access, Intrusion prevention) at their own rhythms; an event log underneath.
+1. Learn what normal sounds like: a "Network events" console fills in behind a scan line. Filters, a search field and a Live chip; an event-volume histogram; four sources (Web proxy, Network access, VPN, DNS) at their own rhythms; an event log underneath.
 2. Notice what doesn't belong: one proxy event turns amber and pulses, its histogram bar spikes, a card says "Unusual upload", and the log pins a flagged row marked Review.
 3. Respond without breaking work: a ring contains it; the card and the log row say "Contained".
 4. After hours, the same ears: the log closes, the events join up into the regions of "It's been a while", the sources become Xylophone, Bass and Violin (with M and S buttons and meters), the histogram becomes a chord track (Emaj7, D#7, G#m9, C#/E#, F#m7, B7), the clock becomes bars of 3/4, and the search field becomes the display: bar, beat, 116 bpm, 3/4, B major. Playback starts; the loop is six bars.
