@@ -330,36 +330,36 @@ export default function StoryScene({ p, id, still = false }: Props) {
             return (
               <g key={i}>
                 <g opacity={f3(sec)}>
-                  <text className={styles.lane} x={20} y={f1(top + 27)}>
+                  <text className={styles.lane} x={20} y={f1(top + f.laneH * 0.42 + 4)}>
                     {S.lanes[i]}
                   </text>
-                  <text className={styles.laneSub} x={20} y={f1(top + 45)}>
+                  <text className={styles.laneSub} x={20} y={f1(top + f.laneH * 0.42 + 20)}>
                     {S.laneCounts[i]}
                   </text>
                 </g>
                 <g opacity={f3(mus)}>
-                  <text className={styles.laneSub} x={16} y={f1(top + 25)}>
+                  <text className={styles.laneSub} x={16} y={f1(top + 20)}>
                     {i + 1}
                   </text>
-                  <text className={styles.lane} x={34} y={f1(top + 25)}>
+                  <text className={styles.lane} x={34} y={f1(top + 20)}>
                     {S.tracks[i]}
                   </text>
-                  <rect className={styles.chip} x={34} y={f1(top + 33)} width={20} height={15} rx={5} />
-                  <text className={styles.ms} x={44} y={f1(top + 44)} textAnchor="middle">
+                  <rect className={styles.chip} x={34} y={f1(top + 27)} width={20} height={13} rx={5} />
+                  <text className={styles.ms} x={44} y={f1(top + 36.5)} textAnchor="middle">
                     M
                   </text>
-                  <rect className={styles.chip} x={58} y={f1(top + 33)} width={20} height={15} rx={5} />
-                  <text className={styles.ms} x={68} y={f1(top + 44)} textAnchor="middle">
+                  <rect className={styles.chip} x={58} y={f1(top + 27)} width={20} height={13} rx={5} />
+                  <text className={styles.ms} x={68} y={f1(top + 36.5)} textAnchor="middle">
                     S
                   </text>
-                  <rect className={styles.meterBed} x={152} y={f1(top + 8)} width={6} height={f1(f.laneH - 16)} rx={3} />
+                  <rect className={styles.meterBed} x={152} y={f1(top + 6)} width={6} height={f1(f.laneH - 12)} rx={3} />
                   <rect
                     className={styles.meter}
                     data-meter={i}
                     x={152}
-                    y={f1(top + 8)}
+                    y={f1(top + 6)}
                     width={6}
-                    height={f1(f.laneH - 16)}
+                    height={f1(f.laneH - 12)}
                     rx={3}
                     data-still={on(still)}
                   />

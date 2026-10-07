@@ -63,7 +63,7 @@ export const method = {
     },
     {
       title: "After hours, the same ears.",
-      body: "At night the timeline is a song in Logic Pro: xylophone, bass and violin at 116 bpm, in 3/4. Same habit. Hear the whole thing first, then look closer.",
+      body: "At night the timeline is a song in Logic Pro: xylophone, bass, violin and piano at 116 bpm, in 3/4. Same habit. Hear the whole thing first, then look closer.",
     },
     {
       title: "Every note belongs to something.",
@@ -76,7 +76,7 @@ export const method = {
   ] satisfies Step[],
   listen: "Listen to It's been a while",
   description:
-    "An illustration in six steps: a console of network events where one unusual upload is flagged in amber and contained; the same window turning into the song in Logic Pro, with xylophone, bass and violin tracks at 116 bpm in 3/4, B major; a piano roll where one note looks out of key until its D#7 chord appears around it; and a 49-key MIDI keyboard playing the loop Emaj7, D#7, G#m9, C#/E#, F#m7, B7.",
+    "An illustration in six steps: a console of network events where one unusual upload is flagged in amber and contained; the same window turning into the song in Logic Pro, with xylophone, bass, violin and piano tracks at 116 bpm in 3/4, B major; a piano roll where one note looks out of key until its D#7 chord appears around it; and a 49-key MIDI keyboard playing the loop Emaj7, D#7, G#m9, C#/E#, F#m7, B7.",
   scene: {
     securityTitle: "Network events",
     musicTitle: "It's been a while",
@@ -86,8 +86,8 @@ export const method = {
     live: "Live",
     volume: "Volume",
     times: ["14:00", "14:02", "14:04", "14:06", "14:08", "14:10", "14:12", "14:14"],
-    lanes: ["Web proxy", "Network access", "Intrusion prevention"],
-    laneCounts: ["1,284 events", "312 events", "41 events"],
+    lanes: ["Web proxy", "Network access", "Intrusion prevention", "DNS"],
+    laneCounts: ["1,284 events", "312 events", "41 events", "2,906 events"],
     columns: ["Source", "Event", "Action"],
     feed: [
       ["Web proxy", "Software update", "Allowed"],
@@ -106,7 +106,7 @@ export const method = {
     cardAlertSub: "2.3 GB to an unknown host",
     cardContained: "Contained",
     cardContainedSub: "Everyone else keeps working",
-    tracks: ["Xylophone", "Bass", "Violin"],
+    tracks: ["Xylophone", "Bass", "Violin", "Piano"],
     chordsLabel: "Chords",
     chords: ["Emaj7", "D#7", "G#m9", "C#/E#", "F#m7", "B7"],
     bar: "bar",
