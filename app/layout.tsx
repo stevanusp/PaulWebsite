@@ -64,7 +64,6 @@ const personJsonLd = {
     "Network access control",
     "Zero Trust",
     "Secure web gateway",
-    "Intrusion prevention",
     "Data loss prevention",
     "AI security",
   ],
