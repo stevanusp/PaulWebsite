@@ -165,8 +165,20 @@ export function getEngine(): Engine {
 
   let held: Voice[] = [];
 
+  // Rest the whole graph (the tremolo, the room) once the last note has died away, so a page
+  // left open after a tap does not keep the audio thread busy. Any new note wakes it.
+  const REST_MS = 9000;
+  let rest = 0;
+  const restSoon = () => {
+    window.clearTimeout(rest);
+    rest = window.setTimeout(() => {
+      if (ctx.state === "running") void ctx.suspend();
+    }, REST_MS);
+  };
+
   const play = (notes: readonly number[], opts?: { keep?: boolean }) => {
     if (ctx.state !== "running") void ctx.resume();
+    restSoon();
     const now = ctx.currentTime + 0.005;
 
     // Changing chords lets the dampers back down on the previous one.

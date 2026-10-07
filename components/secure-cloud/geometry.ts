@@ -5,31 +5,14 @@
 
 import { keyRects } from "@/components/Keystation";
 
-export type Rect = { x: number; y: number; w: number; h: number; r: number };
+import type { Rect } from "@/lib/motion";
+import { rand } from "@/lib/motion";
+
+export { clamp, ease, easeOut, lerp, mix, rand, span, type Rect } from "@/lib/motion";
 /** Where the cloud sits: cloud units are scaled, then moved. */
 export type Fit = { x: number; y: number; scale: number };
 /** A key on its way somewhere: a rectangle, a turn in degrees, and its tone (0 key, 1 cloud). */
 export type Piece = Rect & { turn: number; tone: number };
-
-export const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
-export const ease = (t: number) => {
-  const x = clamp(t);
-  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-};
-export const easeOut = (t: number) => 1 - Math.pow(1 - clamp(t), 3);
-export const span = (p: number, a: number, b: number) => ease((p - a) / (b - a));
-export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-export const rand = (n: number) => {
-  const s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
-  return s - Math.floor(s);
-};
-export const mix = (a: Rect, b: Rect, t: number): Rect => ({
-  x: lerp(a.x, b.x, t),
-  y: lerp(a.y, b.y, t),
-  w: lerp(a.w, b.w, t),
-  h: lerp(a.h, b.h, t),
-  r: lerp(a.r, b.r, t),
-});
 
 // ---- The shape, in cloud units: three circles on a rounded base, and a lock at the middle.
 

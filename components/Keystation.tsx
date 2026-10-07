@@ -9,7 +9,8 @@ import styles from "./Keystation.module.css";
 
 export const KEYSTATION = { w: 1000, h: 228, low: 36, high: 84 } as const;
 
-const WHITE_PCS = new Set([0, 2, 4, 5, 7, 9, 11]);
+/** Pitch classes of the white keys. */
+export const WHITE_PCS: ReadonlySet<number> = new Set([0, 2, 4, 5, 7, 9, 11]);
 const KEYS_X0 = 138;
 const KEYS_X1 = 963;
 const KEYS_Y = 60;
