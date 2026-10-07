@@ -33,7 +33,13 @@ const TYPES = {
 };
 
 function resolve(urlPath) {
-  const clean = normalize(decodeURIComponent(urlPath.split("?")[0])).replace(/^(\.\.[/\\])+/, "");
+  let decoded;
+  try {
+    decoded = decodeURIComponent(urlPath.split("?")[0]);
+  } catch {
+    return null; // a malformed escape is simply not found, not a crash
+  }
+  const clean = normalize(decoded).replace(/^(\.\.[/\\])+/, "");
   const candidates = [clean, `${clean}.html`, join(clean, "index.html")];
   for (const c of candidates) {
     const full = join(ROOT, c);

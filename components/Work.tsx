@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { work } from "@/content/site";
+import { LIVE_QUERY } from "@/lib/motion";
 import Section, { sectionStyles as s } from "./Section";
 import CloudScene from "./work/CloudScene";
 import styles from "./work/Work.module.css";
@@ -25,11 +26,12 @@ export default function Work() {
     let last = -1;
     const wide = window.matchMedia("(min-width: 900px)");
 
-    const live = () => getComputedStyle(root).getPropertyValue("--work-mode").trim() === "live";
+    // The same query that switches the CSS to live mode, read once and on change, not per frame.
+    const mode = window.matchMedia(LIVE_QUERY);
 
     const update = () => {
       raf = 0;
-      if (!live()) return;
+      if (!mode.matches) return;
       const items = Array.from(list.children) as HTMLElement[];
       const a = items[0].getBoundingClientRect();
       const b = items[items.length - 1].getBoundingClientRect();
@@ -51,10 +53,12 @@ export default function Work() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
+    mode.addEventListener("change", onScroll);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      mode.removeEventListener("change", onScroll);
     };
   }, []);
 

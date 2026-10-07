@@ -1,7 +1,6 @@
 /* "How I listen": static by default (no JS, reduced motion, print), pinned and scrubbed
-   by scroll when scripting is on and motion is welcome. JS reads --story-mode and follows. */
+   by scroll when scripting is on and motion is welcome. JS follows the same media query (LIVE_QUERY in lib/motion.ts). */
 .story {
-  --story-mode: static;
   padding-block: var(--section-y);
 }
 
@@ -79,7 +78,6 @@
 /* Live: the stage stays put while the page scrolls under it. */
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
   .story {
-    --story-mode: live;
     height: 620svh;
     padding-block: 0;
   }

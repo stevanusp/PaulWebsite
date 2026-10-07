@@ -18,18 +18,7 @@ export const stepAt = (p: number) => {
   return i;
 };
 
-const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
-const ease = (t: number) => {
-  const x = clamp(t);
-  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-};
-/** 0 before a, 1 after b, eased in between. */
-const span = (p: number, a: number, b: number) => ease((p - a) / (b - a));
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-const rand = (n: number) => {
-  const s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
-  return s - Math.floor(s);
-};
+import { clamp, lerp, mix, rand, span, type Rect } from "@/lib/motion";
 
 // ---- The song, as it sits in the project: 116 bpm, 3/4, B major. The loop is six bars.
 
@@ -135,7 +124,6 @@ const KB = KEYSTATION;
 
 // ---- The security timeline.
 
-type Rect = { x: number; y: number; w: number; h: number; r: number };
 
 const ANOMALY_X = xAt(ODD) + 2;
 
@@ -364,15 +352,5 @@ export function scene(p: number): Frame {
     arrow: span(ctx, 0.6, 1) * (1 - keys),
     keysO: clamp(keys * 1.6),
     keysY: lerp(VIEW_H + 20, VIEW_H - KB.h, keys),
-  };
-}
-
-function mix(a: Rect, b: Rect, t: number): Rect {
-  return {
-    x: lerp(a.x, b.x, t),
-    y: lerp(a.y, b.y, t),
-    w: lerp(a.w, b.w, t),
-    h: lerp(a.h, b.h, t),
-    r: lerp(a.r, b.r, t),
   };
 }

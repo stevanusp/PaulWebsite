@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Keystation } from "@/components/Keystation";
+import { Keystation, WHITE_PCS } from "@/components/Keystation";
 import { method } from "@/content/site";
 import {
   BAR_W,
@@ -34,8 +34,6 @@ const on = (v: boolean) => (v ? "" : undefined);
 const STILL_STEP = 11;
 const STILL_BAR = 1;
 const lit = (i: number) => NOTES[i].start <= STILL_STEP && STILL_STEP < NOTES[i].start + NOTES[i].len;
-
-const WHITE_PCS = new Set([0, 2, 4, 5, 7, 9, 11]);
 
 // ---- Piano roll: the parts that never move, local to the panel's top.
 
@@ -102,7 +100,9 @@ const RollGrid = memo(function RollGrid() {
 
 type Props = { p: number; id: string; still?: boolean };
 
-export default function StoryScene({ p, id, still = false }: Props) {
+// Memoized: its props are plain values, so the hidden stills render once instead of on every
+// scroll frame along with the live scene.
+export default memo(function StoryScene({ p, id, still = false }: Props) {
   const f = scene(p);
   const sec = f.sec;
   const mus = f.mus;
@@ -633,5 +633,4 @@ export default function StoryScene({ p, id, still = false }: Props) {
       </g>
     </svg>
   );
-}
-
+});

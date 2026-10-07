@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { method } from "@/content/site";
+import { LIVE_QUERY, easeOut } from "@/lib/motion";
 import { BAR_S, BEAT_S, LOG, LOOP_S, NOTES, SPAN_W, STEP_S, VOICINGS, stepAt } from "./scene";
 import StoryScene from "./StoryScene";
 import styles from "./Story.module.css";
@@ -10,7 +11,6 @@ import styles from "./Story.module.css";
 const FEED_S = 1.6;
 const FEED_IN_S = 0.4;
 const FEED_N = method.scene.feed.length;
-const easeOut = (t: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
 const mark = (el: Element, name: string, value: boolean) => {
   if (value) el.setAttribute(name, "");
   else el.removeAttribute(name);
@@ -33,8 +33,8 @@ export default function Story() {
     let top = 0;
     let span = 1;
     let last = -1;
-
-    const live = () => getComputedStyle(section).getPropertyValue("--story-mode").trim() === "live";
+    // The same query that switches the CSS to live mode, read once and on change, not per frame.
+    const mode = window.matchMedia(LIVE_QUERY);
 
     const measure = () => {
       top = section.getBoundingClientRect().top + window.scrollY;
@@ -43,7 +43,7 @@ export default function Story() {
 
     const update = () => {
       raf = 0;
-      if (!live()) return;
+      if (!mode.matches) return;
       const next = Math.min(1, Math.max(0, (window.scrollY - top) / span));
       pRef.current = next;
       // Skip changes too small to see.
@@ -66,11 +66,13 @@ export default function Story() {
     ro.observe(document.body);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
+    mode.addEventListener("change", onResize);
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
+      mode.removeEventListener("change", onResize);
     };
   }, []);
 
@@ -98,14 +100,29 @@ export default function Story() {
     let lastBeat = -1;
     let lastStep = -1;
 
-    const isLive = () => getComputedStyle(section).getPropertyValue("--story-mode").trim() === "live";
+    const mode = window.matchMedia(LIVE_QUERY);
+
+    // The log and the roll's notes mount and unmount with scroll. Keep references, and look them
+    // up again only after React has added or removed nodes.
+    let feed: SVGElement | null = null;
+    let notes: SVGElement[] = [];
+    let stale = true;
+    const refresh = () => {
+      feed = live.querySelector<SVGElement>('[data-clock="feed"]');
+      notes = all("[data-note]");
+      stale = false;
+    };
+    const mo = new MutationObserver(() => {
+      stale = true;
+      lastStep = -1;
+    });
+    mo.observe(live, { childList: true, subtree: true });
 
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
       const t = (now - t0) / 1000;
 
-      // The log: rows can mount and unmount with scroll, so look the group up each frame.
-      const feed = live.querySelector<SVGElement>('[data-clock="feed"]');
+      if (stale) refresh();
       if (feed) {
         const k = t / FEED_S;
         const i = Math.floor(k);
@@ -140,7 +157,7 @@ export default function Story() {
       }
       if (step !== lastStep) {
         lastStep = step;
-        for (const el of all("[data-note]")) {
+        for (const el of notes) {
           const n = NOTES[Number(el.dataset.note)];
           mark(el, "data-on", playing && n.start <= step && step < n.start + n.len);
         }
@@ -160,7 +177,7 @@ export default function Story() {
     };
 
     const start = () => {
-      if (raf || !visible || document.hidden || !isLive()) return;
+      if (raf || !visible || document.hidden || !mode.matches) return;
       section.setAttribute("data-run", "");
       raf = requestAnimationFrame(tick);
     };
@@ -170,7 +187,7 @@ export default function Story() {
       section.removeAttribute("data-run");
     };
     const sync = () => {
-      if (visible && !document.hidden && isLive()) start();
+      if (visible && !document.hidden && mode.matches) start();
       else stop();
     };
 
@@ -180,12 +197,13 @@ export default function Story() {
     });
     io.observe(section);
     document.addEventListener("visibilitychange", sync);
-    window.addEventListener("resize", sync, { passive: true });
+    mode.addEventListener("change", sync);
     return () => {
       stop();
       io.disconnect();
+      mo.disconnect();
       document.removeEventListener("visibilitychange", sync);
-      window.removeEventListener("resize", sync);
+      mode.removeEventListener("change", sync);
     };
   }, []);
 

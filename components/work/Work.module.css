@@ -1,9 +1,8 @@
 /* "What I work on": three tiles beside one picture: a Keystation whose keys fall into a locked
    cloud, which stays. Static by default (no JS, reduced motion, print): the Keystation and the
    cloud side by side over the tiles. With script and motion welcome, the picture holds still while the tiles scroll past
-   it, and the scroll position drives the change. JS reads --work-mode and follows. */
+   it, and the scroll position drives the change. JS follows the same media query (LIVE_QUERY in lib/motion.ts). */
 .scrolly {
-  --work-mode: static;
   display: grid;
   gap: var(--s-6);
 }
@@ -49,7 +48,6 @@
 
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
   .scrolly {
-    --work-mode: live;
     gap: 0;
   }
 
