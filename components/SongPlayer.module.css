@@ -1,0 +1,142 @@
+.player {
+  display: grid;
+  gap: var(--s-6);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+}
+
+.button {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--bg);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) ease,
+    transform var(--dur-press) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button:active {
+  transform: scale(0.94);
+}
+
+/* The play glyph sits optically centred, a touch right of the box centre. */
+.player[data-playing="false"] .button svg {
+  transform: translateX(1.5px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button:hover {
+    background: color-mix(in srgb, var(--ink) 84%, var(--bg));
+  }
+}
+
+.meta {
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+  letter-spacing: var(--ls-h3);
+  font-weight: 600;
+}
+
+.note {
+  margin-top: 2px;
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--muted);
+}
+
+.progress {
+  display: grid;
+  gap: var(--s-2);
+}
+
+/* A rounded track that fills from the left; the thumb only grows when you reach for it. */
+.range {
+  --p: 0%;
+  width: 100%;
+  height: 22px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--ink) var(--p), var(--line-strong) var(--p));
+}
+
+.range::-moz-range-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--line-strong);
+}
+
+.range::-moz-range-progress {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+}
+
+.range::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  margin-top: -4px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ink);
+  transform: scale(0.75);
+  transition: transform var(--dur-fast) var(--ease-out);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.range:active::-webkit-slider-thumb,
+.range:focus-visible::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .range:hover::-webkit-slider-thumb {
+    transform: scale(1);
+  }
+}
+
+.range:focus-visible {
+  outline-offset: 4px;
+}
+
+.times {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media print {
+  .player {
+    display: none;
+  }
+}

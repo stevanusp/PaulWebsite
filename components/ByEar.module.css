@@ -1,13 +1,33 @@
-.lead {
-  font-size: var(--fs-lead);
-  line-height: var(--lh-lead);
-  letter-spacing: var(--ls-lead);
-  color: var(--ink);
-  max-width: 28em;
+.grid {
+  display: grid;
+  gap: var(--s-6);
+  align-items: center;
+}
+
+@media (min-width: 960px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: clamp(2rem, 4vw, 4rem);
+  }
 }
 
 .body {
-  margin-top: var(--s-5);
   color: var(--muted);
-  max-width: var(--measure);
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  letter-spacing: var(--ls-lead);
+  max-width: 30em;
+}
+
+/* The heading row above the pads keeps room for the keyboard, so the margin above it is smaller. */
+.try {
+  display: grid;
+  gap: var(--s-4);
+  margin-top: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+}
+
+@media print {
+  .try {
+    display: none;
+  }
 }

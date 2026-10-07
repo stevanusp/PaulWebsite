@@ -1,123 +1,76 @@
-.instrument {
-  margin-top: var(--s-8);
+/* Heading row. The dock on the right (above the heading on phones) is where the keyboard lands
+   (components/secure-cloud/CloudDrop.tsx);
+   its space is kept from the start, so nothing moves under your finger when it arrives. */
+.head {
+  display: grid;
+  grid-template-areas:
+    "dock"
+    "label";
+  row-gap: var(--s-3);
 }
 
-/* A small piece of hardware: a light body around a dark screen. */
-.panel {
-  padding: clamp(12px, 2vw, 20px);
-  border-radius: var(--radius-panel);
-  background: var(--surface);
-  box-shadow:
-    inset 0 0 0 1px var(--line),
-    0 1px 2px rgba(21, 23, 26, 0.04),
-    0 12px 32px -12px rgba(21, 23, 26, 0.12);
+.label {
+  grid-area: label;
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+  letter-spacing: var(--ls-h3);
 }
 
-.screen {
+.dock {
+  grid-area: dock;
   position: relative;
-  height: 160px;
-  border-radius: calc(var(--radius-panel) - 10px);
-  background: var(--stage-bg);
-  overflow: hidden;
-}
-
-.screenLabel,
-.screenValue {
-  position: absolute;
-  top: 12px;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  z-index: 1;
-}
-
-.screenLabel {
-  left: 16px;
-  color: var(--stage-muted);
-}
-
-.screenValue {
-  right: 16px;
-  color: var(--stage-ink);
-}
-
-.svg {
-  position: absolute;
-  inset: 0;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 1000 / 228;
 }
 
-.center {
-  stroke: var(--stage-line);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-}
-
-.trace {
-  fill: none;
-  stroke: var(--stage-ink);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-  transition: stroke 600ms ease;
-}
-
-.screen[data-live="false"] .trace {
-  stroke: var(--stage-faint);
-}
-
-/* Flagged: the detector boxes the scope and the trace turns amber. */
-.corners {
-  fill: none;
-  stroke: var(--stage-alert);
-  stroke-width: 1.5;
-  stroke-linecap: square;
-  vector-effect: non-scaling-stroke;
-  opacity: 0;
-  transform: scale(1.05);
-  transform-origin: center;
-  transform-box: fill-box;
-  transition:
-    opacity 200ms ease,
-    transform 420ms var(--ease-out);
-}
-
-.screen[data-flag="true"] .corners {
-  opacity: 1;
-  transform: none;
-}
-
-.screen[data-flag="true"] .trace {
-  stroke: var(--stage-alert);
-}
-
-.screen[data-flag="true"] .screenValue {
-  color: var(--stage-alert);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .corners,
-  .trace {
-    transition: none;
+@media (min-width: 720px) {
+  .head {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "label dock";
+    align-items: end;
+    column-gap: var(--s-6);
   }
+  .dock {
+    width: clamp(300px, 36vw, 460px);
+  }
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+  }
+}
+
+.instrument {
+  display: grid;
+  gap: var(--s-4);
+}
+
+/* What is playing, said plainly. Amber only when the lone note has nothing to belong to. */
+.status {
+  min-height: 1.5em;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--muted);
+  transition: color var(--dur-base) ease;
+}
+
+.status[data-flag="true"] {
+  color: var(--alert);
 }
 
 .pads {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 0.55fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr)) minmax(0, 0.7fr);
   gap: clamp(8px, 1.2vw, 12px);
-  margin-top: clamp(8px, 1.2vw, 12px);
 }
 
 .pad {
-  position: relative;
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 2px;
-  height: clamp(68px, 9vw, 92px);
+  gap: 4px;
+  height: clamp(76px, 10vw, 104px);
   border: 0;
   border-radius: var(--radius-pad);
   background: var(--bg);
@@ -138,38 +91,24 @@
   transform: scale(0.97);
 }
 
-/* The odd one out: quiet by default, amber only when it is flagged. */
-.padWrong {
-  background: transparent;
-  box-shadow: none;
-  border: 1px dashed var(--line-strong);
-  color: var(--muted);
-}
-
-.pad.padWrong[data-hit="true"] {
-  background: var(--alert);
-  border-color: var(--alert);
-  color: var(--bg);
-}
-
-@media (max-width: 639px) {
-  .pads {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .padWrong {
-    grid-column: 1 / -1;
-    height: 56px;
-    grid-auto-flow: column;
-    gap: 10px;
-    align-content: center;
-  }
-}
-
 /* The hit: instant on, slow decay, like a pad light. */
 .pad[data-hit="true"] {
   background: var(--ink);
   color: var(--bg);
   transition: none;
+}
+
+/* The lone note: quiet by default. Its hit is amber when nothing under it gives it a place,
+   and plain ink when the chord still ringing does. */
+.padNote {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
+  color: var(--muted);
+}
+
+.pad.padNote[data-hit="true"][data-outside="true"] {
+  background: var(--alert);
+  color: var(--bg);
 }
 
 .padName {
@@ -180,8 +119,8 @@
 }
 
 .padDegree {
-  font-size: 11px;
-  color: inherit;
+  font-size: var(--fs-tiny);
+  font-weight: 500;
   opacity: 0.6;
 }
 
@@ -191,40 +130,69 @@
   }
 }
 
+/* Phones: four by two, the lone note across the last two cells. */
+@media (max-width: 639px) {
+  .pads {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .padName {
+    font-size: 1.125rem;
+  }
+  .padNote {
+    grid-column: span 2;
+    grid-auto-flow: column;
+    gap: 10px;
+    align-content: center;
+  }
+}
+
 .caption {
-  margin-top: var(--s-4);
   font-size: var(--fs-small);
   line-height: var(--lh-small);
   color: var(--muted);
 }
 
-.keys {
+.shortcuts {
   display: inline;
+}
+
+.fact {
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--muted);
+  max-width: 44em;
+  animation: fact 520ms var(--ease-out) 1300ms both;
+}
+
+@keyframes fact {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fact {
+    animation: arrive 200ms ease both;
+  }
 }
 
 /* Touch devices have no number keys to press. */
 @media (hover: none) {
-  .keys {
+  .shortcuts {
     display: none;
   }
 }
 
 .found {
   min-height: 1.5em;
-  margin-top: var(--s-1);
   font-size: var(--fs-small);
   line-height: var(--lh-small);
   font-weight: 500;
-  color: var(--ink);
-}
-
-@media (prefers-color-scheme: dark) {
-  .panel {
-    box-shadow: inset 0 0 0 1px var(--line);
-  }
 }
 
 @media print {
+  .head,
   .instrument {
     display: none;
   }

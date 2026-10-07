@@ -1,54 +1,47 @@
-/* Tokens. Every color, size and curve on the site comes from here. */
+/* Tokens. Every color, size and curve on the site comes from here.
+   One set of values for both themes, through light-dark(). The site follows the device,
+   and the toggle in the nav pins a choice with data-theme on <html>.
+   Nothing on this site has a sharp corner. */
 :root {
   color-scheme: light dark;
 
-  /* color, light */
-  --bg: #f3f4f1;
-  --surface: #ffffff;
-  --surface-2: #e9ebe6;
-  --ink: #15171a;
-  --muted: #565c63; /* 6.12:1 on bg */
-  --faint: #8a9097; /* decoration only, never text */
-  --line: #dcdfda;
-  --line-strong: #c7cbc5;
-  --alert: #c25e00; /* anomaly strokes, 3.89:1 on bg */
-  --alert-text: #b45309; /* anomaly labels, 4.55:1 on bg */
-  --nav-bg: rgba(243, 244, 241, 0.78);
+  --bg: light-dark(#fbfbfa, #0c0c0d);
+  --surface: light-dark(#f1f1ef, #18181a);
+  --surface-2: light-dark(#e7e7e4, #232326);
+  --ink: light-dark(#1b1b1d, #f3f3f1);
+  --muted: light-dark(#66666c, #a2a2a8); /* 5.6:1 and 8.1:1 on bg */
+  --faint: light-dark(#a8a8ad, #55555b); /* decoration only, never text */
+  --line: light-dark(#e3e3e0, #29292c);
+  --line-strong: light-dark(#cdcdc9, #3b3b3f);
+  --nav-bg: light-dark(rgba(251, 251, 250, 0.72), rgba(24, 24, 26, 0.66));
 
-  /* the instrument stage is dark in both themes */
-  --stage-bg: #0b0c0d;
-  --stage-ink: #ecede9;
-  --stage-muted: #a0a6ac; /* 7.97:1 */
-  --stage-faint: #5b6168;
-  --stage-line: #24282c;
-  --stage-alert: #f2a23a; /* 9.33:1 */
-  --stage-nav-bg: rgba(11, 12, 13, 0.72);
+  /* the one accent: only for what does not belong */
+  --alert: light-dark(#b45309, #f2a23a); /* 4.9:1 and 9.4:1 on bg */
+
+  /* the soft sheen on display titles */
+  --sheen-top: light-dark(#1b1b1d, #f7f7f5);
+  --sheen-bottom: light-dark(#5a5a61, #9c9ca3);
 
   /* type */
   --font-sans: var(--font-instrument), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", Menlo, monospace;
 
-  --fs-display: clamp(3rem, 1.2rem + 7.2vw, 7.75rem);
-  --lh-display: 0.95;
+  --fs-display: clamp(3rem, 1rem + 6.4vw, 7.5rem);
+  --lh-display: 0.98;
   --ls-display: -0.045em;
-  --fs-h2: clamp(2rem, 1.3rem + 2.6vw, 3.25rem);
-  --lh-h2: 1.04;
-  --ls-h2: -0.032em;
-  --fs-step: clamp(2rem, 1.2rem + 3.2vw, 3.75rem);
-  --lh-step: 1.02;
-  --ls-step: -0.035em;
-  --fs-h3: clamp(1.1875rem, 1rem + 0.5vw, 1.5rem);
-  --lh-h3: 1.25;
-  --ls-h3: -0.014em;
+  --fs-h2: clamp(2.25rem, 1.1rem + 3.6vw, 4.5rem);
+  --lh-h2: 1.03;
+  --ls-h2: -0.04em;
+  --fs-h3: clamp(1.25rem, 1.05rem + 0.6vw, 1.625rem);
+  --lh-h3: 1.2;
+  --ls-h3: -0.022em;
   --fs-lead: clamp(1.1875rem, 1rem + 0.55vw, 1.5rem);
   --lh-lead: 1.42;
-  --ls-lead: -0.012em;
+  --ls-lead: -0.014em;
   --fs-body: clamp(1.0625rem, 1rem + 0.15vw, 1.125rem);
   --lh-body: 1.6;
   --fs-small: 0.9375rem;
   --lh-small: 1.5;
-  --fs-mono: 0.8125rem;
-  --lh-mono: 1.4;
+  --fs-tiny: 0.8125rem;
 
   /* space */
   --s-1: 4px;
@@ -60,18 +53,18 @@
   --s-7: 48px;
   --s-8: 64px;
   --s-9: 96px;
-  --s-10: 128px;
   --gutter: clamp(1.25rem, 0.5rem + 3vw, 3rem);
-  --max: 1320px;
-  --section-y: clamp(6rem, 4rem + 8vw, 11rem);
-  --measure: 38em;
-  --nav-h: 56px;
+  --max: 1240px;
+  --section-y: clamp(5rem, 3rem + 7vw, 10rem);
+  --measure: 36em;
+  --nav-h: 76px;
 
-  /* shape */
+  /* shape: soft everywhere */
   --radius-pill: 999px;
-  --radius-panel: 28px;
-  --radius-pad: 18px;
-  --radius-focus: 8px;
+  --radius-tile: 30px;
+  --radius-media: 34px;
+  --radius-pad: 22px;
+  --radius-focus: 12px;
 
   /* motion */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -81,22 +74,12 @@
   --dur-base: 260ms;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e1012;
-    --surface: #16191c;
-    --surface-2: #1e2226;
-    --ink: #ecede9; /* 16.21:1 */
-    --muted: #a0a6ac; /* 7.76:1 */
-    --faint: #6b7178;
-    --line: #24282c;
-    --line-strong: #353a40;
-    --alert: #f2a23a; /* 9.08:1 */
-    --alert-text: #f2a23a;
-    --nav-bg: rgba(14, 16, 18, 0.72);
-    --stage-bg: #000000;
-    --stage-line: #1f2326;
-  }
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 /* Base */
@@ -123,6 +106,9 @@ body {
   min-height: 100svh;
   background: var(--bg);
   color: var(--ink);
+  transition:
+    background-color 300ms ease,
+    color 300ms ease;
   font-family: var(--font-sans);
   font-size: var(--fs-body);
   line-height: var(--lh-body);
@@ -138,6 +124,15 @@ h2,
 h3 {
   font-weight: 600;
   text-wrap: balance;
+}
+
+/* A soft top-to-bottom sheen for the two display titles. */
+.sheen {
+  background: linear-gradient(180deg, var(--sheen-top) 35%, var(--sheen-bottom) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-bottom: 0.08em;
 }
 
 p {
@@ -192,11 +187,67 @@ main:focus {
   border: 0;
 }
 
-.mono {
-  font-family: var(--font-mono);
-  font-size: var(--fs-mono);
-  line-height: var(--lh-mono);
-  letter-spacing: 0;
+/* Small supporting text: years, stacks, timestamps. */
+.fine {
+  font-size: var(--fs-tiny);
+  line-height: 1.45;
+  letter-spacing: 0.005em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* The shared pill button. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease,
+    transform var(--dur-press) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pill:active {
+  transform: scale(0.97);
+}
+
+.pill-solid {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.pill-quiet {
+  background: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pill-solid:hover {
+    background: color-mix(in srgb, var(--ink) 84%, var(--bg));
+  }
+  .pill-quiet:hover {
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+}
+
+/* A soft rounded tile, the site's one container. */
+.tile {
+  border-radius: var(--radius-tile);
+  background: var(--surface);
+  padding: clamp(1.5rem, 1rem + 1.6vw, 2.5rem);
 }
 
 .link {
@@ -217,6 +268,9 @@ main:focus {
   html {
     scroll-behavior: auto;
   }
+  body {
+    transition: none;
+  }
 }
 
 @media print {
@@ -226,13 +280,15 @@ main:focus {
     --ink: #000000;
     --muted: #333333;
     --line: #cccccc;
+    --alert: #b45309;
+    --sheen-top: #000000;
+    --sheen-bottom: #000000;
     --section-y: 16pt;
     --fs-h2: 17pt;
     --fs-h3: 11.5pt;
     --fs-lead: 11.5pt;
     --fs-body: 10pt;
     --fs-small: 9pt;
-    --fs-mono: 8.5pt;
     --measure: 60em;
   }
 
@@ -249,111 +305,41 @@ main:focus {
 
 /* 404 page (kept global so the root layout never preloads a stray stylesheet) */
 .nf-page {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  place-items: center;
   min-height: 100svh;
-}
-
-.nf-header {
-  display: flex;
-  align-items: center;
-  height: var(--nav-h);
-}
-
-.nf-brand {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  text-decoration: none;
-  padding-block: 12px;
+  padding: var(--gutter);
+  text-align: center;
 }
 
 .nf-main {
-  padding-top: clamp(4rem, 14vh, 10rem);
-  padding-bottom: var(--s-8);
+  display: grid;
+  justify-items: center;
+  gap: var(--s-5);
+  max-width: 34em;
 }
 
 .nf-code {
-  color: var(--muted);
+  display: inline-grid;
+  place-items: center;
+  min-height: 32px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--alert);
+  font-size: var(--fs-tiny);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .nf-title {
-  margin-top: var(--s-4);
-  font-size: clamp(2.5rem, 1rem + 5vw, 5.5rem);
+  font-size: clamp(2.5rem, 1rem + 5vw, 5rem);
   line-height: var(--lh-display);
   letter-spacing: var(--ls-display);
-  font-weight: 600;
-  max-width: 12em;
 }
 
 .nf-body {
-  margin-top: var(--s-5);
   font-size: var(--fs-lead);
   line-height: var(--lh-lead);
   color: var(--muted);
-}
-
-.nf-button {
-  display: inline-flex;
-  align-items: center;
-  min-height: 48px;
-  margin-top: var(--s-6);
-  padding: 0 24px;
-  border-radius: var(--radius-pill);
-  background: var(--ink);
-  color: var(--bg);
-  font-weight: 500;
-  text-decoration: none;
-  transition: transform var(--dur-press) var(--ease-out);
-}
-
-.nf-button:active {
-  transform: scale(0.97);
-}
-
-.nf-signal {
-  width: 100%;
-  height: 160px;
-  margin-top: auto;
-  margin-bottom: clamp(1.5rem, 5vh, 3rem);
-  overflow: visible;
-}
-
-.nf-base {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.nf-alert {
-  fill: none;
-  stroke-width: 2.25;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.nf-stop {
-  stop-color: var(--alert);
-  stop-opacity: 1;
-}
-
-.nf-stopClear {
-  stop-color: var(--alert);
-  stop-opacity: 0;
-}
-
-.nf-corners {
-  fill: none;
-  stroke: var(--alert);
-  stroke-width: 1.5;
-  vector-effect: non-scaling-stroke;
-}
-
-.nf-label {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 500;
-  fill: var(--alert-text);
 }

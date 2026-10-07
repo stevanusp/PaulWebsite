@@ -1,0 +1,639 @@
+/* "How I listen": static by default (no JS, reduced motion, print), pinned and scrubbed
+   by scroll when scripting is on and motion is welcome. JS reads --story-mode and follows. */
+.story {
+  --story-mode: static;
+  padding-block: var(--section-y);
+}
+
+.layout {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+}
+
+.title {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  letter-spacing: var(--ls-h2);
+}
+
+.steps {
+  display: grid;
+  gap: var(--s-6);
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  gap: var(--s-3);
+  align-content: start;
+}
+
+.stepTitle {
+  font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.375rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.stepBody {
+  max-width: 28em;
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  letter-spacing: var(--ls-lead);
+  color: var(--muted);
+}
+
+.listen {
+  justify-self: start;
+  margin-top: var(--s-3);
+}
+
+.stage {
+  min-width: 0;
+}
+
+.live {
+  display: none;
+}
+
+.stills {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .stills {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  font-family: var(--font-sans);
+}
+
+/* Live: the stage stays put while the page scrolls under it. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .story {
+    --story-mode: live;
+    height: 620svh;
+    padding-block: 0;
+  }
+
+  .sticky {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    height: 100svh;
+    padding-top: var(--nav-h);
+    padding-bottom: clamp(1rem, 3vh, 2rem);
+    overflow: hidden;
+  }
+
+  .layout {
+    width: 100%;
+    align-items: center;
+    gap: clamp(1rem, 3vh, 2rem);
+  }
+
+  .title {
+    font-size: var(--fs-small);
+    line-height: var(--lh-small);
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+
+  .steps {
+    grid-template-areas: "step";
+    margin-top: var(--s-3);
+  }
+
+  /* The outgoing caption leaves quickly; the next one waits for it, so they never overlap. */
+  .step {
+    grid-area: step;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition:
+      opacity 160ms ease,
+      transform 160ms ease;
+  }
+
+  .story[data-step="0"] .step:nth-child(1),
+  .story[data-step="1"] .step:nth-child(2),
+  .story[data-step="2"] .step:nth-child(3),
+  .story[data-step="3"] .step:nth-child(4),
+  .story[data-step="4"] .step:nth-child(5),
+  .story[data-step="5"] .step:nth-child(6) {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    transition:
+      opacity 380ms ease 160ms,
+      transform 520ms var(--ease-out) 160ms;
+  }
+
+  .live {
+    display: block;
+  }
+
+  .stills {
+    display: none;
+  }
+
+  /* Phones: the picture first, the words under it. */
+  .stage {
+    order: -1;
+  }
+
+  @media (min-width: 900px) {
+    .layout {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      column-gap: clamp(2rem, 4vw, 4rem);
+    }
+    .stage {
+      order: 0;
+    }
+  }
+
+  @media (max-height: 640px) and (max-width: 899px) {
+    .stepBody {
+      font-size: var(--fs-small);
+      line-height: var(--lh-small);
+    }
+  }
+}
+
+/* ---- SVG parts. The window follows the theme; regions get one calm tint so the song reads as a
+   DAW; amber stays reserved for the one object the story follows. The keyboard is dark like the
+   real one. */
+
+.story {
+  --region: light-dark(#dde5ee, #232d3b);
+  --region-edge: light-dark(#bfcbdb, #36445a);
+  --region-ink: light-dark(#4d607b, #a9bbd4);
+}
+
+.win {
+  fill: var(--surface);
+}
+
+.winEdge {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.bar,
+.side {
+  fill: var(--surface-2);
+}
+
+.dot {
+  fill: var(--line-strong);
+}
+
+.winTitle {
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.rule,
+.tick {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.chip {
+  fill: var(--bg);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.chipText {
+  font-size: 12.5px;
+  font-weight: 500;
+  fill: var(--muted);
+}
+
+.liveDot {
+  fill: var(--ink);
+}
+
+.glass {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.placeholder {
+  font-size: 13px;
+  fill: var(--faint);
+}
+
+.glyph {
+  fill: var(--ink);
+}
+
+.glyphSoft {
+  fill: var(--muted);
+}
+
+.glyphLine {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lcd {
+  fill: var(--bg);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.lcdBig {
+  font-size: 22px;
+  font-weight: 600;
+  fill: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.lcdMid {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.lcdSub {
+  font-size: 11.5px;
+  font-weight: 500;
+  fill: var(--ink);
+}
+
+.lcdLabel {
+  font-size: 8.5px;
+  font-weight: 500;
+  fill: var(--muted);
+}
+
+.lane {
+  font-size: 14px;
+  font-weight: 500;
+  fill: var(--ink);
+}
+
+.laneSub {
+  font-size: 11.5px;
+  fill: var(--muted);
+}
+
+.ms {
+  font-size: 9px;
+  font-weight: 600;
+  fill: var(--muted);
+}
+
+.ruler {
+  font-size: 11px;
+  font-weight: 500;
+  fill: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.cycle {
+  fill: var(--line-strong);
+}
+
+.hist {
+  fill: var(--faint);
+}
+
+.event {
+  fill: var(--faint);
+}
+
+/* Chord track: the cell under the playhead lights up. */
+.chordCell rect {
+  fill: var(--bg);
+  stroke: var(--line);
+  stroke-width: 1;
+  transition: fill 120ms ease;
+}
+
+.chordCell text {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--muted);
+  transition: fill 120ms ease;
+}
+
+.chordCell[data-now] rect {
+  fill: var(--surface-2);
+  stroke: var(--line-strong);
+}
+
+.chordCell[data-now] text {
+  fill: var(--ink);
+}
+
+.focus {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.meterBed {
+  fill: var(--bg);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.meter {
+  fill: var(--muted);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: scaleY(0);
+}
+
+.meter[data-still] {
+  transform: scaleY(0.6);
+}
+
+.region {
+  fill: var(--region);
+  stroke: var(--region-edge);
+  stroke-width: 1;
+}
+
+.regionName {
+  font-size: 10px;
+  font-weight: 600;
+  fill: var(--region-ink);
+}
+
+.mini {
+  fill: var(--region-ink);
+}
+
+.mini[data-on] {
+  fill: var(--ink);
+}
+
+/* Event log */
+.feedDot {
+  fill: var(--faint);
+}
+
+.feedText {
+  font-size: 12px;
+  fill: var(--ink);
+}
+
+.feedMuted {
+  font-size: 12px;
+  fill: var(--muted);
+}
+
+.feedStrong {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.feedAlert {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--alert);
+}
+
+.flagRow {
+  fill: var(--bg);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+/* Piano roll */
+.editorTitle {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.small {
+  font-size: 11.5px;
+  fill: var(--muted);
+}
+
+.rowIn {
+  fill: var(--surface);
+}
+
+.rowOut {
+  fill: var(--surface-2);
+}
+
+.gridBar {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.gridBeat {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.miniWhite {
+  fill: var(--bg);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.miniBlack {
+  fill: var(--ink);
+}
+
+.band {
+  fill: var(--ink);
+  fill-opacity: 0.05;
+}
+
+.note {
+  fill: var(--region-ink);
+}
+
+.note[data-on] {
+  fill: var(--ink);
+}
+
+.lead {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.tag,
+.tagAlert {
+  fill: var(--bg);
+  stroke-width: 1;
+}
+
+.tag {
+  stroke: var(--line-strong);
+}
+
+.tagAlert {
+  stroke: var(--alert);
+}
+
+.tagText,
+.tagAlertText {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.tagText {
+  fill: var(--ink);
+}
+
+.tagAlertText {
+  fill: var(--alert);
+}
+
+/* The one this story follows */
+.alert {
+  fill: var(--alert);
+}
+
+.ring {
+  fill: none;
+  stroke: var(--alert);
+  stroke-width: 2;
+}
+
+.ringSoft {
+  fill: none;
+  stroke: var(--alert);
+  stroke-width: 1.5;
+}
+
+.card {
+  fill: var(--bg);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.cardDot {
+  fill: var(--ink);
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.cardSub {
+  font-size: 13px;
+  fill: var(--muted);
+}
+
+.connector {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1.2;
+}
+
+.scan {
+  stroke: var(--ink);
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+}
+
+.playhead {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.playheadCap {
+  fill: var(--ink);
+}
+
+/* Motion that runs on its own: only while the story is on screen (Story.tsx sets data-run). */
+.pulse,
+.ping {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-play-state: paused;
+}
+
+.pulse {
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+.ping {
+  animation: ping 1.6s cubic-bezier(0.23, 1, 0.32, 1) infinite;
+}
+
+.story[data-run] .pulse,
+.story[data-run] .ping {
+  animation-play-state: running;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes ping {
+  from {
+    transform: scale(1);
+    stroke-opacity: 0.9;
+  }
+  to {
+    transform: scale(2.2);
+    stroke-opacity: 0;
+  }
+}
+
+@media print {
+  .story {
+    padding-block: 14pt;
+    height: auto !important;
+  }
+  .sticky {
+    position: static !important;
+    height: auto !important;
+    display: block !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  .step {
+    opacity: 1 !important;
+    transform: none !important;
+    grid-area: auto !important;
+  }
+  .live,
+  .listen {
+    display: none !important;
+  }
+  .stills {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

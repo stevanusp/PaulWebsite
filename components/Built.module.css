@@ -1,8 +1,5 @@
-.text {
-  display: grid;
-  gap: var(--s-3);
-}
-
+/* The stack sits at the foot of the tile, whatever the length of the story above it. */
 .stack {
-  color: var(--muted);
+  margin-top: auto;
+  padding-top: var(--s-3);
 }

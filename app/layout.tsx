@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { instrument, plexMono } from "./fonts";
+import { instrument } from "./fonts";
 import { site } from "@/content/site";
 import ConsoleNote from "@/components/ConsoleNote";
 import "./globals.css";
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/og.png",
+        url: "/og.jpg",
         width: 1200,
         height: 630,
         alt: "Stevanus Paulus. I listen for what doesn't belong.",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: site.title,
     description: site.description,
-    images: ["/og.png"],
+    images: ["/og.jpg"],
   },
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
@@ -43,8 +43,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f3f4f1" },
-    { media: "(prefers-color-scheme: dark)", color: "#0e1012" },
+    { media: "(prefers-color-scheme: light)", color: "#fbfbfa" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c0c0d" },
   ],
   colorScheme: "light dark",
 };
@@ -70,9 +70,16 @@ const personJsonLd = {
   ],
 };
 
+// Runs while the HTML is parsed, before the first paint, so a saved theme never flashes.
+// Static text: scripts/csp.mjs hashes it like every other inline script.
+const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${instrument.variable} ${plexMono.variable}`}>
+    <html lang="en" className={instrument.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body>
         {children}
         <script
