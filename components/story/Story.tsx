@@ -153,8 +153,9 @@ export default function Story() {
             0.3 + 0.62 * Math.exp(-sinceStep * 9),
             0.25 + 0.65 * Math.exp(-sinceBar * 1.8),
             bar >= 1 ? 0.52 + 0.1 * Math.sin(t * 5.3) : 0.03,
+            0.3 + 0.55 * Math.exp(-sinceBar * 1.2),
           ]
-        : [0, 0, 0];
+        : [0, 0, 0, 0];
       for (const el of meters) el.style.transform = `scaleY(${level[Number(el.dataset.meter)].toFixed(3)})`;
     };
 

@@ -43,6 +43,8 @@ export const LOOP_S = BAR_S * LOOP_BARS;
 export const STEPS = 6;
 export const STEP_S = BAR_S / STEPS;
 
+import { VOICINGS } from "@/lib/loop";
+
 export { VOICINGS, inKey } from "@/lib/loop";
 
 export type Note = { track: number; pitch: number; start: number; len: number };
@@ -69,6 +71,8 @@ export const NOTES: Note[] = [
   ...XYLO.flatMap((bar, b) => bar.map((pitch, s) => ({ track: 0, pitch, start: b * STEPS + s, len: 1 }))),
   ...BASS.map((pitch, b) => ({ track: 1, pitch, start: b * STEPS, len: STEPS })),
   ...VIOLIN.map((v) => ({ track: 2, pitch: v.pitch, start: v.bar * STEPS, len: v.bars * STEPS })),
+  // Piano: the right hand of each chord, held for the bar.
+  ...VOICINGS.flatMap((chord, b) => chord.slice(1).map((pitch) => ({ track: 3, pitch, start: b * STEPS, len: STEPS }))),
 ];
 
 /** The last eighth of bar 2: F double sharp (it sounds as G), the third of D#7. */
@@ -89,7 +93,7 @@ export const LAYOUT = {
   LABEL_W: 170,
   LANES_X: 174,
   LANES_END: 990,
-  LANE_COUNT: 3,
+  LANE_COUNT: 4,
 } as const;
 const { STRIP_Y, STRIP_H, LANES_Y, LANES_X, LANES_END } = LAYOUT;
 
@@ -99,25 +103,27 @@ export const STEP_W = BAR_W / STEPS;
 export const xAt = (step: number) => LANES_X + step * STEP_W;
 
 // Lane heights: short above the event log, tall once it is a song, short again above the piano roll.
-const LANE_SEC = 64;
-const LANE_MUS = 136;
-const LANE_ROLL = 56;
+const LANE_SEC = 48;
+const LANE_MUS = 102;
+const LANE_ROLL = 44;
 
 /** Each track's pitch range, for the small notes drawn inside its regions. */
 export const TRACKS = [
   { lo: 62, hi: 79 },
   { lo: 33, hi: 48 },
   { lo: 66, hi: 75 },
+  { lo: 53, hi: 67 },
 ] as const;
 
 export const REGIONS = [
   { lane: 0, from: 0, to: 6 },
   { lane: 1, from: 0, to: 6 },
   { lane: 2, from: 1, to: 6 },
+  { lane: 3, from: 0, to: 6 },
 ] as const;
 
 /** Piano roll panel, local to its own top: a header, then one row per semitone, high at the top. */
-export const ROLL = { HEAD: 24, LOW: 62, HIGH: 79, ROW: 12 } as const;
+export const ROLL = { HEAD: 24, LOW: 62, HIGH: 79, ROW: 11.5 } as const;
 export const rollY = (pitch: number) => ROLL.HEAD + (ROLL.HIGH - pitch) * ROLL.ROW;
 
 /** Event log panel: a header row, then rows. */
@@ -135,8 +141,8 @@ const ANOMALY_X = xAt(ODD) + 2;
 
 type Ev = { lane: number; x: number; w: number; region: number | null; to: number };
 const EVENTS: Ev[] = [];
-const GAP = [30, 52, 88]; // the proxy is busy, access is steady, intrusion prevention is quiet
-for (let lane = 0; lane < 3; lane++) {
+const GAP = [30, 52, 88, 40]; // the proxy is busy, access is steady, intrusion prevention is quiet, DNS hums
+for (let lane = 0; lane < 4; lane++) {
   let x = LANES_X + 10 + rand(lane + 4) * 16;
   let k = 0;
   while (x < LANES_END - 22) {
@@ -220,7 +226,7 @@ export function scene(p: number): Frame {
   const laneH = lerp(lerp(LANE_SEC, LANE_MUS, morph), LANE_ROLL, roll);
   const laneTop = (lane: number) => LANES_Y + lane * laneH;
   const center = (lane: number) => laneTop(lane) + laneH / 2;
-  const lanesBottom = LANES_Y + 3 * laneH;
+  const lanesBottom = LANES_Y + 4 * laneH;
 
   const scan = lerp(LANES_X, LANES_END, reveal);
   const seenAt = (x: number) => clamp((scan - x) / 40);
