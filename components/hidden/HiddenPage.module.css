@@ -4,7 +4,10 @@
    page's own background, so it reads as a different room. */
 
 .post {
-  /* Colors only this story uses: rain and tears, gold for mended cracks, a rain cloud, the night. */
+  /* Colors only this story uses: the heart, bright red as found and deep red after walking; rain
+     and tears; gold for mended cracks; a rain cloud; the night. */
+  --hp-heart: light-dark(#e2323f, #ff5560);
+  --hp-heart-deep: light-dark(#8c1120, #c8182b);
   --hp-cool: light-dark(#4f6d8c, #8db0d2);
   --hp-gold: light-dark(#c8930c, #f4c24f);
   --hp-shine: light-dark(#fff3c6, #fff7dc);
@@ -164,13 +167,24 @@
   fill: var(--ink);
 }
 
+.heart {
+  fill: var(--hp-heart);
+}
+
+/* The mind and the body as the heart they make: the color itself comes from script. */
 .warm {
-  fill: var(--alert);
-  stroke: var(--alert);
+  fill: var(--hp-heart);
+  stroke: var(--hp-heart);
   stroke-width: 2.5;
 }
 
-.heart,
+/* A thin ring of background under the heart, so a deep red still reads on the dark body. */
+.keyline {
+  fill: var(--bg);
+  stroke: var(--bg);
+  stroke-width: 4;
+}
+
 .sun,
 .petal,
 .firefly,
@@ -203,6 +217,16 @@
 
 .glowOut {
   stop-color: var(--alert);
+  stop-opacity: 0;
+}
+
+.loveIn {
+  stop-color: var(--hp-heart);
+  stop-opacity: 0.42;
+}
+
+.loveOut {
+  stop-color: var(--hp-heart);
   stop-opacity: 0;
 }
 

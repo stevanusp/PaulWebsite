@@ -10,6 +10,8 @@ const f3 = (n: number) => n.toFixed(3);
 const seen = (o: number) => o > 0.002;
 const cls = (...names: (string | false)[]) => names.filter(Boolean).join(" ") || undefined;
 const delay = (s: number): CSSProperties => ({ animationDelay: `${s.toFixed(2)}s` });
+/** The heart's red, from bright (0) to deep (1). */
+const red = (deep: number) => `color-mix(in oklab, var(--hp-heart-deep) ${(deep * 100).toFixed(1)}%, var(--hp-heart))`;
 
 /** The whole scene, and a narrower frame for phones that keeps the middle of it. */
 const FRAMES = {
@@ -117,10 +119,11 @@ const bird = ({ x, y, flap }: Dot & { flap: number }) => {
   return `M${f1(x - 10)} ${tip}Q${f1(x - 5)} ${f1(y - 2)} ${f1(x)} ${f1(y + 1)}Q${f1(x + 5)} ${f1(y - 2)} ${f1(x + 10)} ${tip}`;
 };
 
-function Capsule({ c, className, opacity }: { c: Cap; className?: string; opacity?: number }) {
+function Capsule({ c, className, opacity, style }: { c: Cap; className?: string; opacity?: number; style?: CSSProperties }) {
   return (
     <rect
       className={className}
+      style={style}
       x={f1(c.cx - c.w / 2)}
       y={f1(c.cy - c.h / 2)}
       width={f1(c.w)}
@@ -132,10 +135,10 @@ function Capsule({ c, className, opacity }: { c: Cap; className?: string; opacit
   );
 }
 
-function Heart({ h, className }: { h: HeartShape; className: string }) {
+function Heart({ h, className, style }: { h: HeartShape; className: string; style?: CSSProperties }) {
   const [l, r] = heartCaps(h);
   return (
-    <g className={className}>
+    <g className={className} style={style}>
       <Capsule c={l} />
       <Capsule c={r} />
     </g>
@@ -184,6 +187,10 @@ export default memo(function StoryArt({ a, uid, still = false, narrow }: Props) 
         <radialGradient id={`${uid}-glow`}>
           <stop offset="0" className={styles.glowIn} />
           <stop offset="1" className={styles.glowOut} />
+        </radialGradient>
+        <radialGradient id={`${uid}-love`}>
+          <stop offset="0" className={styles.loveIn} />
+          <stop offset="1" className={styles.loveOut} />
         </radialGradient>
         <linearGradient id={`${uid}-beam`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" className={styles.beamOut} />
@@ -354,21 +361,24 @@ export default memo(function StoryArt({ a, uid, still = false, narrow }: Props) 
         {seen(a.body.o) ? (
           <g opacity={f3(a.body.o)}>
             {a.body.warm < 0.998 ? <Capsule c={a.body} className={styles.body} /> : null}
-            {seen(a.body.warm) ? <Capsule c={a.body} className={styles.warm} opacity={a.body.warm} /> : null}
+            {seen(a.body.warm) ? (
+              <Capsule c={a.body} className={styles.warm} opacity={a.body.warm} style={{ fill: red(a.body.deep), stroke: red(a.body.deep) }} />
+            ) : null}
           </g>
         ) : null}
         {seen(a.heart.o) ? (
           <g opacity={f3(a.heart.o * a.heart.dim)}>
             {seen(a.heart.glow) ? (
               <circle
-                fill={glow}
+                fill={`url(#${uid}-love)`}
                 cx={f1(a.heart.cx)}
                 cy={f1(a.heart.cy)}
                 r={f1(a.heart.s * 1.5)}
                 opacity={f3(a.heart.glow)}
               />
             ) : null}
-            <Heart h={a.heart} className={styles.heart} />
+            <Heart h={a.heart} className={styles.keyline} />
+            <Heart h={a.heart} className={styles.heart} style={{ fill: red(a.heart.deep) }} />
           </g>
         ) : null}
         {seen(a.box.o) ? (
@@ -388,7 +398,9 @@ export default memo(function StoryArt({ a, uid, still = false, narrow }: Props) 
         {seen(a.mind.o) ? (
           <g opacity={f3(a.mind.o)}>
             {a.mind.warm < 0.998 ? <Capsule c={a.mind} className={styles.mind} /> : null}
-            {seen(a.mind.warm) ? <Capsule c={a.mind} className={styles.warm} opacity={a.mind.warm} /> : null}
+            {seen(a.mind.warm) ? (
+              <Capsule c={a.mind} className={styles.warm} opacity={a.mind.warm} style={{ fill: red(a.mind.deep), stroke: red(a.mind.deep) }} />
+            ) : null}
           </g>
         ) : null}
         {seen(eyes.o) ? (

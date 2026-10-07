@@ -127,6 +127,12 @@ const WALKS: readonly (readonly [string, number, number, number])[] = [
 ];
 const walked = (p: number) => WALKS.reduce((d, [id, f0, f1, dist]) => d + dist * lin(p, T(id, f0), T(id, f1)), 0);
 
+// The heart is bright red when it is found and deepens with every step, to a deep red about halfway
+// through. The heart the mind and the body make later is new, so it starts bright again and deepens
+// on its own walk to the end. 0 is bright, 1 is deep.
+const LOVE_WALK = walked(T("love", 0));
+const deepen = (distance: number, full: number) => 1 - (1 - clamp(distance / full)) ** 2;
+
 // ---- One frame
 
 export type Dot = { x: number; y: number; r: number; o: number };
@@ -144,9 +150,9 @@ export type Art = {
   confetti: (Cap & { o: number; tone: number })[];
   box: { o: number; y: number; lid: number };
   bubble: { x: number; y: number; o: number };
-  mind: Cap & { o: number; warm: number };
-  body: Cap & { o: number; warm: number };
-  heart: HeartShape & { o: number; glow: number; dim: number };
+  mind: Cap & { o: number; warm: number; deep: number };
+  body: Cap & { o: number; warm: number; deep: number };
+  heart: HeartShape & { o: number; glow: number; dim: number; deep: number };
   labels: Label[];
   thoughts: Dot[];
   flower: { x: number; y: number; bloom: number; o: number };
@@ -338,6 +344,7 @@ export function art(p: number): Art {
     [T("end", 0.85), 0],
   ]);
   const warm = smooth(p, T("love", 0.05), T("love", 0.4));
+  const deepLove = deepen(wx - LOVE_WALK, 600);
 
   // ---- The heart: out of a box, into its place in the row, onto the chest; dim while forgotten;
   // large and cracked when it hurts; back on the chest; gone when "only the body and the mind".
@@ -410,6 +417,7 @@ export function art(p: number): Art {
       [T("alive", 0.75), 0.4],
       [T("alive", 0.95), 1],
     ]),
+    deep: deepen(wx, 1150),
   };
 
   // ---- The eyes: alone at first (the page noticing you), then on the mind.
@@ -842,8 +850,8 @@ export function art(p: number): Art {
     confetti,
     box,
     bubble,
-    mind: { ...mind, o: partsO, warm },
-    body: { ...body, o: partsO, warm },
+    mind: { ...mind, o: partsO, warm, deep: deepLove },
+    body: { ...body, o: partsO, warm, deep: deepLove },
     heart,
     labels,
     thoughts,
