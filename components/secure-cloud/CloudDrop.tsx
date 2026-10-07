@@ -9,9 +9,7 @@ import {
   WHITE_SLOTS,
   clamp,
   ease,
-  easeOut,
   fitCloud,
-  lerp,
   mix,
   place,
   traits,
@@ -28,9 +26,10 @@ import styles from "./CloudDrop.module.css";
 const FIT = fitCloud(KEYSTATION.w / 2, KEYSTATION.h, 0.68);
 const FALL = 0.5; // seconds in the air
 const HEIGHT = 640; // how far above it starts, in drawing units
-const BURST = 0.18;
-const LAND = 0.42;
-const END = 1.2;
+const FADE = 0.14; // the smooth cloud gives way to its pieces
+const FLY = 0.78; // each key's flight from the cloud to its place
+const SPREAD = 0.14; // keys leave a moment apart
+const END = FALL + SPREAD + FLY + 0.04;
 
 type Drop = CloudFrame & { body: number; shadow: number; shown: number };
 
@@ -38,41 +37,39 @@ function frame(t: number): Drop {
   const u = clamp(t / FALL);
   const broken = t >= FALL;
   const fit = { ...FIT, y: FIT.y - HEIGHT * (1 - u * u) }; // gravity: slow, then fast
-  const burst = easeOut((t - FALL) / BURST);
 
+  // One continuous arc per key: from its place in the cloud, up through a point it is flung
+  // toward, down into its place on the keyboard. No second move, so nothing snaps.
   const piece = (slot: Rect, key: Rect, tr: ReturnType<typeof traits>, kind: "white" | "black"): Piece => {
-    let r = place(slot, fit);
-    let turn = 0;
-    if (broken) {
-      const cx = r.x + r.w / 2;
-      r = {
-        ...r,
-        x: r.x + ((cx - KEYSTATION.w / 2) * 0.45 + tr.fling.x * 220) * burst,
-        y: r.y - (30 + tr.fling.y * 150) * burst,
-      };
-      turn = tr.fling.turn * burst;
-    }
-    // Each key finds its own place, a moment apart.
-    const a = ease((t - (FALL + 0.1 + tr.order * 0.14)) / LAND);
-    r = mix(r, key, a);
-    turn = lerp(turn, 0, a);
-    // Black keys go dark again as it breaks, so their pieces show; white keys pale as they land.
-    const back = kind === "black" && broken ? burst : 0;
-    return { ...r, turn, tone: (1 - back) * (1 - a) };
+    const from = place(slot, fit);
+    const k = clamp((t - FALL - tr.order * SPREAD) / FLY);
+    const e = ease(k);
+    const fx = from.x + from.w / 2;
+    const tx = key.x + key.w / 2;
+    const cx = (fx + tx) / 2 + ((fx - KEYSTATION.w / 2) * 0.35 + tr.fling.x * 180);
+    const cy = Math.min(from.y, key.y) - (60 + tr.fling.y * 160);
+    const q = (a: number, c: number, b: number) => (1 - e) * (1 - e) * a + 2 * (1 - e) * e * c + e * e * b;
+    const size = mix(from, key, e);
+    const mid = { x: q(fx, cx, tx), y: q(from.y + from.h / 2, cy, key.y + key.h / 2) };
+    const r = { ...size, x: mid.x - size.w / 2, y: mid.y - size.h / 2 };
+    const turn = tr.fling.turn * Math.sin(Math.PI * e);
+    // White keys pale on the way; black keys darken almost at once so their pieces show.
+    const tone = kind === "white" ? 1 - e : 1 - clamp(k * 5);
+    return { ...r, turn, tone };
   };
 
-  const whole = broken ? 0 : 1;
+  const cloud = broken ? 1 - clamp((t - FALL) / FADE) : 1;
   return {
     fit,
     whites: KEYS.whites.map((k, i) => piece(WHITE_SLOTS[i].shut, k, traits("white", i), "white")),
     blacks: KEYS.blacks.map((k, j) => piece(BLACK_SLOTS[j], k, traits("black", j), "black")),
     pieces: broken,
-    base: whole,
-    cloud: whole,
-    lock: whole,
-    shackleDraw: whole,
+    base: cloud,
+    cloud,
+    lock: cloud,
+    shackleDraw: cloud > 0.002 ? 1 : 0,
     shackleDrop: 0,
-    body: ease((t - (FALL + 0.15)) / 0.4),
+    body: ease((t - FALL - 0.2) / 0.55),
     shadow: broken ? 1 : u * u,
     shown: clamp(u * 6),
   };
