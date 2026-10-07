@@ -4,10 +4,12 @@
    page's own background, so it reads as a different room. */
 
 .post {
-  /* Colors only this story uses: the heart, bright red as found and deep red after walking; rain
-     and tears; gold for mended cracks; a rain cloud; the night. */
+  /* Colors only this story uses: the heart, bright red as found and deep red after walking;
+     fireflies in a bright yellow; rain and tears; gold for mended cracks; a rain cloud; the night. */
   --hp-heart: light-dark(#e2323f, #ff5560);
   --hp-heart-deep: light-dark(#8c1120, #c8182b);
+  --hp-firefly: light-dark(#ffd60a, #ffe84d);
+  --hp-firefly-edge: light-dark(#d49a00, transparent);
   --hp-cool: light-dark(#4f6d8c, #8db0d2);
   --hp-gold: light-dark(#c8930c, #f4c24f);
   --hp-shine: light-dark(#fff3c6, #fff7dc);
@@ -187,10 +189,18 @@
 
 .sun,
 .petal,
-.firefly,
+.ember,
 .pinEnd,
 .c1 {
   fill: var(--alert);
+}
+
+/* Fireflies, and the light they gather into: a bright yellow. On the light page a thin darker
+   edge keeps the yellow from washing out; on the dark page it glows on its own. */
+.firefly {
+  fill: var(--hp-firefly);
+  stroke: var(--hp-firefly-edge);
+  stroke-width: 1;
 }
 
 .eye,
@@ -217,6 +227,16 @@
 
 .glowOut {
   stop-color: var(--alert);
+  stop-opacity: 0;
+}
+
+.flyIn {
+  stop-color: var(--hp-firefly);
+  stop-opacity: 0.62;
+}
+
+.flyOut {
+  stop-color: var(--hp-firefly);
   stop-opacity: 0;
 }
 

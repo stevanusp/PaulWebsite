@@ -171,6 +171,7 @@ type Props = {
 export default memo(function StoryArt({ a, uid, still = false, narrow }: Props) {
   const live = !still;
   const glow = `url(#${uid}-glow)`;
+  const flyGlow = `url(#${uid}-fly)`;
   const { eyes } = a;
   const rainTop = a.cloud.y + (CLOUD.bottom - CLOUD.cy) * a.cloud.s + 4;
   const pinO = Math.max(a.route.o, a.journey.o) * Math.min(1, a.route.draw * 5);
@@ -187,6 +188,10 @@ export default memo(function StoryArt({ a, uid, still = false, narrow }: Props) 
         <radialGradient id={`${uid}-glow`}>
           <stop offset="0" className={styles.glowIn} />
           <stop offset="1" className={styles.glowOut} />
+        </radialGradient>
+        <radialGradient id={`${uid}-fly`}>
+          <stop offset="0" className={styles.flyIn} />
+          <stop offset="1" className={styles.flyOut} />
         </radialGradient>
         <radialGradient id={`${uid}-love`}>
           <stop offset="0" className={styles.loveIn} />
@@ -516,7 +521,7 @@ export default memo(function StoryArt({ a, uid, still = false, narrow }: Props) 
           <g key={i} opacity={f3(f.o)}>
             <circle
               className={live ? styles.flicker : undefined}
-              fill={glow}
+              fill={flyGlow}
               cx={f1(f.x)}
               cy={f1(f.y)}
               r={f1(f.r * 4)}
@@ -528,7 +533,7 @@ export default memo(function StoryArt({ a, uid, still = false, narrow }: Props) 
       )}
       {seen(a.orb.o) ? (
         <g opacity={f3(a.orb.o)}>
-          <circle fill={glow} cx={a.orb.x} cy={a.orb.y} r={f1(a.orb.r * 4)} />
+          <circle fill={flyGlow} cx={a.orb.x} cy={a.orb.y} r={f1(a.orb.r * 4)} />
           <circle className={styles.firefly} cx={a.orb.x} cy={a.orb.y} r={f1(a.orb.r)} />
         </g>
       ) : null}
@@ -537,7 +542,7 @@ export default memo(function StoryArt({ a, uid, still = false, narrow }: Props) 
         seen(f.o) ? (
           <circle
             key={i}
-            className={f.warm ? styles.firefly : styles.cool}
+            className={f.warm ? styles.ember : styles.cool}
             cx={f1(f.x)}
             cy={f1(f.y)}
             r={f.r}
