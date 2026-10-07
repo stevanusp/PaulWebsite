@@ -102,6 +102,20 @@ html {
   scroll-padding-top: calc(var(--nav-h) + var(--s-4));
 }
 
+/* While Lenis eases the scroll, the browser's own smoothing must stay out of its way. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
 body {
   min-height: 100svh;
   background: var(--bg);

@@ -1,4 +1,5 @@
 import Nav from "@/components/Nav";
+import SmoothScroll from "@/components/SmoothScroll";
 import Hero from "@/components/Hero";
 import Story from "@/components/story/Story";
 import Work from "@/components/Work";
@@ -12,6 +13,7 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <>
+      <SmoothScroll />
       <Nav />
       <main id="main" tabIndex={-1}>
         <Hero />
