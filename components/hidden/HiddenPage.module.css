@@ -1,0 +1,171 @@
+/* The page behind the page. One long post: a cover, then the text with a picture that holds
+   still beside it (above it on phones) and follows the reading. It sits on the surface tone, a
+   step away from the page's own background, so it reads as a different room. */
+
+.post {
+  min-height: 100%;
+}
+
+/* The cover fills the first screen and keeps its words low, so a page lifted only a little
+   already shows that something is written underneath. */
+.cover {
+  display: grid;
+  align-content: end;
+  gap: var(--s-5);
+  min-height: 100svh;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: var(--s-9) var(--gutter) clamp(3.5rem, 9vh, 7rem);
+}
+
+.title {
+  max-width: 13em;
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  letter-spacing: var(--ls-h2);
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+.intro {
+  max-width: 30em;
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  letter-spacing: var(--ls-lead);
+  color: var(--muted);
+}
+
+.body {
+  display: grid;
+  grid-template-areas:
+    "stage"
+    "text";
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: 0 var(--gutter) var(--s-9);
+}
+
+/* Phones: the picture sticks to the top of the layer and the text passes beneath it. Its
+   background runs out over the side margins too, so no edge of a passing letter shows there. */
+.stage {
+  grid-area: stage;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  margin-inline: calc(var(--gutter) * -1);
+  padding: var(--s-4) var(--gutter) var(--s-5);
+  background: var(--surface);
+}
+
+.stage::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: var(--s-6);
+  background: linear-gradient(var(--surface), transparent);
+  pointer-events: none;
+}
+
+.scene {
+  display: block;
+  width: min(100%, 26svh, 300px);
+  height: auto;
+}
+
+.text {
+  grid-area: text;
+  display: grid;
+  gap: var(--s-8);
+  max-width: 34em;
+  padding-top: var(--s-6);
+}
+
+.part {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.partTitle {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+  letter-spacing: var(--ls-h3);
+  font-weight: 600;
+}
+
+.paragraph {
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+  line-height: 1.7;
+}
+
+.signoff {
+  padding-top: var(--s-5);
+  color: var(--muted);
+}
+
+@media (min-width: 900px) {
+  .body {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-areas: "text stage";
+    column-gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  .stage {
+    height: 100svh;
+    align-items: center;
+    margin-inline: 0;
+    padding: 0;
+    background: none;
+  }
+
+  .stage::after {
+    content: none;
+  }
+
+  .scene {
+    width: min(100%, 420px);
+  }
+
+  .text {
+    padding-block: 30svh 20svh;
+  }
+}
+
+/* The stand-in picture. */
+.frame {
+  fill: var(--bg);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.track {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 6;
+}
+
+.arc {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.numeral {
+  font-size: 104px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  fill: var(--ink);
+}
+
+.dot {
+  fill: var(--line-strong);
+}
+
+.dotOn {
+  fill: var(--ink);
+}

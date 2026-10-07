@@ -1,5 +1,6 @@
 import Nav from "@/components/Nav";
 import SmoothScroll from "@/components/SmoothScroll";
+import Curtain from "@/components/hidden/Curtain";
 import Hero from "@/components/Hero";
 import Story from "@/components/story/Story";
 import Work from "@/components/Work";
@@ -14,18 +15,20 @@ export default function Home() {
   return (
     <>
       <SmoothScroll />
-      <Nav />
-      <main id="main" tabIndex={-1}>
-        <Hero />
-        <Story />
-        <Work />
-        <FieldNotes />
-        <Built />
-        <Path />
-        <ByEar />
-        <Contact />
-      </main>
-      <Footer />
+      <Curtain>
+        <Nav />
+        <main id="main" tabIndex={-1}>
+          <Hero />
+          <Story />
+          <Work />
+          <FieldNotes />
+          <Built />
+          <Path />
+          <ByEar />
+          <Contact />
+        </main>
+        <Footer />
+      </Curtain>
     </>
   );
 }

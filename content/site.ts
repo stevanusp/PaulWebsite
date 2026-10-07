@@ -1,4 +1,5 @@
 // Every visible string on the site lives here. Components never hardcode copy.
+// The one exception is the hidden post's text, in content/hidden.ts, so it loads only with it.
 // House rule: no em dash characters anywhere. Use commas, colons or periods.
 
 export const site = {

@@ -17,6 +17,7 @@ House rule: no em dash characters anywhere (copy, code, comments, commits).
 9. Then: F#m7 after C#/E#, and B becomes B7, so the loop is Emaj7, D#7, G#m9, C#/E#, F#m7, B7 (a ii-V back to Emaj7). The pads get an easter egg: the first hit drops the Keystation in above them, and it plays along. He loves the Rhodes sound, so the pads should sound like one.
 10. Then: "What I work on" gets its own scroll illustration, a piano that turns smoothly into a cloud-security logo. And a fun fact by the pads: the progression is one YOASOBI uses.
 11. Then, for consistency (corrected the same day): the Work picture goes from the Keystation to the secure cloud and stays there. The fall happens by the pads: the first press drops the secure cloud (not the keyboard), it shatters on landing, and the pieces form the Keystation, which plays along. The fun fact shows only after someone presses a pad. One set of pieces across the page: Keystation (story), cloud (work), cloud breaking into the Keystation (pads).
+12. Then (7 Oct 2026): the site does not stop at the footer. Whoever keeps pushing past the end lifts the whole page like a curtain and finds a hidden page underneath: one long post, told with scrollytelling, with its own smooth scroll. It must not open easily (only for people who are genuinely curious), it gives no hint except the page giving a little under a continued push, it relaxes back if they stop, and it is not indexed. Paulus writes the post later; placeholder text for now.
 
 Everything from v2 section 1 (dates, canonical URL, résumé) still holds.
 
@@ -84,6 +85,7 @@ All tokens live at the top of `app/globals.css`, written once with `light-dark()
 8. By ear (`#ear`): lit intro, text beside the song card, then the pads under "Or play it yourself".
 9. Say hello (`#contact`): one large rounded panel, centred.
 10. Footer.
+11. Behind the page (no anchor, no link): the hidden post, reached only by pushing past the end (see 6).
 
 ## 6. Moving parts
 
@@ -95,6 +97,7 @@ All tokens live at the top of `app/globals.css`, written once with `light-dark()
 - `components/Work.tsx` with `components/work/` (`cloud.ts`, `CloudScene.tsx`): the tile nearest the middle of the screen is at full strength and sets progress. The keys hop out of the Keystation and tumble down into the cloud and lock; the smooth cloud fades in over them and the shackle draws on and drops shut. A camera follows the fall a step behind. It ends on the cloud. Static mode shows the Keystation and the locked cloud side by side over the tiles.
 - `components/secure-cloud/CloudDrop.tsx`: the pads' easter egg, on the first press. The locked cloud falls in from above with gravity (0.5 s), breaks on landing into its keys, which fly out and land as the Keystation (about 1.2 s in all, driven by rAF, then the normal interactive keyboard takes over). Reduced motion: the keyboard simply fades in.
 - Under the pads, a fact, shown only once someone presses a pad (it fades in after the keyboard lands): the loop is the Just the Two of Us progression (IVmaj7, III7, vim7, vm7, I7; marusa in Japan) with one passing chord, and Japanese write-ups cite it in the chorus of YOASOBI's Yoru ni Kakeru.
+- The hidden page (`components/hidden/`): `Curtain.tsx` wraps the whole page (nav, main, footer) as an opaque sheet over a fixed layer that holds the post. At the very bottom, after a 300 ms settle (so a fling's leftover momentum does not count), every further push fills an effort: wheel deltas, a finger moving up (counted double, with a non-passive touchmove attached only for touches that start at the edge), or ArrowDown, PageDown, Space and End. The sheet gives up to about 18% of the screen as the effort grows and relaxes back about 280 ms after the pushing stops. About 2.6 screens of pushing lifts it off (ease-out, 0.9 s); the page is then inert, the document locked (`html[data-curtain="open"]`, page Lenis stopped) and the post scrolls in its own layer with its own Lenis. Pushing up at the post's top (under one screen of effort, so leaving is easier than finding), ArrowUp, PageUp, Home, or Escape lays the sheet back down (0.82 s), exactly where it was. Reduced motion: the same effort, but the page fades instead of travelling. The post (`HiddenPage.tsx`, text in `content/hidden.ts`) loads through `next/dynamic` with `ssr: false` only on the first push, so its words are never in the HTML and never indexed; the code is fetched ahead once the reader is near the bottom. `PostScene.tsx` is a stand-in illustration that already follows the reading (part and progress), to be replaced by the real drawing.
 - `lib/epiano.ts`: a Rhodes-style voice, no samples. Per note a 1:1 FM pair whose index jumps with velocity (bark) and mellows, a 1:14 pair for the tine's ping, and a touch of second harmonic; low notes ring longer. On the bus a soft lopsided drive, a 3.9 kHz low-pass, a 4.6 Hz Suitcase stereo tremolo, and a small room. Rendered offline to check: no clipping (peak about -5 dB), no DC, tremolo swings about 6 dB left to right, chords ring about four seconds. Nobody has listened to it from this side; tune by ear. The G is checked against the chord still ringing, then the key: after D#7 it "Belongs to D#7"; alone it is "Outside B major" and flagged in amber.
 - The photo is a plain `<img>`: `next/image` adds an inline style attribute, which the CSP build rejects.
 
@@ -113,6 +116,8 @@ Unchanged: static export, per-page hash CSP from `scripts/csp.mjs` (the theme sc
 - Not yet run for v4: Lighthouse, print, a live reduced-motion pass, Safari and Firefox.
 
 ## 9. Open items
+
+- The hidden post is placeholder text (`content/hidden.ts`) with a stand-in picture (`components/hidden/PostScene.tsx`): write the post, then draw its scenes.
 
 - The photo is the 360 x 540 copy from chat. Replace `public/media/paulus-at-the-keys.jpg` with the original (at least 900 px wide) and update `hero.photo.width/height` in `content/site.ts`; it is slightly soft on large screens until then.
 

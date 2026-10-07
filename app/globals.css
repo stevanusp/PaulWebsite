@@ -100,6 +100,13 @@ html {
   text-size-adjust: 100%;
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--nav-h) + var(--s-4));
+  /* Keep the scrollbar's room even when the page is locked, so nothing shifts sideways. */
+  scrollbar-gutter: stable;
+}
+
+/* While the hidden page is open, the page behind it holds still (components/hidden). */
+html[data-curtain="open"] {
+  overflow: hidden;
 }
 
 /* While Lenis eases the scroll, the browser's own smoothing must stay out of its way. */
