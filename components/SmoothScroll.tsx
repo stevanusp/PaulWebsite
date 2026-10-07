@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
 import { LIVE_QUERY } from "@/lib/motion";
+import { setPageScroll } from "@/lib/smooth";
 
 // Eases the mouse wheel and in-page links (the keyboard keeps the browser's own scrolling). It scrolls the real page
 // (scrollY and position: sticky keep working, so the scroll stories are unaffected), and touch
@@ -16,10 +17,12 @@ export default function SmoothScroll() {
       if (lenis || !mode.matches) return;
       // In-page links stop below the floating nav: Lenis honors the page's scroll-padding-top.
       lenis = new Lenis({ autoRaf: true, lerp: 0.1, anchors: true });
+      setPageScroll(lenis);
     };
     const stop = () => {
       lenis?.destroy();
       lenis = null;
+      setPageScroll(null);
     };
     const sync = () => (mode.matches ? start() : stop());
 

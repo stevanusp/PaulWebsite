@@ -1,0 +1,52 @@
+/* The whole page is a sheet over a second page (components/hidden/Curtain.tsx). The sheet is
+   opaque and rounded at the bottom; it only shows its edge and shadow once it is lifted. */
+
+.page {
+  position: relative;
+  z-index: 1;
+  background: var(--bg);
+  border-radius: 0 0 var(--radius-media) var(--radius-media);
+}
+
+.page[data-lifted] {
+  box-shadow:
+    0 1px 0 var(--line-strong),
+    0 28px 80px -12px rgb(0 0 0 / 0.32);
+  will-change: transform;
+}
+
+/* The room underneath: fixed to the screen, on the surface tone, out of sight until the sheet
+   moves. The post scrolls inside it, never the page. */
+.under {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  visibility: hidden;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.scroller {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: none;
+}
+
+/* A scroll area takes focus only so the keys scroll it; it needs no ring of its own. */
+.scroller:focus {
+  outline: none;
+}
+
+@media print {
+  .under {
+    display: none;
+  }
+
+  .page {
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    box-shadow: none;
+  }
+}
