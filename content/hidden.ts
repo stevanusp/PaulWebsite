@@ -1,56 +1,97 @@
-// The page behind the page: one long post, for whoever keeps scrolling past the end.
-// Its text lives here, apart from content/site.ts, so it only ever loads with that page
-// (it is never in the HTML, so it is never indexed). House rule as everywhere: no em dashes.
-//
-// Placeholder for now. Every string below is filler that only holds the shape of the writing;
-// the real post replaces it.
+// The page behind the page: one post, for whoever keeps scrolling past the end.
+// It loads only with that page (it is never in the HTML, so it is never indexed).
+// The words are Paulus's own, kept exactly as written. The story only decides where each line
+// stops for a moment, and which lines of a stanza arrive one by one.
+// House rule as everywhere: no em dashes.
 
-export type Part = { title: string; paragraphs: readonly string[] };
+export type Beat = {
+  /** Names the moment, so the drawing can follow it (components/hidden/art.ts). */
+  id: string;
+  /** One line, or a stanza whose lines arrive one by one. */
+  lines: readonly string[];
+  /** Short lines can be set larger. */
+  size?: "big" | "huge";
+};
 
 export const hidden = {
-  title: "A placeholder title for the long post",
-  intro:
-    "This first screen is the cover. The finished post opens here, with a line or two that sets up everything below it.",
-  parts: [
+  beats: [
+    { id: "oh", lines: ["Oh."], size: "huge" },
+    { id: "huh", lines: ["Huh?"], size: "huge" },
+    { id: "still", lines: ["You’re still here?"], size: "big" },
+    { id: "glad", lines: ["I’m really glad you wanted to know more. Congratulations."] },
+    { id: "found", lines: ["You’ve found a part of me that I rarely show to other people."] },
     {
-      title: "First part",
-      paragraphs: [
-        "Placeholder text. This paragraph only holds the shape of the writing to come, so the page can be built and read before the words exist.",
-        "A second paragraph of filler, a little longer than the first, to show how a full block of reading sits on the page, how long a line feels, and where the eye rests between one idea and the next.",
-        "A short one to close the part.",
+      id: "share",
+      lines: [
+        "So, I thought I’d share a few things that have been on my mind today. Hopefully, something here can help you. And please, feel free to talk to me too.",
+      ],
+    },
+    { id: "parts", lines: ["I think there are three parts to being human: the mind, the body, and the heart."] },
+    {
+      id: "carry",
+      lines: ["We carry all three with us as we wander through life, trying to figure out where we’re going."],
+    },
+    { id: "forget", lines: ["But somewhere along the way, we tend to forget a lot of things."] },
+    { id: "alive", lines: ["Sometimes, we forget to simply enjoy being alive."] },
+    {
+      id: "change",
+      lines: ["As time goes by, our destinations may change, but the experiences we gather along the way stay with us."],
+    },
+    { id: "lost", lines: ["So, it’s okay to lose your way sometimes."] },
+    { id: "wander", lines: ["It’s okay to just wander around for a while."] },
+    {
+      id: "answers",
+      lines: [
+        "We don’t have to, and probably never will, find every answer to every question we have all at once. Everything has its own time.",
       ],
     },
     {
-      title: "Second part",
-      paragraphs: [
-        "More filler. As you read on, the drawing beside the text follows along, so each part of the post can have its own moment in the picture.",
-        "This paragraph stands in for a longer thought. It runs on for a few lines on purpose, the way a real paragraph would, so the spacing and rhythm of the page can be judged before the real sentences arrive.",
-        "And one more, of middling length, to make the part feel like a part.",
-      ],
+      id: "times",
+      lines: ["There is a time to keep walking.", "There is a time to rest.", "And sometimes, there is a time to cry."],
     },
     {
-      title: "Third part",
-      paragraphs: [
-        "Placeholder again. The middle of a post is usually the longest stretch, so this part carries a little more text than the others.",
-        "Here the writing would slow down and go deeper. For now these lines only take up the room that writing will take, so nothing about the layout has to be guessed later.",
-        "A paragraph to let the reader breathe, short and plain.",
-        "And a last one in this part, long enough to wrap across several lines on a phone and a couple on a wide screen, which is where most of the reading will happen.",
+      id: "feel",
+      lines: [
+        "It’s okay if you feel sad or angry. Every emotion you feel is a part of you. They aren’t signs of weakness. In their own way, they help shape the person you become.",
       ],
     },
+    { id: "allowed", lines: ["You’re allowed to be tired.", "You’re allowed to cry.", "You’re allowed to fall, too."] },
+    { id: "stop", lines: ["You can stop for a little while."] },
+    { id: "again", lines: ["We can start walking again later, slowly."] },
     {
-      title: "Fourth part",
-      paragraphs: [
-        "Filler that leads toward the end. The picture should be close to its final state by now.",
-        "A longer placeholder paragraph to keep the scroll honest: the stage stays in place, the text keeps moving, and the drawing keeps pace with whichever part is in the middle of the screen.",
+      id: "wounds",
+      lines: [
+        "Learn to embrace the wounds left behind by people who hurt you, even if they never had the chance to say they were sorry.",
       ],
     },
+    { id: "yourself", lines: ["Don’t do it for them.", "Do it for yourself.", "Do it because you deserve peace, too."] },
     {
-      title: "Fifth part",
-      paragraphs: [
-        "The last part of the placeholder. In the real post, this is where everything comes together.",
-        "One final paragraph of filler, so the end of the page has the same weight as the rest of it.",
+      id: "plans",
+      lines: [
+        "Don’t let your plans get in the way of your journey. Enjoy where you are, and give yourself permission to explore.",
       ],
     },
-  ] satisfies Part[],
-  signoff: "End of the placeholder. The real ending goes here.",
+    { id: "find", lines: ["Eventually, little by little, you’ll find what you’ve been looking for."] },
+    {
+      id: "recap",
+      lines: [
+        "And when you’ve felt it all and lived through it all, remember that there are three things at the heart of being human:",
+      ],
+    },
+    { id: "three", lines: ["The body, the mind, and the heart."], size: "big" },
+    { id: "two", lines: ["Some people might say there are only the body and the mind."] },
+    { id: "make", lines: ["But even with just those two, somehow, we can still make…"] },
+    { id: "love", lines: ["<3"], size: "huge" },
+    { id: "heal", lines: ["I hope you heal from every struggle you keep hidden from the world."] },
+    { id: "hears", lines: ["God hears everything you carry in your heart."] },
+    { id: "forward", lines: ["Keep moving forward. You’re almost there."] },
+    { id: "going", lines: ["Just keep going."], size: "big" },
+    { id: "alright", lines: ["Somehow, things will be alright in"] },
+    { id: "end", lines: ["the end."], size: "huge" },
+  ] satisfies readonly Beat[],
+  /** The names under the three shapes, the two times they line up. */
+  labels: { mind: "mind", body: "body", heart: "heart" },
+  /** For screen readers, in place of the drawing. */
+  description:
+    "Alongside the words, a drawing: a small traveler made of three shapes, a mind, a body and a heart, walks through the story, from the first look to a sunrise at the end.",
 } as const;

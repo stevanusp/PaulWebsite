@@ -1,171 +1,498 @@
-/* The page behind the page. One long post: a cover, then the text with a picture that holds
-   still beside it (above it on phones) and follows the reading. It sits on the surface tone, a
-   step away from the page's own background, so it reads as a different room. */
+/* The page behind the page: one long post, told as a story. A drawing and the words hold still
+   while scrolling moves the story along beneath them; with reduced motion it is a plain column of
+   words with a few stills. It sits on the surface tone (Curtain.module.css), a step away from the
+   page's own background, so it reads as a different room. */
 
 .post {
-  min-height: 100%;
+  /* Colors only this story uses: rain and tears, gold for mended cracks, a rain cloud, the night. */
+  --hp-cool: light-dark(#4f6d8c, #8db0d2);
+  --hp-gold: light-dark(#c8930c, #f4c24f);
+  --hp-shine: light-dark(#fff3c6, #fff7dc);
+  --hp-cloud: light-dark(#b3b9c0, #3a4047);
+  --hp-night: light-dark(rgb(26 30 58 / 0.16), rgb(0 0 12 / 0.5));
 }
 
-/* The cover fills the first screen and keeps its words low, so a page lifted only a little
-   already shows that something is written underneath. */
-.cover {
+/* ---- Live: a tall track, and a stage that sticks to its top while it scrolls past. The track's
+   length (--screens) and the screen's height (--h) come from script. */
+
+.track {
+  position: relative;
+  height: calc((var(--screens) + 1) * var(--h, 100svh));
+}
+
+.stage {
+  position: sticky;
+  top: 0;
   display: grid;
-  align-content: end;
-  gap: var(--s-5);
-  min-height: 100svh;
-  max-width: var(--max);
-  margin-inline: auto;
-  padding: var(--s-9) var(--gutter) clamp(3.5rem, 9vh, 7rem);
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: var(--h, 100svh);
+  padding-top: clamp(0.75rem, 4svh, 3rem);
+  overflow: hidden;
 }
 
-.title {
-  max-width: 13em;
+.night {
+  position: absolute;
+  inset: 0;
+  background: var(--hp-night);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The drawing takes what the words leave, as large as it fits. */
+.art {
+  position: relative;
+  container-type: size;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+}
+
+.art .svg {
+  width: min(100cqw, 200cqh, 1400px);
+  aspect-ratio: 2 / 1;
+}
+
+.words {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: clamp(9rem, 30svh, 18rem);
+  padding: var(--s-4) var(--gutter) clamp(2rem, 7svh, 4.5rem);
+  text-align: center;
+}
+
+/* Every line of the story is here at once, stacked in one place; only the one being told shows.
+   The rest stay in the page for screen readers, in order. */
+.words > .beat {
+  grid-area: 1 / 1;
+}
+
+/* Phones: the drawing across the top at full width, the words in the space below it. */
+@media (max-width: 699px) {
+  .stage {
+    grid-template-rows: auto minmax(0, 1fr);
+    padding-top: var(--s-5);
+  }
+
+  .art {
+    container-type: normal;
+  }
+
+  .art .svg {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+  }
+
+  .words {
+    min-height: 0;
+  }
+}
+
+/* ---- The words */
+
+.beat {
+  max-width: 22em;
+  margin: 0;
+  font-size: clamp(1.25rem, 1rem + 0.9vw, 1.75rem);
+  line-height: 1.36;
+  letter-spacing: -0.014em;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.big {
   font-size: var(--fs-h2);
   line-height: var(--lh-h2);
   letter-spacing: var(--ls-h2);
   font-weight: 600;
-  text-wrap: balance;
 }
 
-.intro {
-  max-width: 30em;
-  font-size: var(--fs-lead);
-  line-height: var(--lh-lead);
-  letter-spacing: var(--ls-lead);
-  color: var(--muted);
-}
-
-.body {
-  display: grid;
-  grid-template-areas:
-    "stage"
-    "text";
-  max-width: var(--max);
-  margin-inline: auto;
-  padding: 0 var(--gutter) var(--s-9);
-}
-
-/* Phones: the picture sticks to the top of the layer and the text passes beneath it. Its
-   background runs out over the side margins too, so no edge of a passing letter shows there. */
-.stage {
-  grid-area: stage;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
-  margin-inline: calc(var(--gutter) * -1);
-  padding: var(--s-4) var(--gutter) var(--s-5);
-  background: var(--surface);
-}
-
-.stage::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  height: var(--s-6);
-  background: linear-gradient(var(--surface), transparent);
-  pointer-events: none;
-}
-
-.scene {
-  display: block;
-  width: min(100%, 26svh, 300px);
-  height: auto;
-}
-
-.text {
-  grid-area: text;
-  display: grid;
-  gap: var(--s-8);
-  max-width: 34em;
-  padding-top: var(--s-6);
-}
-
-.part {
-  display: grid;
-  gap: var(--s-4);
-}
-
-.partTitle {
-  font-size: var(--fs-h3);
-  line-height: var(--lh-h3);
-  letter-spacing: var(--ls-h3);
+.huge {
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
   font-weight: 600;
 }
 
-.paragraph {
-  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
-  line-height: 1.7;
+.line {
+  display: block;
 }
 
-.signoff {
-  padding-top: var(--s-5);
-  color: var(--muted);
+/* ---- Calm: the same words in one column, with stills of the drawing between them. */
+
+.calm {
+  display: grid;
+  justify-items: center;
+  gap: var(--s-7);
+  max-width: 44rem;
+  margin-inline: auto;
+  padding: clamp(5rem, 16svh, 9rem) var(--gutter) var(--s-9);
+  text-align: center;
 }
 
-@media (min-width: 900px) {
-  .body {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    grid-template-areas: "text stage";
-    column-gap: clamp(2rem, 5vw, 5rem);
-    align-items: start;
-  }
+.still {
+  width: 100%;
+}
 
-  .stage {
-    height: 100svh;
-    align-items: center;
-    margin-inline: 0;
-    padding: 0;
-    background: none;
-  }
+.still .svg {
+  width: 100%;
+  aspect-ratio: 2 / 1;
+}
 
-  .stage::after {
-    content: none;
-  }
-
-  .scene {
-    width: min(100%, 420px);
-  }
-
-  .text {
-    padding-block: 30svh 20svh;
+@media (max-width: 699px) {
+  .still .svg {
+    aspect-ratio: 3 / 2;
   }
 }
 
-/* The stand-in picture. */
-.frame {
+/* ---- The drawing */
+
+.svg {
+  display: block;
+  height: auto;
+  /* The ground and the sky fade out at the sides instead of stopping at an edge. */
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.mind {
   fill: var(--bg);
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+.body {
+  fill: var(--ink);
+}
+
+.warm {
+  fill: var(--alert);
+  stroke: var(--alert);
+  stroke-width: 2.5;
+}
+
+.heart,
+.sun,
+.petal,
+.firefly,
+.pinEnd,
+.c1 {
+  fill: var(--alert);
+}
+
+.eye,
+.dot,
+.leaf,
+.pin,
+.star,
+.speck,
+.c0 {
+  fill: var(--ink);
+}
+
+.happy {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.glowIn {
+  stop-color: var(--alert);
+  stop-opacity: 0.5;
+}
+
+.glowOut {
+  stop-color: var(--alert);
+  stop-opacity: 0;
+}
+
+.beamIn {
+  stop-color: var(--hp-gold);
+  stop-opacity: 0.42;
+}
+
+.beamOut {
+  stop-color: var(--hp-gold);
+  stop-opacity: 0;
+}
+
+.moon,
+.flag,
+.box,
+.bubble {
+  fill: var(--bg);
+  stroke: var(--ink);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.thought {
+  fill: var(--bg);
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.ground,
+.loop {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.pebble {
+  fill: var(--line-strong);
+}
+
+.grid {
   stroke: var(--line);
   stroke-width: 1;
 }
 
-.track {
+.gridFrame {
   fill: none;
-  stroke: var(--line);
-  stroke-width: 6;
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
 }
 
-.arc {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 6;
+.route {
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-dasharray: 7 8;
   stroke-linecap: round;
 }
 
-.numeral {
-  font-size: 104px;
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  fill: var(--ink);
+.journey,
+.stem,
+.pole,
+.bird {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.dot {
-  fill: var(--line-strong);
+.question {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2.5;
+  stroke-linecap: round;
 }
 
-.dotOn {
-  fill: var(--ink);
+.questionDot {
+  fill: var(--muted);
+}
+
+.cloud {
+  fill: var(--hp-cloud);
+}
+
+.rain {
+  stroke: var(--hp-cool);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.tear,
+.cool,
+.c2 {
+  fill: var(--hp-cool);
+}
+
+.splash {
+  fill: none;
+  stroke: var(--hp-cool);
+  stroke-width: 2;
+}
+
+.cushion {
+  fill: var(--surface-2);
+  stroke: var(--line-strong);
+  stroke-width: 2;
+}
+
+/* Cracks are gaps to the background; mended, they are gold with a bright seam. */
+.crack {
+  fill: none;
+  stroke: var(--surface);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gold {
+  fill: none;
+  stroke: var(--hp-gold);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shine {
+  fill: none;
+  stroke: var(--hp-shine);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.arm {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 12;
+  stroke-linecap: round;
+}
+
+.other {
+  fill: var(--faint);
+}
+
+.halo {
+  fill: none;
+  stroke: var(--hp-gold);
+  stroke-width: 2;
+}
+
+.spark,
+.c3 {
+  fill: var(--hp-gold);
+}
+
+.label {
+  fill: var(--muted);
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 500;
+  text-anchor: middle;
+}
+
+/* ---- Small motions that loop while you read. Script never drives these. */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The first blink comes a second after the eyes appear, then every few seconds. */
+  .blink {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: blink 5.4s -3.9s infinite;
+  }
+
+  .typing {
+    animation: typing 1.1s ease-in-out infinite;
+  }
+
+  .typing:nth-of-type(2) {
+    animation-delay: 0.15s;
+  }
+
+  .typing:nth-of-type(3) {
+    animation-delay: 0.3s;
+  }
+
+  .fall {
+    animation: fall 0.8s linear infinite;
+  }
+
+  .twinkle {
+    animation: twinkle 3.6s ease-in-out infinite;
+  }
+
+  .flicker {
+    animation: flicker 2.4s ease-in-out infinite;
+  }
+
+  .breathe {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: breathe 3.8s ease-in-out infinite;
+  }
+
+  .pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: pulse 1.9s ease-in-out infinite;
+  }
+}
+
+@keyframes blink {
+  0%,
+  93%,
+  100% {
+    transform: scaleY(1);
+  }
+  95.5% {
+    transform: scaleY(0.08);
+  }
+}
+
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+@keyframes fall {
+  from {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  12%,
+  88% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(196px);
+    opacity: 0;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1, 1.035);
+  }
+}
+
+/* A heartbeat: two beats, then rest. */
+@keyframes pulse {
+  0%,
+  28%,
+  56%,
+  100% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.06);
+  }
+  42% {
+    transform: scale(1.035);
+  }
 }

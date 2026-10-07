@@ -23,6 +23,11 @@ const TOUCH = 2; // a finger's travel counts double against a wheel's
 const OPEN_MS = 900;
 const CLOSE_MS = 820;
 const CALM_MS = 260; // with reduced motion, the change is a short fade instead
+// Once open, the post holds still for a moment, and until the wheel has gone quiet (a trackpad's
+// momentum outlasts the push), so its first line is seen before anything scrolls.
+const STILL_MS = 600;
+const QUIET_MS = 180;
+const STILL_MAX_MS = 1800;
 
 // How much pushing it takes, in wheel pixels: several screens to open, under one to close.
 const openEffort = () => clamp(window.innerHeight * 2.6, 1800, 2800);
@@ -67,6 +72,20 @@ export default function Curtain({ children }: { children: ReactNode }) {
     let mounted = false;
     let lifted = false;
     let post: Lenis | null = null;
+    let openedAt = 0;
+    let holding = 0; // the timer that ends the hold
+
+    const release = () => {
+      clearTimeout(holding);
+      holding = 0;
+      post?.start();
+      scroller.style.overflowY = "";
+    };
+    const hold = (now: number) => {
+      clearTimeout(holding);
+      const wait = Math.min(Math.max(openedAt + STILL_MS - now, QUIET_MS), openedAt + STILL_MAX_MS - now);
+      holding = window.setTimeout(release, Math.max(0, wait));
+    };
 
     const measure = () => {
       maxScroll = root.scrollHeight - window.innerHeight;
@@ -105,6 +124,7 @@ export default function Curtain({ children }: { children: ReactNode }) {
       if (next === "lowering") {
         // The post lets go of the scroll; the page takes it back once it has landed (closed()),
         // so a push that carries on past the threshold cannot scroll the page as it comes down.
+        release();
         post?.destroy();
         post = null;
         setOpen(false);
@@ -127,6 +147,10 @@ export default function Curtain({ children }: { children: ReactNode }) {
           overscroll: false,
         });
       }
+      openedAt = performance.now();
+      if (post) post.stop();
+      else scroller.style.overflowY = "hidden";
+      hold(openedAt);
       setOpen(true);
       edgeSince = 0;
       track();
@@ -200,6 +224,7 @@ export default function Curtain({ children }: { children: ReactNode }) {
       if (e.ctrlKey) return; // pinch to zoom
       const unit = e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? window.innerHeight : 1;
       const dy = clamp(e.deltaY * unit, -240, 240);
+      if (holding && phase === "open" && dy > 0) hold(performance.now());
       if (phase === "closed") push(dy > 0 ? dy : effort > 0 ? dy * 2 : 0);
       else if (phase === "open") push(dy < 0 ? -dy : effort > 0 ? -dy * 2 : 0);
     };
@@ -298,6 +323,8 @@ export default function Curtain({ children }: { children: ReactNode }) {
 
     return () => {
       cancelAnimationFrame(raf);
+      clearTimeout(holding);
+      scroller.style.overflowY = "";
       ro.disconnect();
       stopWatching();
       window.removeEventListener("wheel", onWheel);
