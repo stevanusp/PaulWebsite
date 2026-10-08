@@ -5,12 +5,14 @@
 // that runs on its own (the event feed, playback, the keys) lives in Story.tsx and adds to this.
 
 import { KEYSTATION } from "@/components/Keystation";
+import { VOICINGS } from "@/lib/loop";
+import { clamp, lerp, mix, rand, span, type Rect } from "@/lib/motion";
 
 export const VIEW_W = 1000;
 export const VIEW_H = 660;
 
 /** Where each caption begins, in progress. Six captions, six beats. */
-export const BEATS = [0, 0.16, 0.32, 0.48, 0.66, 0.84] as const;
+const BEATS = [0, 0.16, 0.32, 0.48, 0.66, 0.84] as const;
 
 export const stepAt = (p: number) => {
   let i = 0;
@@ -18,12 +20,10 @@ export const stepAt = (p: number) => {
   return i;
 };
 
-import { clamp, lerp, mix, rand, span, type Rect } from "@/lib/motion";
-
 // ---- The song, as it sits in the project: 116 bpm, 3/4, B major. The loop is six bars.
 
-export const BPM = 116;
-export const METER = 3;
+const BPM = 116;
+const METER = 3;
 export const BEAT_S = 60 / BPM;
 export const BAR_S = BEAT_S * METER;
 export const LOOP_BARS = 6;
@@ -32,11 +32,9 @@ export const LOOP_S = BAR_S * LOOP_BARS;
 export const STEPS = 6;
 export const STEP_S = BAR_S / STEPS;
 
-import { VOICINGS } from "@/lib/loop";
-
 export { VOICINGS, inKey } from "@/lib/loop";
 
-export type Note = { track: number; pitch: number; start: number; len: number };
+type Note = { track: number; pitch: number; start: number; len: number };
 
 // Xylophone: the chords broken into eighths. Bass: one note a bar. Violin: a falling line from
 // bar 2, holding the A from F#m7 across into B7, where it becomes the seventh.
@@ -97,14 +95,14 @@ const LANE_MUS = 102;
 const LANE_ROLL = 44;
 
 /** Each track's pitch range, for the small notes drawn inside its regions. */
-export const TRACKS = [
+const TRACKS = [
   { lo: 62, hi: 79 },
   { lo: 33, hi: 48 },
   { lo: 66, hi: 75 },
   { lo: 53, hi: 67 },
 ] as const;
 
-export const REGIONS = [
+const REGIONS = [
   { lane: 0, from: 0, to: 6 },
   { lane: 1, from: 0, to: 6 },
   { lane: 2, from: 1, to: 6 },
@@ -162,7 +160,7 @@ const SPIKE = Math.floor((ANOMALY_X - LANES_X) / HIST_W);
 
 // ---- One frame.
 
-export type Frame = {
+type Frame = {
   winScale: number;
   winX: number;
   winY: number;

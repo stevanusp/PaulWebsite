@@ -135,8 +135,10 @@ const deepen = (distance: number, full: number) => 1 - (1 - clamp(distance / ful
 
 // ---- One frame
 
-export type Dot = { x: number; y: number; r: number; o: number };
-export type Label = { text: "mind" | "body" | "heart"; x: number; y: number; o: number };
+/** A place and how much of it shows. */
+export type Pt = { x: number; y: number; o: number };
+export type Dot = Pt & { r: number };
+type Label = { text: "mind" | "body" | "heart"; x: number; y: number; o: number };
 
 export type Art = {
   night: number;
@@ -160,8 +162,8 @@ export type Art = {
   fireflies: Dot[];
   orb: Dot;
   loop: { o: number; draw: number };
-  birds: (Dot & { flap: number })[];
-  questions: Dot[];
+  birds: (Pt & { flap: number })[];
+  questions: Pt[];
   cloud: { x: number; y: number; s: number; o: number };
   rain: number;
   tears: Dot[];
@@ -171,7 +173,7 @@ export type Art = {
   breathing: boolean;
   cracks: { cx: number; cy: number; s: number; draw: number; gold: number; o: number };
   arms: { cx: number; cy: number; s: number; draw: number; o: number };
-  others: Dot[];
+  others: Pt[];
   halo: { cx: number; cy: number; o: number; s: number };
   grid: number;
   route: { draw: number; o: number };
@@ -626,14 +628,13 @@ export function art(p: number): Art {
       ? [0, 1].map((i) => ({
           x: 760 - fly * 620 + i * 46,
           y: 120 + i * 18 + Math.sin(fly * 12 + i) * 6,
-          r: 1,
           o: arc(fly),
           flap: Math.sin(fly * 70 + i * 2.1),
         }))
       : [];
   const questions = Array.from({ length: 4 }, (_, i) => {
     const t = lin(p, T("answers", 0.05 + i * 0.12), T("answers", 0.45 + i * 0.12));
-    return { x: mind.cx - 24 + i * 16 + Math.sin(t * 4 + i) * 4, y: mind.cy - 30 - t * 70, r: 1, o: arc(t) };
+    return { x: mind.cx - 24 + i * 16 + Math.sin(t * 4 + i) * 4, y: mind.cy - 30 - t * 70, o: arc(t) };
   });
 
   // ---- The sky: a morning sun, an arc across the day, a sunset; a night with a moon and stars;
@@ -767,8 +768,8 @@ export function art(p: number): Art {
     ]) *
     (1 - leave);
   const others = [
-    { x: 140 - 70 * leave, y: 330, r: 1, o: othersO },
-    { x: 660 + 70 * leave, y: 330, r: 1, o: othersO },
+    { x: 140 - 70 * leave, y: 330, o: othersO },
+    { x: 660 + 70 * leave, y: 330, o: othersO },
   ];
   const halo = {
     cx: heart.cx,

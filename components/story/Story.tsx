@@ -213,7 +213,7 @@ export default function Story() {
     <section ref={sectionRef} id="method" className={styles.story} aria-labelledby="method-title" data-step={step}>
       <div className={styles.sticky}>
         <div className={`container ${styles.layout}`}>
-          <div className={styles.text}>
+          <div>
             <h2 id="method-title" className={styles.title}>
               {method.title}
             </h2>

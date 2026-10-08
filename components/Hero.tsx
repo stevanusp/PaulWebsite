@@ -6,7 +6,7 @@ export default function Hero() {
   return (
     <section id="top" className={styles.hero} aria-labelledby="hero-title">
       <div className={`container ${styles.grid}`}>
-        <div className={styles.text}>
+        <div>
           <p className={styles.name}>{site.name}</p>
           <h1 id="hero-title" className={styles.title}>
             <span className="visually-hidden">{hero.title}</span>
