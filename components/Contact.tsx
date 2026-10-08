@@ -1,4 +1,4 @@
-import { contact, site } from "@/content/site";
+import { contact, site, ui } from "@/content/site";
 import CopyEmail from "./CopyEmail";
 import styles from "./Contact.module.css";
 
@@ -36,7 +36,7 @@ export default function Contact() {
               >
                 {contact.linkedin}
                 <External />
-                <span className="visually-hidden"> (opens in a new tab)</span>
+                <span className="visually-hidden"> {ui.newTab}</span>
               </a>
             </li>
             <li>

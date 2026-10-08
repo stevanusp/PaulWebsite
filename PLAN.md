@@ -71,7 +71,7 @@ All tokens live at the top of `app/globals.css`, written once with `light-dark()
 
 - bg `#fbfbfa` / `#0c0c0d`, surface (tiles) `#f1f1ef` / `#18181a`, surface-2 `#e7e7e4` / `#232326`.
 - ink `#1b1b1d` / `#f3f3f1`, muted `#66666c` / `#a2a2a8` (5.6:1 and 8.1:1 on bg), line `#e3e3e0` / `#29292c`.
-- alert `#b45309` / `#f2a23a`.
+- alert `#a94e07` / `#f2a23a` (light: 5.4:1 on bg and 4.9:1 on the gray cards, which is what the 404 badge and the pads' status sit on).
 - Display `clamp(3rem, 1rem + 6.4vw, 7.5rem)`, tracking -0.045em. H2 `clamp(2.25rem, 1.1rem + 3.6vw, 4.5rem)`, tracking -0.04em.
 - Radius: pills for buttons, 22 px pads, 30 px tiles, 34 px media, 12 px focus rings.
 - Shared global classes: `.pill`, `.pill-solid`, `.pill-quiet`, `.tile`, `.sheen`, `.fine`.
@@ -107,7 +107,11 @@ All tokens live at the top of `app/globals.css`, written once with `light-dark()
 
 ## 7. Security
 
-Unchanged: static export, per-page hash CSP from `scripts/csp.mjs` (the theme script is hashed like the others), no inline `style=""` or `on*=` in markup, security headers in `vercel.json`.
+Static export, per-page hash CSP from `scripts/csp.mjs` (the theme script is hashed like the others, and the JSON-LD block too), no inline `style=""` or `on*=` in markup, security headers in `vercel.json`.
+
+`vercel.json` sets `"buildCommand": "npm run build"`. Without it Vercel ran `next build` alone, `scripts/csp.mjs` never ran, and for a while the live HTML had no CSP meta tag at all (only the four header directives), although every local check passed. Found on 8 Oct 2026 when the live HTML was 499 bytes shorter than the local export, exactly the meta's length. After any change to the build or the deploy, check the live page: `curl -s https://aboutspm.vercel.app/ | grep -c Content-Security-Policy` must print 1.
+
+Forced colors (Windows High Contrast): backgrounds and shadows are dropped, so `.pill` and every `button` get a real 1px border there and nowhere else (`app/globals.css`).
 
 ## 8. Verified (6 Oct 2026)
 
@@ -118,11 +122,15 @@ Unchanged: static export, per-page hash CSP from `scripts/csp.mjs` (the theme sc
 - Pads: lone G flags amber, G after D#7 belongs, playing all six chords in order finds the loop; the Keystation drops on the first hit and follows each chord, in dev and in the production export, with zero CSP violations.
 - Share image `public/og.jpg` (1200 x 630, 86 KB) is wired into Open Graph and Twitter metadata.
 - The hidden post (7 Oct 2026): every moment at 1440x900 in light and dark and at 390x844, the reduced-motion column, and the curtain flow (nudge and relax, wheel, keys, Escape, touch), in dev and in the production export, with zero CSP violations and zero console errors. Scrolling through it holds 60 fps with no long animation frames (headless Chrome). The exported HTML has none of its words; they load in one lazy chunk (11 KB gzipped).
+- The "production export" checks above ran on the local export (`npm run build`, then `scripts/serve.mjs`), which has the CSP meta; see section 7 for what that missed.
+- The live site (8 Oct 2026, headless Chrome, cold cache): desktop FCP and LCP 0.28 s, CLS 0, no long tasks, about 290 KB in all (170 KB of it JS). A phone profile (390 px, 4x slower CPU, slow 4G): FCP 0.9 s, LCP 1.6 s, CLS 0, one 82 ms long task. Every asset, `robots.txt`, `sitemap.xml`, `security.txt` and the 404 page answer correctly; security headers are all present. Text contrast passes AA in both themes (amber on the gray cards was 4.44:1 and is now 4.9:1). Forced colors: the gradient titles stay readable; the pills lost their shape (fixed).
 - Not yet run for v4: Lighthouse, print, a live reduced-motion pass, Safari and Firefox.
 
 ## 9. Open items
 
 - The hidden post has only been seen in headless Chrome: look at it on a real phone and in Safari.
+- `public/.well-known/security.txt` expires on 29 Sep 2027. Renew its `Expires` line before then; an expired file is worse than none.
+- "Zero Trust" was dropped from the JSON-LD `knowsAbout` because nothing on the page says it. If it is a real strength, add a sentence to the page first, then put it back.
 
 - The photo is the 360 x 540 copy from chat. Replace `public/media/paulus-at-the-keys.jpg` with the original (at least 900 px wide) and update `hero.photo.width/height` in `content/site.ts`; it is slightly soft on large screens until then.
 

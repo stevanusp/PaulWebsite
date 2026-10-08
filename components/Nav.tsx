@@ -6,6 +6,7 @@ import ThemeToggle from "./ThemeToggle";
 import styles from "./Nav.module.css";
 
 const sections = nav.filter((item) => item.id !== "contact");
+const contactLink = nav.find((item) => item.id === "contact");
 
 export default function Nav() {
   const headerRef = useRef<HTMLElement>(null);
@@ -50,7 +51,7 @@ export default function Nav() {
   return (
     <>
       <a className={styles.skip} href="#main">
-        Skip to content
+        {ui.skip}
       </a>
       <header ref={headerRef} className={styles.header} data-scrolled="false">
         <nav className={styles.bar} aria-label="Primary">
@@ -77,7 +78,7 @@ export default function Nav() {
               href="#contact"
               aria-current={active === "contact" ? "true" : undefined}
             >
-              Contact
+              {contactLink?.label}
             </a>
           </div>
         </nav>
