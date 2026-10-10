@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Lenis from "lenis";
+import { curtain } from "@/content/site";
 import { LIVE_QUERY, clamp, ease } from "@/lib/motion";
 import { pageScroll } from "@/lib/smooth";
 import styles from "./Curtain.module.css";
@@ -29,8 +30,12 @@ const STILL_MS = 600;
 const QUIET_MS = 180;
 const STILL_MAX_MS = 1800;
 
-// How much pushing it takes, in wheel pixels: several screens to open, under one to close.
-const openEffort = () => clamp(window.innerHeight * 2.6, 1800, 2800);
+// How much pushing it takes, in wheel pixels: a screen and a half to open, under one to close.
+const openEffort = () => clamp(window.innerHeight * 1.5, 1000, 1700);
+// Which line of encouragement a given effort has earned (-1: none yet).
+// Pulled this far (the last line of encouragement), letting go opens it, like a feed that refreshes.
+const COMMIT = 0.78;
+const hintAt = (effort: number): number => (effort < 0.2 ? -1 : effort < 0.5 ? 0 : effort < 0.78 ? 1 : 2);
 const closeEffort = () => clamp(window.innerHeight * 0.8, 520, 800);
 // How far the page gives while it is being pushed, before it lets go.
 const give = () => clamp(window.innerHeight * 0.18, 90, 180);
@@ -46,6 +51,7 @@ export default function Curtain({ children }: { children: ReactNode }) {
   const underRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
+  const hintRef = useRef<HTMLParagraphElement>(null);
   const [armed, setArmed] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -97,7 +103,17 @@ export default function Curtain({ children }: { children: ReactNode }) {
       else if (!edgeSince) edgeSince = performance.now();
     };
 
+    let shownHint = -1;
     const paint = () => {
+      // Until the sheet is let go of, the room underneath shows only a line of encouragement, not the post.
+      scroller.style.visibility = phase === "closed" ? "hidden" : "";
+      const hint = hintRef.current;
+      if (hint) {
+        const at = phase === "closed" ? hintAt(effort) : -1;
+        if (at >= 0 && at !== shownHint) hint.textContent = curtain.hints[at] ?? "";
+        if (at >= 0) shownHint = at;
+        hint.style.opacity = at >= 0 ? "1" : "0";
+      }
       const full = window.innerHeight + SHADOW;
       if (calm.matches) {
         // No travel with reduced motion: the page fades as far as it would have moved.
@@ -173,7 +189,9 @@ export default function Curtain({ children }: { children: ReactNode }) {
       if (phase === "closed" || phase === "open") {
         if (effort >= 1) begin(phase === "closed" ? "lifting" : "lowering", now);
         else {
-          if (now - last > HOLD) {
+          if (phase === "closed" && effort >= COMMIT && now - last > HOLD) {
+            begin("lifting", now);
+          } else if (now - last > HOLD) {
             effort *= Math.exp(-dt / RELAX);
             if (effort < 0.002) effort = 0;
           }
@@ -253,6 +271,7 @@ export default function Curtain({ children }: { children: ReactNode }) {
       }
     };
     const stopWatching = () => {
+      last = 0; // a finger lifted counts as letting go right away
       if (!watching) return;
       watching = false;
       window.removeEventListener("touchmove", onTouchMove);
@@ -360,6 +379,7 @@ export default function Curtain({ children }: { children: ReactNode }) {
         <div ref={scrollerRef} className={styles.scroller} tabIndex={-1}>
           <div ref={innerRef}>{armed ? <HiddenPage scroller={scrollerRef} /> : null}</div>
         </div>
+        {armed ? <p ref={hintRef} className={styles.hint} aria-hidden="true" /> : null}
       </div>
     </>
   );
