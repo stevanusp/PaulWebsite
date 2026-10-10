@@ -30,12 +30,14 @@ const STILL_MS = 600;
 const QUIET_MS = 180;
 const STILL_MAX_MS = 1800;
 
-// How much pushing it takes, in wheel pixels: a screen and a half to open, under one to close.
-const openEffort = () => clamp(window.innerHeight * 1.5, 1000, 1700);
-// Which line of encouragement a given effort has earned (-1: none yet).
-// Pulled this far (the last line of encouragement), letting go opens it, like a feed that refreshes.
-const COMMIT = 0.78;
-const hintAt = (effort: number): number => (effort < 0.2 ? -1 : effort < 0.5 ? 0 : effort < 0.78 ? 1 : 2);
+// How much pushing one pull takes, in wheel pixels, and under one screen to close.
+const pullEffort = () => clamp(window.innerHeight * 0.6, 400, 700);
+// Opening is pull by pull, like a feed: each pull lifts the sheet a little and shows a line, and
+// letting go drops it again. A pull counts once it has gone this far (a nudge does not).
+const PULL_MIN = 0.45;
+const SHOWS_AT = 0.12; // effort at which the line of the pull appears
+const COMMIT = 0.78; // the pull after the last line: letting go from here opens it
+const FORGET_MS = 12000; // the count starts over after this long without a pull
 const closeEffort = () => clamp(window.innerHeight * 0.8, 520, 800);
 // How far the page gives while it is being pushed, before it lets go.
 const give = () => clamp(window.innerHeight * 0.18, 90, 180);
@@ -66,6 +68,10 @@ export default function Curtain({ children }: { children: ReactNode }) {
     const smooth = window.matchMedia(LIVE_QUERY);
 
     let phase: Phase = "closed";
+    let stage = 0; // pulls so far, each one showing its line (0 to the number of lines)
+    let peak = 0; // the furthest this pull went
+    let startStage = 0; // the count when this pull began: only a pull that begins after the last line opens it
+    let lastPull = 0;
     let effort = 0; // toward opening while closed, toward closing while open; 0 to 1
     let last = 0; // when the last push came
     let edgeSince = 0; // when the current edge was reached: the page's bottom, or the post's top
@@ -109,7 +115,7 @@ export default function Curtain({ children }: { children: ReactNode }) {
       scroller.style.visibility = phase === "closed" ? "hidden" : "";
       const hint = hintRef.current;
       if (hint) {
-        const at = phase === "closed" ? hintAt(effort) : -1;
+        const at = phase === "closed" && effort >= SHOWS_AT ? Math.min(startStage, curtain.hints.length - 1) : -1;
         if (at >= 0 && at !== shownHint) hint.textContent = curtain.hints[at] ?? "";
         if (at >= 0) shownHint = at;
         hint.style.opacity = at >= 0 ? "1" : "0";
@@ -189,9 +195,17 @@ export default function Curtain({ children }: { children: ReactNode }) {
       if (phase === "closed" || phase === "open") {
         if (effort >= 1) begin(phase === "closed" ? "lifting" : "lowering", now);
         else {
-          if (phase === "closed" && effort >= COMMIT && now - last > HOLD) {
+          if (phase === "closed" && startStage >= curtain.hints.length && effort >= COMMIT && now - last > HOLD) {
             begin("lifting", now);
           } else if (now - last > HOLD) {
+            // Let go: a pull that went far enough counts, and the sheet drops back.
+            if (phase === "closed" && peak > 0) {
+              if (peak >= PULL_MIN && stage < curtain.hints.length) {
+                stage++;
+                lastPull = now;
+              }
+              peak = 0;
+            }
             effort *= Math.exp(-dt / RELAX);
             if (effort < 0.002) effort = 0;
           }
@@ -224,6 +238,7 @@ export default function Curtain({ children }: { children: ReactNode }) {
     const push = (amount: number) => {
       if (!amount || (phase !== "closed" && phase !== "open")) return;
       const now = performance.now();
+      const fresh = now - last > HOLD; // the first push of a new pull
       if (amount > 0) {
         track();
         if (!edgeSince || now - edgeSince < SETTLE) return;
@@ -234,7 +249,12 @@ export default function Curtain({ children }: { children: ReactNode }) {
           setArmed(true);
         }
       }
-      effort = clamp(effort + amount / (phase === "closed" ? openEffort() : closeEffort()));
+      if (phase === "closed" && effort === 0 && stage > 0 && now - lastPull > FORGET_MS) stage = 0;
+      // Until every line has been shown, a pull stops just short of opening.
+      if (phase === "closed" && fresh && amount > 0) startStage = stage;
+      const cap = phase === "closed" && startStage < curtain.hints.length ? 0.95 : 1;
+      effort = Math.min(cap, clamp(effort + amount / (phase === "closed" ? pullEffort() : closeEffort())));
+      if (phase === "closed") peak = Math.max(peak, effort);
       kick();
     };
 
