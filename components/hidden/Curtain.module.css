@@ -26,6 +26,22 @@
   color: var(--ink);
 }
 
+.hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(10px, 2.5svh, 22px);
+  margin: 0;
+  padding-inline: var(--gutter);
+  text-align: center;
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+
 .scroller {
   position: absolute;
   inset: 0;

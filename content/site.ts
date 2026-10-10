@@ -22,6 +22,16 @@ export const nav = [
   { id: "contact", label: "Contact" },
 ] as const;
 
+// What the page says under itself while someone pushes past the end: the first, then more, then the last.
+// It is only ever put on screen after the first push, never in the HTML.
+export const curtain = {
+  hints: [
+    "Oh.. you were trying to do something",
+    "It's working. Try harder",
+    "Okay, one more scroll and you will unlock something",
+  ],
+} as const;
+
 export const ui = {
   toLight: "Switch to light mode",
   toDark: "Switch to dark mode",
