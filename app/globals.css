@@ -16,7 +16,7 @@
   --nav-bg: light-dark(rgba(251, 251, 250, 0.72), rgba(24, 24, 26, 0.66));
 
   /* the one accent: only for what does not belong */
-  --alert: light-dark(#b45309, #f2a23a); /* 4.9:1 and 9.4:1 on bg */
+  --alert: light-dark(#a94e07, #f2a23a); /* 5.4:1 on bg, 4.9:1 on surface; 9.4:1 on dark bg */
 
   /* the soft sheen on display titles */
   --sheen-top: light-dark(#1b1b1d, #f7f7f5);
@@ -291,6 +291,16 @@ main:focus {
   }
   body {
     transition: none;
+  }
+}
+
+/* Windows High Contrast and other forced-colors modes drop backgrounds and shadows, which leaves
+   buttons and pills looking like plain text. A real border keeps their shape; it is only here,
+   so nothing else changes size. The !important beats the borderless buttons in component styles. */
+@media (forced-colors: active) {
+  .pill,
+  button {
+    border: 1px solid ButtonText !important;
   }
 }
 

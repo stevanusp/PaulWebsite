@@ -25,6 +25,8 @@ export const nav = [
 export const ui = {
   toLight: "Switch to light mode",
   toDark: "Switch to dark mode",
+  skip: "Skip to content",
+  newTab: "(opens in a new tab)",
 } as const;
 
 export const hero = {

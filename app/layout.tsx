@@ -62,7 +62,6 @@ const personJsonLd = {
   sameAs: [site.linkedin],
   knowsAbout: [
     "Network access control",
-    "Zero Trust",
     "Secure web gateway",
     "Data loss prevention",
     "AI security",
