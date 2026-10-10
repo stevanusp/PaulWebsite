@@ -46,7 +46,7 @@ export const hero = {
   },
 } as const;
 
-export type Step = { title: string; body: string };
+type Step = { title: string; body: string };
 
 // The story under the hero: three beats at work, then the same habit at the piano.
 export const method = {

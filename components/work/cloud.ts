@@ -53,7 +53,7 @@ function camera(p: number) {
   return CAMERA[CAMERA.length - 1][1];
 }
 
-export type Frame = CloudFrame & { shift: number; ks: number };
+type Frame = CloudFrame & { shift: number; ks: number };
 
 export function scene(p: number): Frame {
   const merge = span(p, 0.4, 0.48);

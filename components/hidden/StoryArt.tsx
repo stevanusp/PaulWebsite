@@ -2,7 +2,7 @@ import { memo, type CSSProperties } from "react";
 import { BASE, BOX, CIRCLES } from "@/components/secure-cloud/geometry";
 import { hidden } from "@/content/hidden";
 import { rand } from "@/lib/motion";
-import { GROUND, LOOP, PLAN, VIEW, heartCaps, type Art, type Cap, type Dot, type HeartShape } from "./art";
+import { GROUND, LOOP, PLAN, VIEW, heartCaps, type Art, type Cap, type Dot, type HeartShape, type Pt } from "./art";
 import styles from "./HiddenPage.module.css";
 
 const f1 = (n: number) => n.toFixed(1);
@@ -114,7 +114,7 @@ const teardrop = ({ x, y, r }: Dot) =>
   `M${f1(x)} ${f1(y - 2.2 * r)}Q${f1(x + 1.1 * r)} ${f1(y - 0.6 * r)} ${f1(x + r)} ${f1(y + 0.1 * r)}` +
   `A${r} ${r} 0 0 1 ${f1(x - r)} ${f1(y + 0.1 * r)}Q${f1(x - 1.1 * r)} ${f1(y - 0.6 * r)} ${f1(x)} ${f1(y - 2.2 * r)}Z`;
 
-const bird = ({ x, y, flap }: Dot & { flap: number }) => {
+const bird = ({ x, y, flap }: Pt & { flap: number }) => {
   const tip = f1(y - 4 + flap * 5);
   return `M${f1(x - 10)} ${tip}Q${f1(x - 5)} ${f1(y - 2)} ${f1(x)} ${f1(y + 1)}Q${f1(x + 5)} ${f1(y - 2)} ${f1(x + 10)} ${tip}`;
 };

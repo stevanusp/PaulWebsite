@@ -22,7 +22,7 @@ const WW = (KEYS_X1 - KEYS_X0) / WHITES.length;
 const whiteX = new Map(WHITES.map((m, i) => [m, KEYS_X0 + i * WW]));
 
 /** The keys' rectangles in the drawing's own 1000 x 228 box, white then black, low to high. */
-export type KeyRect = { midi: number; x: number; y: number; w: number; h: number; r: number };
+type KeyRect = { midi: number; x: number; y: number; w: number; h: number; r: number };
 export function keyRects(): { whites: KeyRect[]; blacks: KeyRect[] } {
   const whites = WHITES.map((m) => ({ midi: m, x: (whiteX.get(m) ?? 0) + 0.75, y: KEYS_Y - 4, w: WW - 1.5, h: WHITE_LEN, r: 4 }));
   const blacks: KeyRect[] = [];
