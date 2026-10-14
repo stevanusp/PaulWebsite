@@ -183,6 +183,9 @@ export default function Curtain({ children }: { children: ReactNode }) {
     const closed = () => {
       phase = "closed";
       y = 0;
+      stage = 0; // a sheet laid back down starts the pulls over
+      startStage = 0;
+      peak = 0;
       scroller.scrollTop = 0;
       delete root.dataset.curtain;
       pageScroll()?.start();

@@ -5,6 +5,7 @@ import {
   useEffect,
   useRef,
   useState,
+  memo,
   useSyncExternalStore,
   type CSSProperties,
   type RefObject,
@@ -39,7 +40,7 @@ const RISE = 14;
 const LAST = BEATS.length - 1;
 
 /** For the calm version: after these moments, the drawing as it stands there. */
-const STILLS: Partial<Record<string, Art>> = Object.fromEntries(
+const STILL_AT: Record<string, number> = Object.fromEntries(
   (
     [
       ["glad", 0.5],
@@ -53,8 +54,14 @@ const STILLS: Partial<Record<string, Art>> = Object.fromEntries(
       ["love", 0.6],
       ["end", 0.92],
     ] as const
-  ).map(([id, f]) => [id, art(T(id, f))]),
+  ) as readonly (readonly [string, number])[],
 );
+// Worked out the first time the calm version needs them, not when this file loads.
+let stills: Partial<Record<string, Art>> | undefined;
+const stillOf = (id: string): Art | undefined => {
+  stills ??= Object.fromEntries(Object.entries(STILL_AT).map(([k, f]) => [k, art(T(k, f))]));
+  return stills[id];
+};
 
 // The page behind the page (Curtain.tsx): one long post, told as a story. The drawing and the words
 // hold still while the reader scrolls, and scrolling moves the story along, one line at a time.
@@ -117,7 +124,12 @@ function Live({ scroller, narrow }: Props & { narrow: boolean }) {
         </div>
         <div className={styles.words}>
           {BEATS.map((b, i) => (
-            <Beat key={b.id} b={b} i={i} p={p} />
+            <Beat
+              key={b.id}
+              b={b}
+              leave={leaving(b, i, p)}
+              enter={b.lines.map((_, j) => entering(b, i, j, p)).join(",")}
+            />
           ))}
         </div>
       </div>
@@ -125,23 +137,28 @@ function Live({ scroller, narrow }: Props & { narrow: boolean }) {
   );
 }
 
+/** How far a line has come in, 0 to 1: the same number every frame until it is within reach. */
+const entering = (b: Timed, i: number, j: number, p: number) =>
+  i === 0 && j === 0 ? 1 : clamp((p - (b.a + ((b.b - b.a) * j) / b.lines.length)) / FADE);
+const leaving = (b: Timed, i: number, p: number) => (i === LAST ? 1 : clamp((b.b - p) / FADE));
+
 /** One moment of the story: it rises in, holds, and lifts away as the next comes. A stanza's
-    lines arrive one by one, and leave together. */
-function Beat({ b, i, p }: { b: Timed; i: number; p: number }) {
-  const leave = i === LAST ? 1 : clamp((b.b - p) / FADE);
-  const n = b.lines.length;
+    lines arrive one by one, and leave together. It only draws again when what it shows changes,
+    so the many moments out of reach cost nothing as the reader scrolls. */
+const Beat = memo(function Beat({ b, leave, enter }: { b: Timed; leave: number; enter: string }) {
+  const enters = enter.split(",").map(Number);
   return (
     <p
       className={cls(styles.beat, b.size && styles[b.size])}
       style={leave < 1 ? { opacity: leave, transform: `translateY(${(-(1 - leave) * RISE).toFixed(1)}px)` } : undefined}
     >
       {b.lines.map((line, j) => {
-        const enter = i === 0 && j === 0 ? 1 : clamp((p - (b.a + ((b.b - b.a) * j) / n)) / FADE);
+        const e = enters[j] ?? 1;
         return (
           <span
             key={j}
             className={styles.line}
-            style={enter < 1 ? { opacity: enter, transform: `translateY(${((1 - enter) * RISE).toFixed(1)}px)` } : undefined}
+            style={e < 1 ? { opacity: e, transform: `translateY(${((1 - e) * RISE).toFixed(1)}px)` } : undefined}
           >
             {line}
           </span>
@@ -149,14 +166,14 @@ function Beat({ b, i, p }: { b: Timed; i: number; p: number }) {
       })}
     </p>
   );
-}
+});
 
 function Calm({ narrow }: { narrow: boolean }) {
   return (
     <article className={cls(styles.post, styles.calm)}>
       <p className="visually-hidden">{hidden.description}</p>
       {BEATS.map((b) => {
-        const still = STILLS[b.id];
+        const still = stillOf(b.id);
         return (
           <Fragment key={b.id}>
             <p className={cls(styles.beat, b.size && styles[b.size])}>
